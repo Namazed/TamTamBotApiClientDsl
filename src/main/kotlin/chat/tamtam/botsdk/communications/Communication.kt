@@ -1,4 +1,4 @@
-package chat.tamtam.botsdk
+package chat.tamtam.botsdk.communications
 
 import chat.tamtam.botsdk.scopes.BotScope
 

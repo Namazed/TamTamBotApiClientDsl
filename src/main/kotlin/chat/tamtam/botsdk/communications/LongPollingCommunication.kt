@@ -1,5 +1,6 @@
-package chat.tamtam.botsdk
+package chat.tamtam.botsdk.communications
 
+import chat.tamtam.botsdk.UpdateParsing
 import chat.tamtam.botsdk.client.BotHttpManager
 import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.scopes.BotScope

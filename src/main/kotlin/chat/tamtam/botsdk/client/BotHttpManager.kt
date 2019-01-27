@@ -6,10 +6,6 @@ import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.model.response.Updates
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
-import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.AnswerCallback as ResponseAnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.json.JsonFeature
@@ -19,6 +15,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.URL
+import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
+import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
+import chat.tamtam.botsdk.model.response.AnswerCallback as ResponseAnswerCallback
+import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 class BotHttpManager(
     private val botApiEndpoint: String,
@@ -44,11 +44,12 @@ class BotHttpManager(
         body = sendMessage
     }
 
-    suspend fun sendMessage(chatId: ChatId) = httpClient.post<ResponseSendMessage> {
+    suspend fun sendMessage(chatId: ChatId, sendMessage: RequestSendMessage) = httpClient.post<ResponseSendMessage> {
         url(URL("$botApiEndpoint/messages"))
         parameter("access_token", botToken)
         parameter("chat_id", chatId.id)
         contentType(ContentType.parse("application/json"))
+        body = sendMessage
     }
 
     suspend fun editMessage(messageId: MessageId, sendMessage: RequestSendMessage) =
