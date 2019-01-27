@@ -1,6 +1,5 @@
 package chat.tamtam.botsdk.scopes
 
-import chat.tamtam.botsdk.BotMarker
 import chat.tamtam.botsdk.client.BotHttpManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -9,9 +8,9 @@ import org.slf4j.LoggerFactory
 class BotScope(
     internal val botHttpManager: BotHttpManager,
     private val log: Logger = LoggerFactory.getLogger(BotScope::class.java.name),
-    private val commandScope: CommandsScope = CommandsScope(),
-    private val callbacksScope: CallbacksScope = CallbacksScope(),
-    private val messagesScope: MessagesScope = MessagesScope()
+    internal val commandScope: CommandsScope = CommandsScope(botHttpManager),
+    internal val callbacksScope: CallbacksScope = CallbacksScope(botHttpManager),
+    internal val messagesScope: MessagesScope = MessagesScope(botHttpManager)
 ) {
 
     fun commands(init: CommandsScope.() -> Unit) {
@@ -30,8 +29,7 @@ class BotScope(
     }
 
     @Deprecated(level = DeprecationLevel.ERROR,
-        message = "LongPolling can't be nested.")
+        message = "LongPolling communication can't be nested.")
     fun longPolling(botToken: String, init: () -> Unit = {}) {
-
     }
 }

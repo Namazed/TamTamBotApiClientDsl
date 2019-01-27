@@ -9,11 +9,11 @@ class Command(
     val update: Update = Update(-1, "")
 )
 
-fun String.toCommand() = Command(this)
+fun String.toCommand(update: Update) = Command(this, update)
 
 fun String.isCommand(): Boolean = this.startsWith('/') && findCommand(this, BOTS_COMMAND_PATTERN)
 
-fun findCommand(text: String, commandRegex: Regex): Boolean {
+private fun findCommand(text: String, commandRegex: Regex): Boolean {
     commandRegex.findAll(text).map {commandResult: MatchResult ->
         if (commandResult.groups.size == 1) {
             return@map true
