@@ -1,7 +1,12 @@
 package chat.tamtam.botsdk
 
+import chat.tamtam.botsdk.model.Payload
+import chat.tamtam.botsdk.model.isCommand
 import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.Updates
+import chat.tamtam.botsdk.model.response.isNotEmptyCallback
+import chat.tamtam.botsdk.model.response.isNotEmptyMessage
+import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,10 +28,24 @@ class UpdateParsing(
         updatesProcessing(updates)
     }
 
-    private fun updatesProcessing(updates: Updates) {
+    private suspend fun updatesProcessing(updates: Updates) {
         updates.listUpdates.forEach { update: Update ->
-            when {
+            process(update)
+        }
+    }
 
+    private suspend fun process(update: Update) {
+        when {
+            isNotEmptyMessage(update.message) && update.message.messageInfo.text.isCommand() -> {
+                val command = update.message.messageInfo.text.toCommand(update)
+                botScope.commandScope[command.name](command)
+            }
+            isNotEmptyMessage(update.message) -> {
+                botScope.messagesScope.getAnswer()(update.message)
+            }
+            isNotEmptyCallback(update.callback) -> {
+                val callback = update.callback
+                botScope.callbacksScope[Payload(callback.payload)](callback)
             }
         }
     }
