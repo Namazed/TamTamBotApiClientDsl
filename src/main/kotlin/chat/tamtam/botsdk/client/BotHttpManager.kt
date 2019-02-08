@@ -4,20 +4,26 @@ import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.response.BotInfo
-import chat.tamtam.botsdk.model.response.Updates
+import chat.tamtam.botsdk.model.request.Action
+import chat.tamtam.botsdk.model.request.UploadType
+import chat.tamtam.botsdk.model.response.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.content.PartData
 import io.ktor.http.contentType
+import kotlinx.io.streams.asInput
 import okhttp3.logging.HttpLoggingInterceptor
+import java.io.File
 import java.net.URL
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.AnswerCallback as ResponseAnswerCallback
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 class BotHttpManager(
@@ -34,6 +40,29 @@ class BotHttpManager(
     suspend fun getUpdates() = httpClient.get<Updates> {
         url(URL("$botApiEndpoint/updates"))
         parameter("access_token", botToken)
+    }
+
+    suspend fun getAllChats(count: Int = 50, marker: Long? = null) = httpClient.get<ChatsResult> {
+        url(URL("$botApiEndpoint/chats"))
+        parameter("access_token", botToken)
+        parameter("count", count)
+        parameter("marker", marker)
+    }
+
+    suspend fun getAllMessages(chatId: ChatId, fromTime: Long, toTime: Long, count: Int = 50) = httpClient.get<List<Message>> {
+        url(URL("$botApiEndpoint/chats"))
+        parameter("access_token", botToken)
+        parameter("chat_id", chatId.id)
+        parameter("from", fromTime)
+        parameter("to", toTime)
+        parameter("count", count)
+    }
+
+    suspend fun sendAction(chatId: ChatId, action: Action) = httpClient.post<Default> {
+        url(URL("$botApiEndpoint/chats/${chatId.id}/actions"))
+        parameter("access_token", botToken)
+        parameter("chat_id", chatId.id)
+        parameter("action", action.name.toLowerCase())
     }
 
     suspend fun sendMessage(userId: UserId, sendMessage: RequestSendMessage) = httpClient.post<ResponseSendMessage> {
@@ -53,7 +82,7 @@ class BotHttpManager(
     }
 
     suspend fun editMessage(messageId: MessageId, sendMessage: RequestSendMessage) =
-        httpClient.put<ResponseAnswerCallback> {
+        httpClient.put<Default> {
             url(URL("$botApiEndpoint/messages"))
             parameter("access_token", botToken)
             parameter("message_id", messageId.id)
@@ -62,13 +91,28 @@ class BotHttpManager(
         }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback) =
-        httpClient.post<ResponseAnswerCallback> {
+        httpClient.post<Default> {
             url(URL("$botApiEndpoint/answers"))
             parameter("access_token", botToken)
             parameter("callback_id", callbackId.id)
             contentType(ContentType.parse("application/json"))
             body = answerCallback
         }
+
+    suspend fun uploadUrl(uploadType: UploadType) = httpClient.post<Upload> {
+        url(URL("$botApiEndpoint/uploads"))
+        parameter("access_token", botToken)
+        parameter("type", uploadType.type)
+    }
+
+    suspend fun upload(url: String, filePath: String) = httpClient.post<String> {
+        url(URL(url))
+        body = MultiPartFormDataContent(formData {
+            PartData.FileItem({
+                File("/2").inputStream().asInput()
+            }, {}, Headers.Empty)
+        })
+    }
 
 }
 

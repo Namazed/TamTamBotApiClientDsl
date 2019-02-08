@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class AnswerCallback(
     @SerialName("user_id") val userId: Long,
-    val message: SendMessage,
+    val message: SendMessage? = null,
     @Optional val notification: String? = null
 )
