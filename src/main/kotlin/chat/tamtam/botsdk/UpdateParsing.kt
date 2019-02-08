@@ -8,11 +8,18 @@ import chat.tamtam.botsdk.model.response.isNotEmptyCallback
 import chat.tamtam.botsdk.model.response.isNotEmptyMessage
 import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExecutorCoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
 
 class UpdateParsing(
     private val botScope: BotScope,
+    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()).asCoroutineDispatcher(),
+    private val parallelScope: CoroutineScope = CoroutineScope(context),
     private val log: Logger = LoggerFactory.getLogger(UpdateParsing::class.java.name)
 ) {
 
@@ -29,7 +36,7 @@ class UpdateParsing(
     }
 
     private suspend fun updatesProcessing(updates: Updates) {
-        updates.listUpdates.forEach { update: Update ->
+        updates.listUpdates.forEachParallel { update: Update ->
             process(update)
         }
     }
@@ -49,4 +56,7 @@ class UpdateParsing(
             }
         }
     }
+
+    private suspend fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit =
+        map { parallelScope.async { f(it) } }.forEach { it.await() }
 }
