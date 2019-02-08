@@ -15,17 +15,17 @@ class BotScope(
 
     fun commands(init: CommandsScope.() -> Unit) {
         log.info("commands: init")
-        init(commandScope)
+        commandScope.init()
     }
 
     fun callbacks(init: CallbacksScope.() -> Unit) {
         log.info("callbacks: init")
-        init(callbacksScope)
+        callbacksScope.init()
     }
 
     fun messages(init: MessagesScope.() -> Unit) {
         log.info("messages: init")
-        init(messagesScope)
+        messagesScope.init()
     }
 
     @Deprecated(level = DeprecationLevel.ERROR,

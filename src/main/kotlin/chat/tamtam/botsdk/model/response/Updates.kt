@@ -15,9 +15,6 @@ class Update(
     val updateType: String,
     val messageId: String = "",
     @Optional val message: Message = EMPTY_MESSAGE,
-    @Optional val callback: Callback = EMPTY_CALLBACK
+    @Optional val callback: Callback = EMPTY_CALLBACK,
+    val marker: Long
 )
-
-//sealed class UpdateState() {
-//    class MessageCreatedState(message: Message)
-//}

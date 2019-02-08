@@ -16,15 +16,32 @@ class Message(
 
 @Serializable
 class MessageInfo(
-    val mid: String = "",
-    val seq: Long = -1,
+    @SerialName("mid") val messageId: String = "",
+    @SerialName("seq") val sequenceIdInChat: Long = -1,
+    @Optional val attachments: List<Attachment> = emptyList(),
     val text: String = ""
 )
 
 @Serializable
+class Link(
+    val type: String,
+    val message: Message
+)
+
+@Serializable
 class Recipient(
-    @Optional val chatId: Long = -1,
-    @Optional val userId: Long = -1
+    @Optional val chatId: Long = -1
 )
 
 fun isNotEmptyMessage(message: Message?) = message != null && message.timestamp != -1L
+
+enum class LinkType(val type: String) {
+    FORWARD("FORWARD"),
+    REPLY("REPLY")
+}
+
+fun linkTypeFrom(value: String) = when (value.toUpperCase()) {
+    "FORWARD" -> AttachType.IMAGE
+    "REPLY" -> AttachType.VIDEO
+    else -> throw IllegalArgumentException("Unknown type")
+}

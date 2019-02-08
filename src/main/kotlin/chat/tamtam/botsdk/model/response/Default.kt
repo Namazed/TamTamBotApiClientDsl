@@ -3,6 +3,6 @@ package chat.tamtam.botsdk.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AnswerCallback(
+class Default(
     val success: Boolean
 )
