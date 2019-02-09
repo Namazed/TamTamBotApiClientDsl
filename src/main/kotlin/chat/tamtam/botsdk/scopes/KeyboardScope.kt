@@ -18,6 +18,10 @@ class KeyboardScope(
         buttons += this
     }
 
+    infix fun KeyboardScope.add(buttonsInRow: List<Button>) {
+        buttons += buttonsInRow
+    }
+
     //todo необходимо сделать internal package, для этого скорее всего нужно будет перенести keyboard метод в каждый scope
     fun create() = buttons
 

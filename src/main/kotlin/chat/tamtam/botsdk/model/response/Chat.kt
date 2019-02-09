@@ -14,10 +14,11 @@ class Chat(
     @Optional val participants: List<Any> = emptyList()
 )
 
-enum class ChatType {
-    DIALOG,
-    CHAT,
-    CHANNEL
+enum class ChatType(val type: String) {
+    DIALOG("dialog"),
+    CHAT("chat"),
+    CHANNEL("channel"),
+    UNKNOWN("unknown")
 }
 
 enum class Status {

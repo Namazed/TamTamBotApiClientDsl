@@ -30,7 +30,8 @@ class Link(
 
 @Serializable
 class Recipient(
-    @Optional val chatId: Long = -1
+    @Optional val chatId: Long = -1,
+    val chatType: ChatType = ChatType.UNKNOWN
 )
 
 fun isNotEmptyMessage(message: Message?) = message != null && message.timestamp != -1L
