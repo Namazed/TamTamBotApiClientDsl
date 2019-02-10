@@ -1,6 +1,6 @@
 package chat.tamtam.botsdk.communications
 
-import chat.tamtam.botsdk.UpdateParsing
+import chat.tamtam.botsdk.UpdatesHandler
 import chat.tamtam.botsdk.client.BotHttpManager
 import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.scopes.BotScope
@@ -16,7 +16,7 @@ class LongPollingCommunication(
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
     override fun start(botScope: BotScope) {
-        val updateParsing = UpdateParsing(botScope)
+        val updateParsing = UpdatesHandler(botScope)
         GlobalScope.launch {
             while (this.isActive) {
                 updateParsing.run()

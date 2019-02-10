@@ -16,11 +16,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
-class UpdateParsing(
+class UpdatesHandler(
     private val botScope: BotScope,
     private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()).asCoroutineDispatcher(),
     private val parallelScope: CoroutineScope = CoroutineScope(context),
-    private val log: Logger = LoggerFactory.getLogger(UpdateParsing::class.java.name)
+    private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
 
     suspend fun run() {
@@ -32,10 +32,10 @@ class UpdateParsing(
             return
         }
 
-        updatesProcessing(updates)
+        processUpdates(updates)
     }
 
-    private suspend fun updatesProcessing(updates: Updates) {
+    private suspend fun processUpdates(updates: Updates) {
         updates.listUpdates.forEachParallel { update: Update ->
             process(update)
         }
