@@ -33,7 +33,8 @@ class BotHttpManager(
     internal val botToken: String,
     private val httpClient: HttpClient = initHttpClient(),
     internal val chatApi: ChatApi = ChatApi("$botApiEndpoint/chats", botToken, httpClient),
-    internal val messageApi: MessageApi = MessageApi("$botApiEndpoint/messages", botToken, httpClient)
+    internal val messageApi: MessageApi = MessageApi("$botApiEndpoint/messages", botToken, httpClient),
+    internal val subscriptionApi: SubscriptionApi = SubscriptionApi("$botApiEndpoint/subscriptions", botToken, httpClient)
 ) {
 
     suspend fun getBotInfo() = httpClient.get<BotInfo> {
