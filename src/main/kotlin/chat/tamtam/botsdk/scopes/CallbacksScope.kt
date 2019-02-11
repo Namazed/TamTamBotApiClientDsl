@@ -34,11 +34,11 @@ class CallbacksScope(
     }
 
     private suspend fun send(userId: UserId, sendMessage: RequestSendMessage) {
-        botHttpManager.sendMessage(userId, sendMessage)
+        botHttpManager.messageApi.sendMessage(userId, sendMessage)
     }
 
     suspend infix fun Callback.send(sendMessage: RequestSendMessage) {
-        botHttpManager.sendMessage(UserId(this.user.userId), sendMessage)
+        botHttpManager.messageApi.sendMessage(UserId(this.user.userId), sendMessage)
     }
 
     infix fun Callback.createText(text: String) : Triple<CallbackId, UserId, RequestSendMessage> {

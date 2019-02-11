@@ -1,19 +1,21 @@
 package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.model.CallbackId
-import chat.tamtam.botsdk.model.ChatId
-import chat.tamtam.botsdk.model.MessageId
-import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.request.Action
 import chat.tamtam.botsdk.model.request.UploadType
-import chat.tamtam.botsdk.model.response.*
+import chat.tamtam.botsdk.model.response.BotInfo
+import chat.tamtam.botsdk.model.response.Default
+import chat.tamtam.botsdk.model.response.Updates
+import chat.tamtam.botsdk.model.response.Upload
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.content.PartData
@@ -29,7 +31,9 @@ import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 class BotHttpManager(
     private val botApiEndpoint: String,
     internal val botToken: String,
-    private val httpClient: HttpClient = initHttpClient()
+    private val httpClient: HttpClient = initHttpClient(),
+    internal val chatApi: ChatApi = ChatApi("$botApiEndpoint/chats", botToken, httpClient),
+    internal val messageApi: MessageApi = MessageApi("$botApiEndpoint/messages", botToken, httpClient)
 ) {
 
     suspend fun getBotInfo() = httpClient.get<BotInfo> {
@@ -41,54 +45,6 @@ class BotHttpManager(
         url(URL("$botApiEndpoint/updates"))
         parameter("access_token", botToken)
     }
-
-    suspend fun getAllChats(count: Int = 50, marker: Long? = null) = httpClient.get<ChatsResult> {
-        url(URL("$botApiEndpoint/chats"))
-        parameter("access_token", botToken)
-        parameter("count", count)
-        parameter("marker", marker)
-    }
-
-    suspend fun getAllMessages(chatId: ChatId, fromTime: Long, toTime: Long, count: Int = 50) = httpClient.get<List<Message>> {
-        url(URL("$botApiEndpoint/chats"))
-        parameter("access_token", botToken)
-        parameter("chat_id", chatId.id)
-        parameter("from", fromTime)
-        parameter("to", toTime)
-        parameter("count", count)
-    }
-
-    suspend fun sendAction(chatId: ChatId, action: Action) = httpClient.post<Default> {
-        url(URL("$botApiEndpoint/chats/${chatId.id}/actions"))
-        parameter("access_token", botToken)
-        parameter("chat_id", chatId.id)
-        parameter("action", action.name.toLowerCase())
-    }
-
-    suspend fun sendMessage(userId: UserId, sendMessage: RequestSendMessage) = httpClient.post<ResponseSendMessage> {
-        url(URL("$botApiEndpoint/messages"))
-        parameter("access_token", botToken)
-        parameter("user_id", userId.id)
-        contentType(ContentType.parse("application/json"))
-        body = sendMessage
-    }
-
-    suspend fun sendMessage(chatId: ChatId, sendMessage: RequestSendMessage) = httpClient.post<ResponseSendMessage> {
-        url(URL("$botApiEndpoint/messages"))
-        parameter("access_token", botToken)
-        parameter("chat_id", chatId.id)
-        contentType(ContentType.parse("application/json"))
-        body = sendMessage
-    }
-
-    suspend fun editMessage(messageId: MessageId, sendMessage: RequestSendMessage) =
-        httpClient.put<Default> {
-            url(URL("$botApiEndpoint/messages"))
-            parameter("access_token", botToken)
-            parameter("message_id", messageId.id)
-            contentType(ContentType.parse("application/json"))
-            body = sendMessage
-        }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback) =
         httpClient.post<Default> {
@@ -109,7 +65,7 @@ class BotHttpManager(
         url(URL(url))
         body = MultiPartFormDataContent(formData {
             PartData.FileItem({
-                File("/2").inputStream().asInput()
+                File(filePath).inputStream().asInput()
             }, {}, Headers.Empty)
         })
     }

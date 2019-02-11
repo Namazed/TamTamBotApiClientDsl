@@ -20,7 +20,7 @@ class MessagesScope(
     internal fun getAnswer() = messagesAnswer
 
     suspend infix fun Message.send(sendMessage: SendMessage) {
-        botHttpManager.sendMessage(ChatId(this.recipient.chatId), sendMessage)
+        botHttpManager.messageApi.sendMessage(ChatId(this.recipient.chatId), sendMessage)
     }
 
     suspend infix fun Message.sendWithTyping(sendMessage: SendMessage) {

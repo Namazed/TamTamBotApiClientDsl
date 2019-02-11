@@ -13,10 +13,10 @@ class TypingController(
 ) {
 
     suspend fun startTyping(chatId: ChatId) {
-        botHttpManager.sendAction(chatId, Action.TYPING_ON)
+        botHttpManager.chatApi.sendAction(chatId, Action.TYPING_ON)
     }
 
     suspend fun stopTyping(chatId: ChatId) {
-        botHttpManager.sendAction(chatId, Action.TYPING_OFF)
+        botHttpManager.chatApi.sendAction(chatId, Action.TYPING_OFF)
     }
 }

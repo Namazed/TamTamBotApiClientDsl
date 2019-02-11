@@ -2,7 +2,7 @@ package chat.tamtam.botsdk.model.response
 
 import kotlinx.serialization.Optional
 
-class ChatMembers(
+class ChatMembersResult(
     val members: List<ChatMember>,
     @Optional val marker: Long = -1L
 )
