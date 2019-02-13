@@ -18,7 +18,7 @@ import java.util.concurrent.Executors
 
 class UpdatesHandler(
     private val botScope: BotScope,
-    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()).asCoroutineDispatcher(),
+    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(getAvailableThread()).asCoroutineDispatcher(),
     private val parallelScope: CoroutineScope = CoroutineScope(context),
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
@@ -59,4 +59,12 @@ class UpdatesHandler(
 
     private suspend fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit =
         map { parallelScope.async { f(it) } }.forEach { it.await() }
+}
+
+private fun getAvailableThread(): Int {
+    val availableProcessors = Runtime.getRuntime().availableProcessors()
+    return when {
+        availableProcessors > 2 -> availableProcessors - 1
+        else -> availableProcessors
+    }
 }
