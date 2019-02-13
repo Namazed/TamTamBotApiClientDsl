@@ -18,7 +18,7 @@ class LongPollingCommunication(
     override fun start(botScope: BotScope) {
         val updateParsing = UpdatesHandler(botScope)
         GlobalScope.launch {
-            while (this.isActive) {
+            while (isActive) {
                 updateParsing.run()
             }
         }
