@@ -11,7 +11,7 @@ class Chat(
     val lastEventTime: Long,
     val participantsCount: Int,
     @Optional val ownerId: Long = -1,
-    @Optional val participants: List<ChatMember> = emptyList()
+    @Optional val participants: Map<Long, Long> = emptyMap()
 )
 
 enum class ChatType(val type: String) {
