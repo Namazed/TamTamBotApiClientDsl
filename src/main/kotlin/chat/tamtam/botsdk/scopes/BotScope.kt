@@ -18,7 +18,7 @@ class BotScope(
     internal val commandScope: CommandsScope = CommandsScope(requests),
     internal val callbacksScope: CallbacksScope = CallbacksScope(requests),
     internal val messagesScope: MessagesScope = MessagesScope(requests),
-    internal val userScope: UserScope = UserScope(botHttpManager)
+    internal val userScope: UserScope = UserScope(requests)
 ) {
 
     internal var answerOnStart: suspend (StartedBotState) -> Unit = {}

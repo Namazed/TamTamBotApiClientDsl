@@ -56,7 +56,7 @@ class BotHttpManager(
             body = answerCallback
         }
 
-    suspend fun uploadUrl(uploadType: UploadType) = httpClient.post<Upload> {
+    suspend fun getUploadUrl(uploadType: UploadType) = httpClient.post<Upload> {
         url(URL("$botApiEndpoint/uploads"))
         parameter("access_token", botToken)
         parameter("type", uploadType.type)

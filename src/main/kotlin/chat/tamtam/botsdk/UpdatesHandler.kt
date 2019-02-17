@@ -33,6 +33,9 @@ class UpdatesHandler(
     }
 
     private suspend fun processUpdates(updates: Updates) {
+        if (updates.listUpdates.isEmpty()) {
+            return
+        }
         updates.listUpdates.forEachParallel { update: Update ->
             process(update)
         }

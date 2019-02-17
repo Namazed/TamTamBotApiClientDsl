@@ -1,11 +1,12 @@
-package chat.tamtam.botsdk.scopes
+package chat.tamtam.botsdk.keyboard
 
 import chat.tamtam.botsdk.model.Button
 import chat.tamtam.botsdk.model.request.InlineKeyboard
+import chat.tamtam.botsdk.scopes.BotMarker
 
 @BotMarker
-class KeyboardScope(
-    internal val buttons: MutableList<List<Button>> = mutableListOf()
+class KeyboardFactory(
+    private val buttons: MutableList<List<Button>> = mutableListOf()
 ) {
 
     fun buttonRow(initRow: ButtonsRow.() -> Unit): List<Button> {
@@ -18,7 +19,7 @@ class KeyboardScope(
         buttons += this
     }
 
-    infix fun KeyboardScope.add(buttonsInRow: List<Button>) {
+    infix fun KeyboardFactory.add(buttonsInRow: List<Button>) {
         buttons += buttonsInRow
     }
 
@@ -27,8 +28,8 @@ class KeyboardScope(
 
 }
 
-inline fun keyboard(init: KeyboardScope.() -> Unit): InlineKeyboard {
-    val keyboardScope = KeyboardScope()
-    keyboardScope.init()
-    return InlineKeyboard(keyboardScope.create())
+inline fun keyboard(init: KeyboardFactory.() -> Unit): InlineKeyboard {
+    val keyboardFactory = KeyboardFactory()
+    keyboardFactory.init()
+    return InlineKeyboard(keyboardFactory.create())
 }

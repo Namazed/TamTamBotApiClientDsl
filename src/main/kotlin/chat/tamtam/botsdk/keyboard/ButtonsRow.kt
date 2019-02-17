@@ -1,4 +1,4 @@
-package chat.tamtam.botsdk.scopes
+package chat.tamtam.botsdk.keyboard
 
 import chat.tamtam.botsdk.model.Button
 
