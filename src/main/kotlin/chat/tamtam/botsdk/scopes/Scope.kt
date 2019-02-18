@@ -1,5 +1,6 @@
 package chat.tamtam.botsdk.scopes
 
+import chat.tamtam.botsdk.client.PreparedAnswer
 import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.client.ResultAnswer
 import chat.tamtam.botsdk.client.ResultSend
@@ -48,17 +49,9 @@ interface Scope {
         send(userId, SendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
     }
 
-    suspend infix fun Pair<ChatId, SendMessage>.sendWith(keyboard: InlineKeyboard) {
-        val attaches = listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
-        send(first, SendMessage(second.text, attaches, second.notifyUser))
-    }
-
-    suspend infix fun String.prepareAnswerWith(answerParams: AnswerParams): Pair<AnswerParams, SendMessage> {
-        return Pair(answerParams, SendMessage(this))
-    }
-
-    suspend infix fun AnswerCallback.prepareAnswerWith(answerParams: AnswerParams): Pair<AnswerParams, AnswerCallback> {
-        return Pair(answerParams, this)
+    suspend infix fun String.prepareReplacementCurrentMessage(answerParams: AnswerParams): PreparedAnswer {
+        val answerCallback = AnswerCallback(message = SendMessage(this))
+        return PreparedAnswer(answerCallback, answerParams)
     }
 
     suspend infix fun String.answerFor(callbackId: CallbackId): ResultAnswer {
@@ -66,18 +59,18 @@ interface Scope {
         return requests.answer(callbackId, answerCallback)
     }
 
-    suspend infix fun AnswerParams.answer(notification: String): ResultAnswer {
-        val answerCallback = AnswerCallback(userId.id, notification = notification)
+    suspend infix fun String.replaceCurrentMessage(callbackId: CallbackId): ResultAnswer {
+        val answerCallback = AnswerCallback(message = SendMessage(this))
         return requests.answer(callbackId, answerCallback)
     }
 
-    suspend infix fun Pair<AnswerParams, AnswerCallback>.answerWith(keyboard: InlineKeyboard): ResultAnswer {
-        val answerCallback = AnswerCallback(
-            first.userId.id, SendMessage(
-                "",
-                listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard))
-            )
-        )
-        return requests.answer(first.callbackId, answerCallback)
+    suspend infix fun String.answerLikeNotification(answerParams: AnswerParams): ResultAnswer {
+        val answerCallback = AnswerNotificationCallback(answerParams.userId.id, notification = this)
+        return requests.answer(answerParams.callbackId, answerCallback)
+    }
+
+    suspend infix fun PreparedAnswer.answerWith(keyboard: InlineKeyboard): ResultAnswer {
+        val answerCallback = AnswerCallback(SendMessage(answerCallback.message.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard))))
+        return requests.answer(answerParams.callbackId, answerCallback)
     }
 }

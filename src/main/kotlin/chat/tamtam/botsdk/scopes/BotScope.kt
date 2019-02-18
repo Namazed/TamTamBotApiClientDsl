@@ -14,12 +14,12 @@ class BotScope(
     internal val botHttpManager: BotHttpManager,
     private val typingController: TypingController = TypingController(botHttpManager),
     private val log: Logger = LoggerFactory.getLogger(BotScope::class.java.name),
-    val requests: RequestsManager = RequestsManager(botHttpManager, typingController),
+    override val requests: RequestsManager = RequestsManager(botHttpManager, typingController),
     internal val commandScope: CommandsScope = CommandsScope(requests),
     internal val callbacksScope: CallbacksScope = CallbacksScope(requests),
     internal val messagesScope: MessagesScope = MessagesScope(requests),
     internal val userScope: UserScope = UserScope(requests)
-) {
+) : Scope {
 
     internal var answerOnStart: suspend (StartedBotState) -> Unit = {}
     internal var answerOnAdd: suspend (AddedBotState) -> Unit = {}

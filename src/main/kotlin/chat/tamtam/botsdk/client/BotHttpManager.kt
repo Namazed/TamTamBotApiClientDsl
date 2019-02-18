@@ -25,6 +25,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
 import java.net.URL
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
+import chat.tamtam.botsdk.model.request.AnswerNotificationCallback as RequestAnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -48,6 +49,15 @@ class BotHttpManager(
     }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback) =
+        httpClient.post<Default> {
+            url(URL("$botApiEndpoint/answers"))
+            parameter("access_token", botToken)
+            parameter("callback_id", callbackId.id)
+            contentType(ContentType.parse("application/json"))
+            body = answerCallback
+        }
+
+    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback) =
         httpClient.post<Default> {
             url(URL("$botApiEndpoint/answers"))
             parameter("access_token", botToken)
