@@ -11,6 +11,11 @@ class MessagesScope(
     private var messagesAnswer: suspend (MessageState) -> Unit = {}
 ) : Scope {
 
+    /**
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message.
+     *
+     * @param answer - all actions in this lambda is async.
+     */
     fun answerOnMessage(answer: suspend (messageState: MessageState) -> Unit) {
         messagesAnswer = answer
     }

@@ -25,11 +25,22 @@ class CommandsScope(
         unknownCommandAction = action
     }
 
+    /**
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message with specific command.
+     *
+     * @param command - text of command.
+     * @param action - all actions in this lambda is async.
+     */
     fun onCommand(command: String, action: suspend (CommandState) -> Unit) {
         saveCommand(command, action)
         log.info("onCommand: saved command -> $command")
     }
 
+    /**
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message with unknown command.
+     *
+     * @param action - all actions in this lambda is async.
+     */
     fun onUnknownCommand(action: suspend (CommandState) -> Unit) {
         saveUnknownCommand(action)
         log.info("onUnknownCommand: saved")

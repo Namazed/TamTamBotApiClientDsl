@@ -22,6 +22,13 @@ class RequestsManager(
     private val typingController: TypingController
 ) {
 
+    /**
+     * This method need for send [RequestSendMessage] for User by userId
+     *
+     * @param userId - this is inline class [UserId] which contains userId
+     * @param sendMessage - this is [RequestSendMessage] which you send for User
+     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     */
     suspend fun send(userId: UserId, sendMessage: RequestSendMessage): ResultSend {
         return try {
             val response = botHttpManager.messageApi.sendMessage(userId, sendMessage)
@@ -33,6 +40,9 @@ class RequestsManager(
         }
     }
 
+    /**
+     * Look on [send]
+     */
     suspend fun send(chatId: ChatId, sendMessage: RequestSendMessage): ResultSend {
         return try {
             val response = botHttpManager.messageApi.sendMessage(chatId, sendMessage)
@@ -44,8 +54,19 @@ class RequestsManager(
         }
     }
 
+    /**
+     * This method need for send text message for Chat by chatId
+     * You should know that this method notify all users
+     *
+     * @param chatId - this is inline class [ChatId] which contains chatId
+     * @param text - text of new message
+     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     */
     suspend fun sendText(chatId: ChatId, text: String): ResultSend = send(chatId, RequestSendMessage(text))
 
+    /**
+     * Look on [sendText]
+     */
     suspend fun sendText(userId: UserId, text: String): ResultSend = send(userId, RequestSendMessage(text))
 
     suspend fun startTyping(chatId: ChatId) {
