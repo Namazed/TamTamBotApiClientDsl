@@ -4,10 +4,25 @@ import chat.tamtam.botsdk.client.PreparedAnswer
 import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.client.ResultAnswer
 import chat.tamtam.botsdk.client.ResultSend
+import chat.tamtam.botsdk.client.ResultUploadUrl
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
+import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.request.*
+import chat.tamtam.botsdk.model.VideoUrl
+import chat.tamtam.botsdk.model.request.AnswerCallback
+import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
+import chat.tamtam.botsdk.model.request.AnswerParams
+import chat.tamtam.botsdk.model.request.AttachmentKeyboard
+import chat.tamtam.botsdk.model.request.InlineKeyboard
+import chat.tamtam.botsdk.model.request.SendMessage
+import chat.tamtam.botsdk.model.request.SendParams
+import chat.tamtam.botsdk.model.request.UploadParams
+import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
+import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
+import chat.tamtam.botsdk.model.request.createAnswerCallbackForVideoUrl
+import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
+import chat.tamtam.botsdk.model.request.createSendMessageForVideoUrl
 import chat.tamtam.botsdk.model.response.AttachType
 
 interface Scope {
@@ -22,17 +37,11 @@ interface Scope {
         requests.stopTyping(chatId)
     }
 
-    private suspend fun send(userId: UserId, sendMessage: SendMessage): ResultSend =
-        requests.send(userId, sendMessage)
-
-    private suspend fun send(chatId: ChatId, sendMessage: SendMessage): ResultSend =
-        requests.send(chatId, sendMessage)
-
-    suspend infix fun SendMessage.sendFor(userId: UserId): ResultSend = send(userId, this)
+    suspend infix fun SendMessage.sendFor(userId: UserId): ResultSend = requests.send(userId, this)
 
     suspend infix fun String.sendFor(userId: UserId): ResultSend = SendMessage(this).sendFor(userId)
 
-    suspend infix fun SendMessage.sendFor(chatId: ChatId): ResultSend = send(chatId, this)
+    suspend infix fun SendMessage.sendFor(chatId: ChatId): ResultSend = requests.send(chatId, this)
 
     suspend infix fun String.sendFor(chatId: ChatId): ResultSend = SendMessage(this).sendFor(chatId)
 
@@ -46,7 +55,25 @@ interface Scope {
 
     suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard) {
         val attaches = listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
-        send(userId, SendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
+        requests.send(userId, SendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
+    }
+
+    suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultSend {
+        val sendMessage = createSendMessageForImageUrl(sendMessage, imageUrl)
+        return requests.send(chatId, sendMessage)
+    }
+
+    suspend infix fun SendParams.sendWith(videoUrl: VideoUrl): ResultSend {
+        val sendMessage = createSendMessageForVideoUrl(sendMessage, videoUrl)
+        return requests.send(chatId, sendMessage)
+    }
+
+    suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultSend {
+        val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
+        return when (resultUpload) {
+            is ResultUploadUrl.Success -> requests.sendWithUpload(chatId, sendMessage, resultUpload.response, uploadParams)
+            is ResultUploadUrl.Failure -> ResultSend.Failure(resultUpload.exception)
+        }
     }
 
     suspend infix fun String.prepareReplacementCurrentMessage(answerParams: AnswerParams): PreparedAnswer {
@@ -70,7 +97,25 @@ interface Scope {
     }
 
     suspend infix fun PreparedAnswer.answerWith(keyboard: InlineKeyboard): ResultAnswer {
-        val answerCallback = AnswerCallback(SendMessage(answerCallback.message.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard))))
+        val answerCallback = createAnswerCallbackForKeyboard(answerCallback.message, keyboard)
         return requests.answer(answerParams.callbackId, answerCallback)
+    }
+
+    suspend infix fun PreparedAnswer.answerWith(imageUrl: ImageUrl): ResultAnswer {
+        val answerCallback = createAnswerCallbackForImageUrl(answerCallback.message, imageUrl)
+        return requests.answer(answerParams.callbackId, answerCallback)
+    }
+
+    suspend infix fun PreparedAnswer.answerWith(videoUrl: VideoUrl): ResultAnswer {
+        val answerCallback = createAnswerCallbackForVideoUrl(answerCallback.message, videoUrl)
+        return requests.answer(answerParams.callbackId, answerCallback)
+    }
+
+    suspend infix fun PreparedAnswer.answerWith(uploadParams: UploadParams): ResultAnswer {
+        val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
+        return when (resultUpload) {
+            is ResultUploadUrl.Success -> requests.answerWithUpload(answerParams.callbackId, answerCallback.message, resultUpload.response, uploadParams)
+            is ResultUploadUrl.Failure -> ResultAnswer.Failure(resultUpload.exception)
+        }
     }
 }

@@ -11,13 +11,13 @@ class AttachmentKeyboard(
 ) : Attachment
 
 @Serializable
-class AttachmentPhoto(
+class AttachmentMedia(
     val type: String,
     val payload: String
 ) : Attachment
 
 @Serializable
-class AttachmentPhotoWithUrl(
+class AttachmentMediaWithUrl(
     val type: String,
     val payload: Payload
 ) : Attachment
