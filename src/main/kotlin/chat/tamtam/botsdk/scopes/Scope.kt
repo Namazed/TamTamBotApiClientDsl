@@ -206,7 +206,7 @@ interface Scope {
      * @receiver - this is notification text
      * @return - [ResultAnswer] which contains Success with current response or Failure with [BadResponseStatusException] or [Exception]
      */
-    suspend infix fun String.answerLikeNotification(answerParams: AnswerParams): ResultAnswer {
+    suspend infix fun String.answerNotification(answerParams: AnswerParams): ResultAnswer {
         val answerCallback = AnswerNotificationCallback(answerParams.userId.id, notification = this)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
