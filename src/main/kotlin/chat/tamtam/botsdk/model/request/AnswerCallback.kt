@@ -18,7 +18,7 @@ class AnswerNotificationCallback(
 )
 
 internal fun createAnswerCallbackForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): AnswerCallback {
-    return AnswerCallback(SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard)), sendMessage.notifyUser))
+    return AnswerCallback(SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard)), sendMessage.notifyUser))
 }
 
 internal fun createAnswerCallbackForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): AnswerCallback {

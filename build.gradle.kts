@@ -2,7 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "1.3.11"
+    kotlin("jvm") version "1.3.21"
+    id("kotlinx-serialization") version "1.3.21"
 }
 
 group = "chat.tamtam.botsdk"
@@ -34,5 +35,5 @@ compileKotlin.kotlinOptions {
 }
 
 compileKotlin.kotlinOptions {
-    freeCompilerArgs = listOf("-XXLanguage:+InlineClasses")
+    freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }

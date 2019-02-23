@@ -1,9 +1,14 @@
 package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.model.CallbackId
+import chat.tamtam.botsdk.model.request.RequestAttachmentsSerializer
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.response.BotInfo
+import chat.tamtam.botsdk.model.response.ChatTypeSerializer
+import chat.tamtam.botsdk.model.response.ChatsSerializer
 import chat.tamtam.botsdk.model.response.Default
+import chat.tamtam.botsdk.model.response.ResponseAttachmentsSerializer
+import chat.tamtam.botsdk.model.response.UpdateTypeSerializer
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.Upload
 import io.ktor.client.HttpClient
@@ -95,7 +100,13 @@ private fun initHttpClient(): HttpClient = HttpClient(OkHttp) {
     }
 
     install(JsonFeature) {
-        serializer = KotlinxSerializer()
+        serializer = KotlinxSerializer().apply {
+            register(ChatsSerializer)
+            register(UpdateTypeSerializer)
+            register(ChatTypeSerializer)
+            registerList(RequestAttachmentsSerializer)
+            registerList(ResponseAttachmentsSerializer)
+        }
     }
 }
 

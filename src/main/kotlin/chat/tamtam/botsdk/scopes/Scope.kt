@@ -14,6 +14,7 @@ import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.AttachmentKeyboard
+import chat.tamtam.botsdk.model.request.EMPTY_INLINE_KEYBOARD
 import chat.tamtam.botsdk.model.request.InlineKeyboard
 import chat.tamtam.botsdk.model.request.SendMessage
 import chat.tamtam.botsdk.model.request.SendParams
@@ -125,7 +126,11 @@ interface Scope {
      * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
      */
     suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard): ResultSend {
-        val attaches = listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
+        val attaches = if (keyboard == EMPTY_INLINE_KEYBOARD) {
+            emptyList()
+        } else {
+            listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
+        }
         return requests.send(userId, SendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
     }
 

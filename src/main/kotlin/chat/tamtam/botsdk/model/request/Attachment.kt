@@ -29,6 +29,7 @@ class AttachmentLocation(
     val longitude: Double
 ) : Attachment
 
+@Serializable
 class Payload(
     val url: String
 )

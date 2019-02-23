@@ -3,13 +3,19 @@ package chat.tamtam.botsdk.client
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.request.Action
+import chat.tamtam.botsdk.model.request.ActionWrapper
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMembersResult
 import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
 import io.ktor.client.HttpClient
-import io.ktor.client.request.*
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.net.URL
@@ -42,7 +48,7 @@ class ChatApi(
         url(URL("$chatApiEndpoint/${chatId.id}/actions"))
         parameter("access_token", botToken)
         contentType(ContentType.parse("application/json"))
-        body = action.name
+        body = ActionWrapper(action.name)
     }
 
     suspend fun leaveChat(chatId: ChatId) = httpClient.delete<Default> {

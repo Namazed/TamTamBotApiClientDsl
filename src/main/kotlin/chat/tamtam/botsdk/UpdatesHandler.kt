@@ -1,22 +1,34 @@
 package chat.tamtam.botsdk
 
-import chat.tamtam.botsdk.model.*
+import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.Payload
-import chat.tamtam.botsdk.model.response.*
+import chat.tamtam.botsdk.model.UserId
+import chat.tamtam.botsdk.model.isCommand
+import chat.tamtam.botsdk.model.response.Update
+import chat.tamtam.botsdk.model.response.UpdateType
+import chat.tamtam.botsdk.model.response.Updates
+import chat.tamtam.botsdk.model.response.isNotEmptyCallback
+import chat.tamtam.botsdk.model.response.isNotEmptyMessage
+import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
-import chat.tamtam.botsdk.state.*
+import chat.tamtam.botsdk.state.AddedBotState
+import chat.tamtam.botsdk.state.AddedUserState
+import chat.tamtam.botsdk.state.CallbackState
+import chat.tamtam.botsdk.state.CommandState
+import chat.tamtam.botsdk.state.MessageState
+import chat.tamtam.botsdk.state.RemovedBotState
+import chat.tamtam.botsdk.state.RemovedUserState
+import chat.tamtam.botsdk.state.StartedBotState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExecutorCoroutineDispatcher
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
 
 class UpdatesHandler(
     private val botScope: BotScope,
-    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(getAvailableThread()).asCoroutineDispatcher(),
-    private val parallelScope: CoroutineScope = CoroutineScope(context),
+//    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(getAvailableThread()).asCoroutineDispatcher(),
+    private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
 
@@ -42,6 +54,7 @@ class UpdatesHandler(
     }
 
     private suspend fun process(update: Update) {
+        log.info("process: start process update with updateType ${update.updateType}")
         when {
             update.updateType == UpdateType.BOT_STARTED -> {
                 botScope.answerOnStart(StartedBotState(update.timestamp, ChatId(update.chatId), UserId(update.userId)))

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 
 class LongPollingCommunication(
     val botToken: String,
-    val botApiEndpoint: String = "URL",
+    val botApiEndpoint: String = "https://botapi.tamtam.chat",
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
     override fun start(botScope: BotScope) {

@@ -2,18 +2,22 @@ package chat.tamtam.botsdk.model.response
 
 import chat.tamtam.botsdk.model.Button
 import kotlinx.serialization.Optional
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Attachment(
     val type: String,
-    @Optional val callbackId: String,
+    @SerialName("callback_id") @Optional val callbackId: String = "",
     val payload: Payload
 )
 
+@Serializable
 class Payload(
-    @Optional val photoId: Long = -1,
+    @SerialName("photo_id") @Optional val photoId: Long = -1,
     @Optional val url: String = "",
-    @Optional val vcfInfo: String = "",
-    @Optional val tamInfo: User,
+    @SerialName("vcf_info") @Optional val vcfInfo: String = "",
+    @SerialName("tam_info") @Optional val tamInfo: User = User(),
     @Optional val buttons: List<List<Button>> = emptyList()
 )
 

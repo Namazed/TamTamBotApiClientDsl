@@ -28,13 +28,5 @@ fun String.isCommand(): Boolean = this.startsWith('/') && findCommand(this, BOTS
 fun String.isCommandInChat(): Boolean = this.startsWith('@') && findCommand(this, BOTS_COMMAND_PATTERN_FOR_CHAT)
 
 private fun findCommand(text: String, commandRegex: Regex): Boolean {
-    commandRegex.findAll(text).map { commandResult: MatchResult ->
-        if (commandResult.groups.size == 1) {
-            return@map true
-        }
-        return@map false
-
-    }
-
-    return false
+    return commandRegex.matches(text)
 }

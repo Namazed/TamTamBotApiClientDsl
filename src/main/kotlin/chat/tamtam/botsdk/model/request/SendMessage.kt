@@ -3,15 +3,39 @@ package chat.tamtam.botsdk.model.request
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.VideoUrl
 import chat.tamtam.botsdk.model.response.AttachType
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.list
+import kotlinx.serialization.serializer
+import kotlinx.serialization.withName
 
 @Serializable
 class SendMessage(
     val text: String,
-    val attachments: List<Attachment> = emptyList(),
+    @Serializable(with = RequestAttachmentsSerializer::class) val attachments: List<Attachment> = emptyList(),
     @SerialName("notify") val notifyUser: Boolean = true
 )
+
+object RequestAttachmentsSerializer : KSerializer<List<Attachment>> {
+    override val descriptor: SerialDescriptor
+        get() = StringDescriptor.withName("RequestAttachments")
+
+    @UseExperimental(ImplicitReflectionSerializer::class)
+    override fun deserialize(input: Decoder): List<Attachment> {
+        return Attachment::class.serializer().list.deserialize(input)
+    }
+
+    @UseExperimental(ImplicitReflectionSerializer::class)
+    override fun serialize(output: Encoder, obj: List<Attachment>) {
+        Attachment::class.serializer().list.serialize(output, obj)
+    }
+}
 
 internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): SendMessage {
     return SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard)), sendMessage.notifyUser)
