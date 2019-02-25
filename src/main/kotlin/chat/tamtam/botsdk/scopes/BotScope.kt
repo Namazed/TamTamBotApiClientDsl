@@ -8,11 +8,12 @@ import chat.tamtam.botsdk.state.StartedBotState
 import chat.tamtam.botsdk.typing.TypingController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 @BotMarker
 class BotScope(
     internal val botHttpManager: BotHttpManager,
-    private val typingController: TypingController = TypingController(botHttpManager),
+    private val typingController: TypingController = TypingController(botHttpManager, jobs = ConcurrentHashMap()),
     private val log: Logger = LoggerFactory.getLogger(BotScope::class.java.name),
     override val requests: RequestsManager = RequestsManager(botHttpManager, typingController),
     internal val commandScope: CommandsScope = CommandsScope(requests),

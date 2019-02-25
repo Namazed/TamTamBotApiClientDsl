@@ -12,13 +12,14 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 private const val DELAY_FOR_TYPING = 7000L
 
 class TypingController(
     private val botHttpManager: BotHttpManager,
     private val typingScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    private val jobs: MutableMap<Long, Job> = mutableMapOf(),
+    private val jobs: ConcurrentHashMap<Long, Job>,
     private val log: Logger = LoggerFactory.getLogger(TypingController::class.java.name)
 ) {
 
