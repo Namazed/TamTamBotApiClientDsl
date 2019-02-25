@@ -25,6 +25,9 @@ class LongPollingCommunication(
     }
 }
 
+/**
+ * This class need for start longPolling for your bot.
+ */
 object longPolling {
     operator fun invoke(botToken: String, init: BotScope.() -> Unit): BotScope {
         check(botToken.isNotEmpty()) { "Bot token must is not empty" }

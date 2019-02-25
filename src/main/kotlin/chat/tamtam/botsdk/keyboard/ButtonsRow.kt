@@ -6,10 +6,18 @@ class ButtonsRow(
     internal val row: MutableList<Button> = mutableListOf()
 ) {
 
+    /**
+     * Added button to Row.
+     * You can use this function or [add]
+     */
     operator fun Button.unaryPlus() {
         row += this
     }
 
+    /**
+     * Added button to Row.
+     * You can use this function or [unaryPlus]
+     */
     infix fun ButtonsRow.add(button: Button) {
         row += button
     }

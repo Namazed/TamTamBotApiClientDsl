@@ -26,34 +26,56 @@ class BotScope(
     internal var answerOnAdd: suspend (AddedBotState) -> Unit = {}
     internal var answerOnRemove: suspend (RemovedBotState) -> Unit = {}
 
+    /**
+     * This method need for start [CommandsScope] where you can handle all your commands
+     */
     fun commands(init: CommandsScope.() -> Unit) {
         log.info("commands: init")
         commandScope.init()
     }
 
+    /**
+     * This method need for start [CallbacksScope] where you can handle all your callbacks
+     */
     fun callbacks(init: CallbacksScope.() -> Unit) {
         log.info("callbacks: init")
         callbacksScope.init()
     }
 
+    /**
+     * This method need for start [MessagesScope] where you can handle all messages which sent
+     * for your bot or sent for chat where your bot is admin
+     */
     fun messages(init: MessagesScope.() -> Unit) {
         log.info("messages: init")
         messagesScope.init()
     }
 
+    /**
+     * This method need for start [UserScope] where you can handle when user add to chat or remove from chat
+     */
     fun users(init: UserScope.() -> Unit) {
         log.info("botStarted: init")
         userScope.init()
     }
 
+    /**
+     * This method need for handle start bot action
+     */
     fun onStartBot(answer: suspend (StartedBotState) -> Unit) {
         answerOnStart = answer
     }
 
+    /**
+     * This method need for handle when somebody added your bot to chat
+     */
     fun onAddBotToChat(answer: suspend (AddedBotState) -> Unit) {
         answerOnAdd = answer
     }
 
+    /**
+     * This method need for handle when somebody removed your bot from chat
+     */
     fun onRemoveBotFromChat(answer: suspend (RemovedBotState) -> Unit) {
         answerOnRemove = answer
     }
