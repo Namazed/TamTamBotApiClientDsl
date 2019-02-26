@@ -3,6 +3,7 @@ package chat.tamtam.botsdk.client
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.request.RequestAttachmentsSerializer
 import chat.tamtam.botsdk.model.request.UploadType
+import chat.tamtam.botsdk.model.response.AttachTypeSerializer
 import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.model.response.ChatTypeSerializer
 import chat.tamtam.botsdk.model.response.ChatsSerializer
@@ -102,6 +103,7 @@ private fun initHttpClient(): HttpClient = HttpClient(OkHttp) {
     install(JsonFeature) {
         serializer = KotlinxSerializer().apply {
             register(ChatsSerializer)
+            register(AttachTypeSerializer)
             register(UpdateTypeSerializer)
             register(ChatTypeSerializer)
             registerList(RequestAttachmentsSerializer)

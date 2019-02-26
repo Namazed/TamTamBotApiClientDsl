@@ -1,13 +1,19 @@
 package chat.tamtam.botsdk.model.response
 
 import chat.tamtam.botsdk.model.Button
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Optional
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.withName
 
 @Serializable
 class Attachment(
-    val type: String,
+    @Serializable(AttachTypeSerializer::class) val type: AttachType,
     @SerialName("callback_id") @Optional val callbackId: String = "",
     val payload: Payload
 )
@@ -32,6 +38,7 @@ fun attachTypeFrom(value: String) = when (value.toUpperCase()) {
     else -> throw IllegalArgumentException("Unknown type")
 }
 
+@Serializable
 enum class AttachType(val value: String) {
     IMAGE("IMAGE"),
     VIDEO("VIDEO"),
@@ -40,4 +47,17 @@ enum class AttachType(val value: String) {
     CONTACT("CONTACT"),
     STICKER("STICKER"),
     INLINE_KEYBOARD("INLINE_KEYBOARD")
+}
+
+object AttachTypeSerializer : KSerializer<AttachType> {
+    override val descriptor: SerialDescriptor
+        get() = StringDescriptor.withName("AttachType")
+
+    override fun deserialize(input: Decoder): AttachType {
+        return attachTypeFrom(input.decodeString())
+    }
+
+    override fun serialize(output: Encoder, obj: AttachType) {
+        AttachType.serializer().serialize(output, obj)
+    }
 }
