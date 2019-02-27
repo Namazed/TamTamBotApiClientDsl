@@ -2,8 +2,8 @@ package chat.tamtam.botsdk.keyboard
 
 import chat.tamtam.botsdk.model.Button
 
-class ButtonsRow(
-    internal val row: MutableList<Button> = mutableListOf()
+class ButtonsRow internal constructor(
+    private val row: MutableList<Button> = mutableListOf()
 ) {
 
     /**

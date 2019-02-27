@@ -15,6 +15,7 @@ class LongPollingCommunication(
     val botApiEndpoint: String = "https://botapi.tamtam.chat",
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
+
     override fun start(botScope: BotScope) {
         val updateParsing = UpdatesHandler(botScope)
         GlobalScope.launch {
@@ -23,6 +24,7 @@ class LongPollingCommunication(
             }
         }
     }
+
 }
 
 /**

@@ -16,14 +16,14 @@ import java.util.concurrent.ConcurrentHashMap
 
 private const val DELAY_FOR_TYPING = 7000L
 
-class TypingController(
+class TypingController internal constructor(
     private val botHttpManager: BotHttpManager,
     private val typingScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val jobs: ConcurrentHashMap<Long, Job>,
     private val log: Logger = LoggerFactory.getLogger(TypingController::class.java.name)
 ) {
 
-    suspend fun startTyping(chatId: ChatId) {
+    internal suspend fun startTyping(chatId: ChatId) {
         jobs[chatId.id] = typingScope.launch {
             while (coroutineContext.isActive) {
                 botHttpManager.chatApi.sendAction(chatId, Action.TYPING_ON)
@@ -33,7 +33,7 @@ class TypingController(
         log.info("startTyping: save job in map, by chatId ${chatId.id}")
     }
 
-    fun stopTyping(chatId: ChatId) {
+    internal fun stopTyping(chatId: ChatId) {
         jobs[chatId.id]?.cancel()
         val removedJob = jobs.remove(chatId.id)
         removedJob?.let { log.info("stopTyping: job removed for chatId ${chatId.id}") }

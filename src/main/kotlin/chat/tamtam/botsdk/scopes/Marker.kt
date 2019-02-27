@@ -1,4 +1,7 @@
 package chat.tamtam.botsdk.scopes
 
+/**
+ * This marker need for control scopes and removes the possibility create nested scopes
+ */
 @DslMarker
-annotation class BotMarker
+internal annotation class BotMarker

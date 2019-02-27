@@ -9,7 +9,7 @@ import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 
 @BotMarker
-class CallbacksScope(
+class CallbacksScope internal constructor(
     override val requests: RequestsManager,
     private val log: Logger = LoggerFactory.getLogger(CallbacksScope::class.java.name),
     private var defaultAnswer: suspend (CallbackState) -> Unit = {},

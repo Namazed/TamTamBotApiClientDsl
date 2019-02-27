@@ -20,7 +20,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.net.URL
 
-class ChatApi(
+class ChatApi internal constructor(
     private val chatApiEndpoint: String,
     private val botToken: String,
     private val httpClient: HttpClient

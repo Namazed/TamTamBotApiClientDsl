@@ -35,8 +35,7 @@ class KeyboardFactory(
         buttons += buttonsInRow
     }
 
-    //todo необходимо сделать internal package, для этого скорее всего нужно будет перенести keyboard метод в каждый scope
-    fun create() = buttons
+    fun create() : List<List<Button>> = buttons
 
 }
 

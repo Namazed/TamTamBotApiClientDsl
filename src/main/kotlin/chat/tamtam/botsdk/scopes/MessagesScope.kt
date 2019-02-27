@@ -6,7 +6,7 @@ import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 @BotMarker
-class MessagesScope(
+class MessagesScope internal constructor(
     override val requests: RequestsManager,
     private var messagesAnswer: suspend (MessageState) -> Unit = {}
 ) : Scope {

@@ -6,7 +6,11 @@ import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Message
 import io.ktor.client.HttpClient
-import io.ktor.client.request.*
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import java.net.URL
@@ -14,7 +18,7 @@ import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
-class MessageApi(
+class MessageApi internal constructor(
     private val messageApiEndpoint: String,
     private val botToken: String,
     private val httpClient: HttpClient

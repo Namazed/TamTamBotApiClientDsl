@@ -4,7 +4,7 @@ import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.state.AddedUserState
 import chat.tamtam.botsdk.state.RemovedUserState
 
-class UserScope(
+class UserScope internal constructor(
     override val requests: RequestsManager
 ) : Scope {
 

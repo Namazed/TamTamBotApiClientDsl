@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 @BotMarker
-class BotScope(
+class BotScope internal constructor(
     internal val botHttpManager: BotHttpManager,
     private val typingController: TypingController = TypingController(botHttpManager, jobs = ConcurrentHashMap()),
     private val log: Logger = LoggerFactory.getLogger(BotScope::class.java.name),
@@ -80,6 +80,10 @@ class BotScope(
         answerOnRemove = answer
     }
 
+    /**
+     * This method need only for simpler job with longPolling.
+     * It removes the possibility create nested longPolling scope
+     */
     @Deprecated(level = DeprecationLevel.ERROR,
         message = "LongPolling communication can't be nested.")
     fun longPolling(botToken: String, init: () -> Unit = {}) {

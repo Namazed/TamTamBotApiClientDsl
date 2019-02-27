@@ -6,7 +6,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @BotMarker
-class CommandsScope(
+class CommandsScope internal constructor(
     override val requests: RequestsManager,
     private val log: Logger = LoggerFactory.getLogger(CommandsScope::class.java.name),
     private var unknownCommandAction: suspend (CommandState) -> Unit = {},
