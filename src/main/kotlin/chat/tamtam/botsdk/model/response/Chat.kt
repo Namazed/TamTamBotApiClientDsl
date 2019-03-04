@@ -54,7 +54,7 @@ class ChatIcon(
     val url: String
 )
 
-object ChatTypeSerializer : KSerializer<ChatType> {
+internal object ChatTypeSerializer : KSerializer<ChatType> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("ChatType")
 

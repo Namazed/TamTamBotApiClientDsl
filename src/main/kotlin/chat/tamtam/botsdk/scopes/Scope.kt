@@ -5,6 +5,7 @@ import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.client.ResultAnswer
 import chat.tamtam.botsdk.client.ResultSend
 import chat.tamtam.botsdk.client.ResultUploadUrl
+import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.ImageUrl
@@ -24,8 +25,6 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForVideoUrl
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
 import chat.tamtam.botsdk.model.request.createSendMessageForVideoUrl
-import chat.tamtam.botsdk.model.response.AttachType
-import io.ktor.client.features.BadResponseStatusException
 
 /**
  * This interface give all requests methods from BotAPI in dsl style and no dsl (with help [requests] property)
@@ -168,7 +167,7 @@ interface Scope {
     suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultSend {
         val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
         return when (resultUpload) {
-            is ResultUploadUrl.Success -> requests.sendWithUpload(chatId, sendMessage, resultUpload.response, uploadParams)
+            is ResultUploadUrl.Success -> requests.sendWithUpload(chatId, userId, sendMessage, resultUpload.response, uploadParams)
             is ResultUploadUrl.Failure -> ResultSend.Failure(resultUpload.exception)
         }
     }

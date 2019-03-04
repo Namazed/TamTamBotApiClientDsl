@@ -13,5 +13,5 @@ class Callback(
     val user: User = User()
 )
 
-fun isNotEmptyCallback(callback: Callback?) =
+internal fun isNotEmptyCallback(callback: Callback?) =
     callback != null && callback.timestamp != -1L

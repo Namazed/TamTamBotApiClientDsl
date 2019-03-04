@@ -1,41 +1,25 @@
 package chat.tamtam.botsdk.model.request
 
+import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.VideoUrl
-import chat.tamtam.botsdk.model.response.AttachType
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
+import chat.tamtam.botsdk.model.response.UploadInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.list
-import kotlinx.serialization.serializer
-import kotlinx.serialization.withName
 
+/**
+ * This class need use when you want send message.
+ *
+ * @param text - text content of message
+ * @param attachments - list of attaches, for example [AttachmentKeyboard], [AttachmentLocation], [AttachmentMediaWithId] and etc.
+ * @param notifyUser - this flag use in chat, when you want send quiet message or not.
+ */
 @Serializable
 class SendMessage(
     val text: String,
-    @Serializable(with = RequestAttachmentsSerializer::class) val attachments: List<Attachment> = emptyList(),
+    @Serializable() val attachments: List<Attachment> = emptyList(),
     @SerialName("notify") val notifyUser: Boolean = true
 )
-
-object RequestAttachmentsSerializer : KSerializer<List<Attachment>> {
-    override val descriptor: SerialDescriptor
-        get() = StringDescriptor.withName("RequestAttachments")
-
-    @UseExperimental(ImplicitReflectionSerializer::class)
-    override fun deserialize(input: Decoder): List<Attachment> {
-        return Attachment::class.serializer().list.deserialize(input)
-    }
-
-    @UseExperimental(ImplicitReflectionSerializer::class)
-    override fun serialize(output: Encoder, obj: List<Attachment>) {
-        Attachment::class.serializer().list.serialize(output, obj)
-    }
-}
 
 internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): SendMessage {
     return SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard)), sendMessage.notifyUser)
@@ -43,23 +27,27 @@ internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: In
 
 internal fun createSendMessageForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): SendMessage {
     return SendMessage(sendMessage.text,
-        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, Payload(imageUrl.value))), sendMessage.notifyUser)
+        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser)
 }
 
 internal fun createSendMessageForVideoUrl(sendMessage: SendMessage, videoUrl: VideoUrl): SendMessage {
     return SendMessage(sendMessage.text,
-        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, Payload(videoUrl.value))), sendMessage.notifyUser)
+        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(videoUrl.value))), sendMessage.notifyUser)
 }
 
-internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage: SendMessage, response: String): SendMessage {
+internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage: SendMessage, response: UploadInfo): SendMessage {
     return when (uploadType) {
-        UploadType.PHOTO -> SendMessage(sendMessage.text, listOf(AttachmentMedia(AttachType.IMAGE.value, response)), sendMessage.notifyUser)
-        UploadType.VIDEO -> SendMessage(sendMessage.text, listOf(AttachmentMedia(AttachType.VIDEO.value, response)), sendMessage.notifyUser)
-        UploadType.FILE -> SendMessage(sendMessage.text, listOf(AttachmentMedia(AttachType.FILE.value, response)), sendMessage.notifyUser)
-        UploadType.AUDIO -> SendMessage(sendMessage.text, listOf(AttachmentMedia(AttachType.FILE.value, response)), sendMessage.notifyUser)
+        UploadType.VIDEO -> SendMessage(sendMessage.text, listOf(AttachmentMediaWithId(AttachType.VIDEO.value, response)), sendMessage.notifyUser)
+        UploadType.FILE -> SendMessage(sendMessage.text, listOf(AttachmentMediaWithId(AttachType.FILE.value, response)), sendMessage.notifyUser)
+        UploadType.AUDIO -> SendMessage(sendMessage.text, listOf(AttachmentMediaWithId(AttachType.FILE.value, response)), sendMessage.notifyUser)
+        else -> throw IllegalArgumentException("Incorrect uploadType for this method")
     }
 }
 
-internal fun createSendMessageForListImageTokens(sendMessage: SendMessage, uploadedTokens: List<String>): SendMessage {
-    return SendMessage(sendMessage.text, uploadedTokens.map { AttachmentMedia(AttachType.IMAGE.value, it) }, sendMessage.notifyUser)
+internal fun createSendMessageForImageToken(sendMessage: SendMessage, response: UploadInfo): SendMessage {
+    return SendMessage(sendMessage.text, listOf(AttachmentPhoto(AttachType.IMAGE.value, response)), sendMessage.notifyUser)
+}
+
+internal fun createSendMessageForListImageTokens(sendMessage: SendMessage, uploadedTokens: List<UploadInfo>): SendMessage {
+    return SendMessage(sendMessage.text, uploadedTokens.map { AttachmentPhoto(AttachType.IMAGE.value, it) }, sendMessage.notifyUser)
 }

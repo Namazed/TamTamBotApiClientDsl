@@ -1,6 +1,6 @@
 package chat.tamtam.botsdk.scopes
 
-import chat.tamtam.botsdk.client.BotHttpManager
+import chat.tamtam.botsdk.client.HttpManager
 import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.state.AddedBotState
 import chat.tamtam.botsdk.state.RemovedBotState
@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 @BotMarker
 class BotScope internal constructor(
-    internal val botHttpManager: BotHttpManager,
-    private val typingController: TypingController = TypingController(botHttpManager, jobs = ConcurrentHashMap()),
+    internal val botHttpManager: HttpManager,
+    private val typingController: TypingController = TypingController(botHttpManager.chatHttpManager, jobs = ConcurrentHashMap()),
     private val log: Logger = LoggerFactory.getLogger(BotScope::class.java.name),
     override val requests: RequestsManager = RequestsManager(botHttpManager, typingController),
     internal val commandScope: CommandsScope = CommandsScope(requests),

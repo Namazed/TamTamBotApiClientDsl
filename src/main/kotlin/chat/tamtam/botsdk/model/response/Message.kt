@@ -1,5 +1,6 @@
 package chat.tamtam.botsdk.model.response
 
+import chat.tamtam.botsdk.model.AttachType
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -45,7 +46,7 @@ class Recipient(
     @Optional @SerialName("user_id") val userId: Long = -1
 )
 
-object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
+internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("ResponseAttachments")
 
@@ -60,7 +61,7 @@ object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
     }
 }
 
-fun isNotEmptyMessage(message: Message?) = message != null && message.timestamp != -1L
+internal fun isNotEmptyMessage(message: Message?) = message != null && message.timestamp != -1L
 
 enum class LinkType(val type: String) {
     FORWARD("FORWARD"),

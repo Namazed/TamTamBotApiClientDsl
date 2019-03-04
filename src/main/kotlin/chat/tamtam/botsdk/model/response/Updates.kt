@@ -2,12 +2,14 @@ package chat.tamtam.botsdk.model.response
 
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.serializer
 import kotlinx.serialization.withName
 
 @Serializable
@@ -19,7 +21,7 @@ class Updates(
 @Serializable
 class Update(
     val timestamp: Long,
-    @Serializable(UpdateTypeSerializer::class) @SerialName("update_type") val updateType: UpdateType,
+    @SerialName("update_type") val updateType: UpdateType,
     @SerialName("message_id") @Optional val messageId: String = "",
     @SerialName("chat_id") @Optional val chatId: Long = -1,
     @SerialName("user_id") @Optional val userId: Long = -1,
@@ -29,7 +31,7 @@ class Update(
     @Optional val callback: Callback = EMPTY_CALLBACK
 )
 
-@Serializable
+@Serializable(UpdateTypeSerializer::class)
 enum class UpdateType(val type: String) {
     CALLBACK("message_callback"),
     MESSAGE_CREATED("message_created"),
@@ -60,7 +62,7 @@ fun updateTypeFrom(value: String) = when(value) {
     else -> UpdateType.UNKNOWN
 }
 
-object UpdateTypeSerializer : KSerializer<UpdateType> {
+internal object UpdateTypeSerializer : KSerializer<UpdateType> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("UpdateType")
 
@@ -68,7 +70,8 @@ object UpdateTypeSerializer : KSerializer<UpdateType> {
         return updateTypeFrom(input.decodeString())
     }
 
+    @UseExperimental(ImplicitReflectionSerializer::class)
     override fun serialize(output: Encoder, obj: UpdateType) {
-        UpdateType.serializer().serialize(output, obj)
+        UpdateType::class.serializer().serialize(output, obj)
     }
 }

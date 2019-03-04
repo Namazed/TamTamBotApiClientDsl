@@ -15,7 +15,7 @@ class ChatsResult(
     val marker: Long
 )
 
-object ChatsSerializer : KSerializer<List<Chat>> {
+internal object ChatsSerializer : KSerializer<List<Chat>> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("Chats")
 

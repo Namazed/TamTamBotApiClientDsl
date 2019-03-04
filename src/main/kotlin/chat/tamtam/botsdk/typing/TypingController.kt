@@ -1,6 +1,6 @@
 package chat.tamtam.botsdk.typing
 
-import chat.tamtam.botsdk.client.BotHttpManager
+import chat.tamtam.botsdk.client.ChatHttpManager
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.request.Action
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 private const val DELAY_FOR_TYPING = 7000L
 
 class TypingController internal constructor(
-    private val botHttpManager: BotHttpManager,
+    private val httpManager: ChatHttpManager,
     private val typingScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     private val jobs: ConcurrentHashMap<Long, Job>,
     private val log: Logger = LoggerFactory.getLogger(TypingController::class.java.name)
@@ -26,7 +26,7 @@ class TypingController internal constructor(
     internal suspend fun startTyping(chatId: ChatId) {
         jobs[chatId.id] = typingScope.launch {
             while (coroutineContext.isActive) {
-                botHttpManager.chatApi.sendAction(chatId, Action.TYPING_ON)
+                httpManager.sendAction(chatId, Action.TYPING_ON)
                 delay(DELAY_FOR_TYPING)
             }
         }

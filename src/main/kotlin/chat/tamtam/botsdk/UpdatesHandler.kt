@@ -4,6 +4,7 @@ import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.Payload
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.isCommand
+import chat.tamtam.botsdk.model.isCommandInChat
 import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
@@ -75,7 +76,7 @@ class UpdatesHandler(
                     UserId(update.userId), UserId(update.adminId)
                 ))
             }
-            isNotEmptyMessage(update.message) && update.message.messageInfo.text.isCommand() -> {
+            isNotEmptyMessage(update.message) && (update.message.messageInfo.text.isCommand() || update.message.messageInfo.text.isCommandInChat()) -> {
                 val command = update.message.messageInfo.text.toCommand(update)
                 botScope.commandScope[command.name](CommandState(update.timestamp, command))
             }

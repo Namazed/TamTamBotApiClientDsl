@@ -24,10 +24,12 @@ repositories {
 
 dependencies {
     compile(kotlin("stdlib-jdk8"))
-    compile("io.ktor:ktor-client-okhttp:$ktorVersion")
-    compile("io.ktor:ktor-client-json-jvm:$ktorVersion")
-//    compile("io.ktor:ktor-client-gson:$ktorVersion")
+    compile("ch.qos.logback:logback-classic:1.2.1")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
+    compile ("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0")
     compile("com.squareup.okhttp3:logging-interceptor:3.12.0")
+    compile("com.squareup.retrofit2:retrofit:2.5.0")
+    compile("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.3.0")
 }
 
 compileKotlin.kotlinOptions {

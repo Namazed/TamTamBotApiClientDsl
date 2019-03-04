@@ -29,7 +29,7 @@ class ChatMember(
     @SerialName("is_admin") @Optional val isAdmin: Boolean? = null
 )
 
-object ChatMemebersSerializer : KSerializer<List<ChatMember>> {
+internal object ChatMemebersSerializer : KSerializer<List<ChatMember>> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("ChatMembers")
 
