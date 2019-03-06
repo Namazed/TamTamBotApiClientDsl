@@ -1,5 +1,10 @@
 package chat.tamtam.botsdk.client
 
+import chat.tamtam.botsdk.client.retrofit.Failure
+import chat.tamtam.botsdk.client.retrofit.HttpResult
+import chat.tamtam.botsdk.client.retrofit.RetrofitFactory
+import chat.tamtam.botsdk.client.retrofit.Success
+import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.response.BotInfo
@@ -10,13 +15,10 @@ import chat.tamtam.botsdk.model.response.UploadInfo
 import com.namazed.orthobot.botsdk.client.api.AnswerApi
 import com.namazed.orthobot.botsdk.client.api.BotApi
 import com.namazed.orthobot.botsdk.client.api.UploadApi
-import com.namazed.orthobot.botsdk.client.retrofit.RetrofitFactory
-import com.namazed.orthobot.botsdk.client.retrofit.await
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
-import retrofit2.Response
 import retrofit2.Retrofit
 import java.io.File
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
@@ -43,38 +45,32 @@ internal class HttpManager(
     private val botService: BotApi = retrofit.create(BotApi::class.java)
 ) {
 
-    suspend fun getBotInfo(): Response<BotInfo> {
+    suspend fun getBotInfo(): HttpResult<BotInfo> {
         return botService.getBotInfo(botToken).await()
     }
 
     suspend fun getUpdates(): Updates {
         val resultUpdates = subscriptionHttpManager.getUpdates()
         when (resultUpdates) {
-            is ResultUpdates.Success -> return resultUpdates.updates
-            is ResultUpdates.Failure -> throw HttpException(resultUpdates.response)
+            is Success<Updates> -> return resultUpdates.response
+            is Failure<Updates> -> throw HttpException(resultUpdates.response)
         }
     }
 
-    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback): Default {
-        val response = answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
-        return response.body() ?: throw HttpException(response)
-    }
+    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback): HttpResult<Default> =
+        answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
 
-    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback): Default {
-        val response = answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
-        return response.body() ?: throw HttpException(response)
-    }
+    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback): HttpResult<Default> =
+        answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
 
-    suspend fun getUploadUrl(uploadType: UploadType): Upload {
-        return uploadService.uploadUrl(botToken, uploadType).await().body()!!
-    }
+    suspend fun getUploadUrl(uploadType: UploadType): HttpResult<Upload> = uploadService.uploadUrl(botToken, uploadType).await()
 
-    suspend fun upload(url: String, uploadType: UploadType, filePath: String): UploadInfo {
+    suspend fun upload(url: String, uploadType: UploadType, filePath: String): HttpResult<UploadInfo> {
         val file = File(filePath)
         return upload(url, uploadType, file.readBytes(), file.name)
     }
 
-    suspend fun upload(url: String, uploadType: UploadType, byteArray: ByteArray, fileName: String): UploadInfo {
+    suspend fun upload(url: String, uploadType: UploadType, byteArray: ByteArray, fileName: String): HttpResult<UploadInfo> {
         val mediaType = when (uploadType) {
             UploadType.PHOTO -> IMAGE_MEDIA_TYPE
             UploadType.VIDEO -> VIDEO_MEDIA_TYPE
@@ -86,8 +82,7 @@ internal class HttpManager(
             fileName,
             RequestBody.create(mediaType, byteArray)
         )
-        val response = uploadService.upload(url, filePart).await()
-        return response.body() ?: throw HttpException(response)
+        return uploadService.upload(url, filePart).await()
     }
 
 }

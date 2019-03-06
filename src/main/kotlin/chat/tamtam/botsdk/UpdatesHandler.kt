@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory
 
 class UpdatesHandler(
     private val botScope: BotScope,
-//    private val context: ExecutorCoroutineDispatcher = Executors.newFixedThreadPool(getAvailableThread()).asCoroutineDispatcher(),
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
@@ -45,7 +44,7 @@ class UpdatesHandler(
         processUpdates(updates)
     }
 
-    private suspend fun processUpdates(updates: Updates) {
+    public suspend fun processUpdates(updates: Updates) {
         if (updates.listUpdates.isEmpty()) {
             return
         }

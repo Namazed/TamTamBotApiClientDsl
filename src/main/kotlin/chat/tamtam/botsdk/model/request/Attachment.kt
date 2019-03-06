@@ -24,27 +24,28 @@ interface Attachment {
         /**
          * This is default deserialize, because it not needed.
          */
-        override fun deserialize(input: Decoder): Attachment {
-            val type: AttachType = attachTypeFrom(input.decodeString())
+        override fun deserialize(decoder: Decoder): Attachment {
             return AttachmentKeyboard("", EMPTY_INLINE_KEYBOARD)
         }
 
-        override fun serialize(output: Encoder, obj: Attachment) {
+        override fun serialize(encoder: Encoder, obj: Attachment) {
             val type: AttachType = attachTypeFrom(obj.type)
             when (type) {
                 AttachType.IMAGE -> {
-                    AttachmentPhoto.serializer().serialize(output, obj as AttachmentPhoto)
+                    if (obj is AttachmentPhoto) {
+                        AttachmentPhoto.serializer().serialize(encoder, obj)
+                    } else {
+                        AttachmentMediaWithUrl.serializer().serialize(encoder, obj as AttachmentMediaWithUrl)
+                    }
                 }
-                AttachType.VIDEO -> TODO()
-                AttachType.AUDIO -> TODO()
-                AttachType.FILE -> TODO()
-                AttachType.CONTACT -> TODO()
-                AttachType.STICKER -> TODO()
+                AttachType.VIDEO -> AttachmentMediaWithId.serializer().serialize(encoder, obj as AttachmentMediaWithId)
+                AttachType.AUDIO -> AttachmentMediaWithId.serializer().serialize(encoder, obj as AttachmentMediaWithId)
+                AttachType.FILE -> AttachmentMediaWithId.serializer().serialize(encoder, obj as AttachmentMediaWithId)
+                AttachType.CONTACT -> AttachmentContact.serializer().serialize(encoder, obj as AttachmentContact)
+                AttachType.STICKER -> AttachmentSticker.serializer().serialize(encoder, obj as AttachmentSticker)
                 AttachType.SHARE -> TODO()
-                AttachType.INLINE_KEYBOARD -> {
-                    AttachmentKeyboard.serializer().serialize(output, obj as AttachmentKeyboard)
-                }
-                AttachType.LOCATION -> TODO()
+                AttachType.INLINE_KEYBOARD -> AttachmentKeyboard.serializer().serialize(encoder, obj as AttachmentKeyboard)
+                AttachType.LOCATION -> AttachmentLocation.serializer().serialize(encoder, obj as AttachmentLocation)
             }
         }
     }

@@ -1,5 +1,7 @@
 package chat.tamtam.botsdk.client
 
+import chat.tamtam.botsdk.client.retrofit.Failure
+import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.UserId
@@ -19,7 +21,11 @@ class RequestsManager internal constructor(
 ) {
 
     suspend fun getBotInfo(): BotInfo {
-        return httpManager.getBotInfo().body()!!
+        val httpResult = httpManager.getBotInfo()
+        return when (httpResult) {
+            is Success -> httpResult.response
+            is Failure -> TODO()
+        }
     }
 
     /**
@@ -31,8 +37,12 @@ class RequestsManager internal constructor(
      */
     suspend fun send(userId: UserId, sendMessage: RequestSendMessage): ResultSend {
         return try {
-            val response = httpManager.messageHttpManager.sendMessage(userId, sendMessage)
-            ResultSend.Success(response)
+            val httpResult = httpManager.messageHttpManager.sendMessage(userId, sendMessage)
+            // todo объединить в один Result с answer и upload
+            when (httpResult) {
+                is Success -> ResultSend.Success(httpResult.response)
+                is Failure -> ResultSend.Failure(HttpException(httpResult.response))
+            }
         } catch (e: HttpException) {
             ResultSend.Failure(e)
         } catch (e: Exception) {
@@ -45,8 +55,11 @@ class RequestsManager internal constructor(
      */
     suspend fun send(chatId: ChatId, sendMessage: RequestSendMessage): ResultSend {
         return try {
-            val response = httpManager.messageHttpManager.sendMessage(chatId, sendMessage)
-            ResultSend.Success(response)
+            val httpResult = httpManager.messageHttpManager.sendMessage(chatId, sendMessage)
+            when (httpResult) {
+                is Success -> ResultSend.Success(httpResult.response)
+                is Failure -> ResultSend.Failure(HttpException(httpResult.response))
+            }
         } catch (e: HttpException) {
             ResultSend.Failure(e)
         } catch (e: Exception) {
@@ -79,8 +92,11 @@ class RequestsManager internal constructor(
 
     suspend fun answer(callbackId: CallbackId, requestAnswerCallback: AnswerCallback): ResultAnswer {
         return try {
-            val response = httpManager.answerOnCallback(callbackId, requestAnswerCallback)
-            ResultAnswer.Success(response)
+            val httpResult = httpManager.answerOnCallback(callbackId, requestAnswerCallback)
+            when (httpResult) {
+                is Success -> ResultAnswer.Success(httpResult.response)
+                is Failure -> ResultAnswer.Failure(HttpException(httpResult.response))
+            }
         } catch (e: HttpException) {
             ResultAnswer.Failure(e)
         } catch (e: Exception) {
@@ -100,8 +116,11 @@ class RequestsManager internal constructor(
         requestAnswerNotificationCallback: AnswerNotificationCallback
     ): ResultAnswer {
         return try {
-            val response = httpManager.answerOnCallback(callbackId, requestAnswerNotificationCallback)
-            ResultAnswer.Success(response)
+            val httpResult = httpManager.answerOnCallback(callbackId, requestAnswerNotificationCallback)
+            when (httpResult) {
+                is Success -> ResultAnswer.Success(httpResult.response)
+                is Failure -> ResultAnswer.Failure(HttpException(httpResult.response))
+            }
         } catch (e: HttpException) {
             ResultAnswer.Failure(e)
         } catch (e: Exception) {
@@ -119,8 +138,11 @@ class RequestsManager internal constructor(
      */
     suspend fun getUploadUrl(uploadType: UploadType): ResultUploadUrl {
         return try {
-            val response = httpManager.getUploadUrl(uploadType)
-            ResultUploadUrl.Success(response)
+            val httpResult = httpManager.getUploadUrl(uploadType)
+            when (httpResult) {
+                is Success -> ResultUploadUrl.Success(httpResult.response)
+                is Failure -> ResultUploadUrl.Failure(HttpException(httpResult.response))
+            }
         } catch (e: HttpException) {
             ResultUploadUrl.Failure(e)
         } catch (e: Exception) {
@@ -136,20 +158,23 @@ class RequestsManager internal constructor(
      * @return [ResultUpload] which contains [ResultUpload.Success] or [ResultUpload.Failure], [ResultUpload.Success] will contains
      * response for specific [UploadType] ([String] with photoTokens for [UploadType.PHOTO] or id [Long] for file, video, audio)
      */
-    suspend fun upload(
-        uploadParams: UploadParams,
-        upload: Upload
-    ): ResultUpload = if (uploadParams.uploadType == UploadType.PHOTO) {
-        uploadLocalImage(upload, uploadParams)
-    } else {
-        uploadLocalFile(upload, uploadParams)
+    suspend fun upload(uploadParams: UploadParams, upload: Upload): ResultUpload<UploadInfo> = try {
+        val httpResult = httpManager.upload(upload.url, uploadParams.uploadType, uploadParams.path)
+        when (httpResult) {
+            is Success -> ResultUpload.Success(httpResult.response)
+            is Failure -> ResultUpload.Failure(HttpException(httpResult.response))
+        }
+    } catch (e: HttpException) {
+        ResultUpload.Failure(e)
+    } catch (e: Exception) {
+        ResultUpload.Failure(e)
     }
 
     internal suspend fun sendWithUpload(chatId: ChatId, userId: UserId, sendMessage: RequestSendMessage, upload: Upload, uploadParams: UploadParams): ResultSend {
         val resultUpload = upload(uploadParams, upload)
         return when (resultUpload) {
-            is ResultUpload.Success<*> -> sendByUploadType(chatId, userId, uploadParams.uploadType, sendMessage, resultUpload)
-            is ResultUpload.Failure -> ResultSend.Failure(resultUpload.exception)
+            is ResultUpload.Success<UploadInfo> -> sendByUploadType(chatId, userId, uploadParams.uploadType, sendMessage, resultUpload)
+            is ResultUpload.Failure<UploadInfo> -> ResultSend.Failure(resultUpload.exception)
         }
     }
 
@@ -158,20 +183,20 @@ class RequestsManager internal constructor(
         userId: UserId,
         uploadType: UploadType,
         sendMessage: chat.tamtam.botsdk.model.request.SendMessage,
-        resultUpload: ResultUpload.Success<*>
+        resultUpload: ResultUpload.Success<UploadInfo>
     ): ResultSend = if (uploadType == UploadType.PHOTO) {
-        val message = createSendMessageForImageToken(sendMessage, resultUpload.response as UploadInfo)
+        val message = createSendMessageForImageToken(sendMessage, resultUpload.response)
         if (chatId.id == -1L) send(userId, message) else send(chatId, message)
     } else {
-        val message = createSendMessageForMediaToken(uploadType, sendMessage, resultUpload.response as UploadInfo)
+        val message = createSendMessageForMediaToken(uploadType, sendMessage, resultUpload.response)
         if (chatId.id == -1L) send(userId, message) else send(chatId, message)
     }
 
     internal suspend fun answerWithUpload(callbackId: CallbackId, sendMessage: RequestSendMessage, upload: Upload, uploadParams: UploadParams): ResultAnswer {
         val resultUpload = upload(uploadParams, upload)
         return when (resultUpload) {
-            is ResultUpload.Success<*> -> answerByUploadType(callbackId, uploadParams.uploadType, sendMessage, resultUpload)
-            is ResultUpload.Failure -> ResultAnswer.Failure(resultUpload.exception)
+            is ResultUpload.Success<UploadInfo> -> answerByUploadType(callbackId, uploadParams.uploadType, sendMessage, resultUpload)
+            is ResultUpload.Failure<UploadInfo> -> ResultAnswer.Failure(resultUpload.exception)
         }
     }
 
@@ -179,34 +204,13 @@ class RequestsManager internal constructor(
         callbackId: CallbackId,
         uploadType: UploadType,
         sendMessage: chat.tamtam.botsdk.model.request.SendMessage,
-        resultUpload: ResultUpload.Success<*>
+        resultUpload: ResultUpload.Success<UploadInfo>
     ): ResultAnswer = if (uploadType == UploadType.PHOTO) {
-        answer(callbackId, createAnswerCallbackForImageToken(sendMessage, resultUpload.response as UploadInfo))
+        answer(callbackId, createAnswerCallbackForImageToken(sendMessage, resultUpload.response))
     } else {
-        answer(callbackId, createAnswerCallbackForMediaToken(uploadType, sendMessage, resultUpload.response as UploadInfo))
+        answer(callbackId, createAnswerCallbackForMediaToken(uploadType, sendMessage, resultUpload.response))
     }
 
-    private suspend fun uploadLocalImage(upload: Upload, uploadParams: UploadParams): ResultUpload {
-        return try {
-            val response = httpManager.upload(upload.url, uploadParams.uploadType, uploadParams.path)
-            ResultUpload.Success(response)
-        } catch (e: HttpException) {
-            ResultUpload.Failure(e)
-        } catch (e: Exception) {
-            ResultUpload.Failure(e)
-        }
-    }
-
-    private suspend fun uploadLocalFile(upload: Upload, uploadParams: UploadParams): ResultUpload {
-        return try {
-            val response = httpManager.upload(upload.url, uploadParams.uploadType, uploadParams.path)
-            ResultUpload.Success(response)
-        } catch (e: HttpException) {
-            ResultUpload.Failure(e)
-        } catch (e: Exception) {
-            ResultUpload.Failure(e)
-        }
-    }
 }
 
 class PreparedAnswer(
@@ -251,13 +255,13 @@ sealed class ResultUploadUrl {
 /**
  * This class return when you upload something by uploadUrl from [ResultUploadUrl]
  */
-sealed class ResultUpload {
+sealed class ResultUpload<out Response> {
     /**
      * @param response - for uploadType [UploadType.PHOTO] is [String] type, for other [UploadType] is [Long] type
      */
-    class Success<Response>(val response: Response) : ResultUpload()
+    class Success<Response>(val response: Response) : ResultUpload<Response>()
     /**
      * @param exception - this exception can contains specific [HttpException] or general [Exception]
      */
-    class Failure(val exception: Exception) : ResultUpload()
+    class Failure<Response>(val exception: Exception) : ResultUpload<Response>()
 }

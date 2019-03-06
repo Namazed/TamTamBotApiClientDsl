@@ -41,13 +41,13 @@ class CommandTest {
     }
 
     @Test
-    fun `check parse command from text with argument in Dialog`() {
+    fun `check parse command with argument from text in Dialog`() {
         val textWithCommand = "/start argument"
         assert(textWithCommand.isCommand())
     }
 
     @Test
-    fun `check parse command from text with argument in Chat`() {
+    fun `check parse command with argument from text in Chat`() {
         val textWithCommand = "@bot /start argument"
         assert(textWithCommand.isCommandInChat())
     }

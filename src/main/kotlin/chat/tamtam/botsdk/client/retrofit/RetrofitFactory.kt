@@ -1,4 +1,4 @@
-package com.namazed.orthobot.botsdk.client.retrofit
+package chat.tamtam.botsdk.client.retrofit
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
