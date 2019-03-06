@@ -2,13 +2,15 @@ package chat.tamtam.botsdk.model
 
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.serializer
 import kotlinx.serialization.withName
 
-@Serializable
+@Serializable(AttachTypeSerializer::class)
 enum class AttachType(val value: String) {
     IMAGE("IMAGE"),
     VIDEO("VIDEO"),
@@ -38,11 +40,12 @@ internal object AttachTypeSerializer : KSerializer<AttachType> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("AttachType")
 
-    override fun deserialize(input: Decoder): AttachType {
-        return attachTypeFrom(input.decodeString())
+    override fun deserialize(decoder: Decoder): AttachType {
+        return attachTypeFrom(decoder.decodeString())
     }
 
-    override fun serialize(output: Encoder, obj: AttachType) {
-        AttachType.serializer().serialize(output, obj)
+    @UseExperimental(ImplicitReflectionSerializer::class)
+    override fun serialize(encoder: Encoder, obj: AttachType) {
+        AttachType::class.serializer().serialize(encoder, obj)
     }
 }

@@ -6,7 +6,6 @@ import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.response.Message
 import retrofit2.Call
-import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -48,5 +47,3 @@ interface MessageApi {
     ): Call<ResponseSendMessage>
 
 }
-
-internal fun Retrofit.createMessageService() = create(MessageApi::class.java)

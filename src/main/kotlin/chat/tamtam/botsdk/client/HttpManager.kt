@@ -26,6 +26,11 @@ import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 internal const val BOT_TOKEN_FIELD = "access_token"
 
+internal val IMAGE_MEDIA_TYPE = MediaType.parse("image/*")
+internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
+internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
+internal val ALL_MEDIA_TYPE = MediaType.parse("all")
+
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
     internal val botToken: String,
@@ -71,10 +76,10 @@ internal class HttpManager(
 
     suspend fun upload(url: String, uploadType: UploadType, byteArray: ByteArray, fileName: String): UploadInfo {
         val mediaType = when (uploadType) {
-            UploadType.PHOTO -> MediaType.parse("image/*")
-            UploadType.VIDEO -> MediaType.parse("video/*")
-            UploadType.AUDIO -> MediaType.parse("audio/*")
-            UploadType.FILE -> MediaType.parse("all")
+            UploadType.PHOTO -> IMAGE_MEDIA_TYPE
+            UploadType.VIDEO -> VIDEO_MEDIA_TYPE
+            UploadType.AUDIO -> AUDIO_MEDIA_TYPE
+            UploadType.FILE -> ALL_MEDIA_TYPE
         }
         val filePart = MultipartBody.Part.createFormData(
             "v1",
