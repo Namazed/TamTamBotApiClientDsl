@@ -17,7 +17,7 @@ class MessageHttpManager internal constructor(
     retrofit: Retrofit,
     private val messageService: MessageApi = retrofit.create(MessageApi::class.java)
 ) {
-    suspend fun getAllMessages(chatId: ChatId, fromTime: Long, toTime: Long, count: Int = 50): HttpResult<List<Message>> =
+    suspend fun getAllMessages(chatId: ChatId, fromTime: Long?, toTime: Long?, count: Int = 50): HttpResult<List<Message>> =
         messageService.getMessages(botToken, count, fromTime, toTime, chatId).await()
 
     suspend fun sendMessage(userId: UserId, sendMessage: RequestSendMessage): HttpResult<ResponseSendMessage> =

@@ -2,7 +2,6 @@ package chat.tamtam.botsdk.model.request
 
 import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.ImageUrl
-import chat.tamtam.botsdk.model.VideoUrl
 import chat.tamtam.botsdk.model.response.UploadInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -28,11 +27,6 @@ internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: In
 internal fun createSendMessageForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): SendMessage {
     return SendMessage(sendMessage.text,
         listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser)
-}
-
-internal fun createSendMessageForVideoUrl(sendMessage: SendMessage, videoUrl: VideoUrl): SendMessage {
-    return SendMessage(sendMessage.text,
-        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(videoUrl.value))), sendMessage.notifyUser)
 }
 
 internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage: SendMessage, response: UploadInfo): SendMessage {

@@ -2,29 +2,27 @@ package chat.tamtam.botsdk.scopes
 
 import chat.tamtam.botsdk.client.PreparedAnswer
 import chat.tamtam.botsdk.client.RequestsManager
-import chat.tamtam.botsdk.client.ResultAnswer
-import chat.tamtam.botsdk.client.ResultSend
-import chat.tamtam.botsdk.client.ResultUploadUrl
+import chat.tamtam.botsdk.client.ResultRequest
 import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.VideoUrl
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.request.EMPTY_INLINE_KEYBOARD
 import chat.tamtam.botsdk.model.request.InlineKeyboard
-import chat.tamtam.botsdk.model.request.SendMessage
 import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
-import chat.tamtam.botsdk.model.request.createAnswerCallbackForVideoUrl
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
-import chat.tamtam.botsdk.model.request.createSendMessageForVideoUrl
+import chat.tamtam.botsdk.model.response.Default
+import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
+import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 /**
  * This interface give all requests methods from BotAPI in dsl style and no dsl (with help [requests] property)
@@ -33,7 +31,7 @@ interface Scope {
 
     /**
      * This property need if you want use request methods without dsl style
-     * like [RequestsManager.send] or [RequestsManager.answer]
+     * like [RequestsManager.send] or [RequestsManager.answer] or something else
      */
     val requests: RequestsManager
 
@@ -56,41 +54,47 @@ interface Scope {
     }
 
     /**
-     * This method need for send [SendMessage] for User by userId
-     *
-     * @param userId - this is inline class [UserId] which contains userId
-     * @receiver - this is [SendMessage] which you send for User
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @see [RequestsManager.getAllMessages]
+     * @receiver - this is a count of messages [0..100]
      */
-    suspend infix fun SendMessage.sendFor(userId: UserId): ResultSend = requests.send(userId, this)
+    suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<List<Message>> = requests.getAllMessages(chatId, count = this)
 
     /**
-     * This method need for send [SendMessage] with text of message for User by userId
+     * This method need for send [RequestSendMessage] for User by userId
+     *
+     * @param userId - this is inline class [UserId] which contains userId
+     * @receiver - this is [RequestSendMessage] which you send for User
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
+     */
+    suspend infix fun RequestSendMessage.sendFor(userId: UserId): ResultRequest<ResponseSendMessage> = requests.send(userId, this)
+
+    /**
+     * This method need for send [RequestSendMessage] with text of message for User by userId
      *
      * @param userId - this is inline class [UserId] which contains userId
      * @receiver - this is text for message which you send for User
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun String.sendFor(userId: UserId): ResultSend = SendMessage(this).sendFor(userId)
+    suspend infix fun String.sendFor(userId: UserId): ResultRequest<ResponseSendMessage> = RequestSendMessage(this).sendFor(userId)
 
     /**
-     * This method need for send [SendMessage] with text of message for Chat by chatId
+     * This method need for send [RequestSendMessage] with text of message for Chat by chatId
      *
      * @param chatId - this is inline class [ChatId] which contains chatId
-     * @receiver - this is [SendMessage] which you send for Chat
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @receiver - this is [RequestSendMessage] which you send for Chat
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun SendMessage.sendFor(chatId: ChatId): ResultSend = requests.send(chatId, this)
+    suspend infix fun RequestSendMessage.sendFor(chatId: ChatId): ResultRequest<ResponseSendMessage> = requests.send(chatId, this)
 
     /**
-     * This method need for send [SendMessage] with text of message for Chat by chatId
+     * This method need for send [RequestSendMessage] with text of message for Chat by chatId
      * You should know that this method notify all users in chat.
      *
      * @param chatId - this is inline class [ChatId] which contains chatId
      * @receiver - this is text for message which you send for Chat
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun String.sendFor(chatId: ChatId): ResultSend = SendMessage(this).sendFor(chatId)
+    suspend infix fun String.sendFor(chatId: ChatId): ResultRequest<ResponseSendMessage> = RequestSendMessage(this).sendFor(chatId)
 
     /**
      * This method need for connect with [sendWith] and pass [SendParams]
@@ -98,10 +102,10 @@ interface Scope {
      *
      * @param userId - this is inline class [UserId] which contains userId
      * @receiver - this is text for message which you send for User after call [sendWith]
-     * @return - [SendParams] which contains [UserId] or [ChatId] and [SendMessage] which contains text of message
+     * @return - [SendParams] which contains [UserId] or [ChatId] and [RequestSendMessage] which contains text of message
      */
     infix fun String.prepareFor(userId: UserId): SendParams {
-        return SendParams(userId, sendMessage = SendMessage(this))
+        return SendParams(userId, sendMessage = RequestSendMessage(this))
     }
 
     /**
@@ -111,49 +115,37 @@ interface Scope {
      *
      * @param chatId - this is inline class [ChatId] which contains chatId
      * @receiver - this is text for message which you send for Chat after call [sendWith]
-     * @return - [SendParams] which contains [UserId] or [ChatId] and [SendMessage] which contains text of message
+     * @return - [SendParams] which contains [UserId] or [ChatId] and [RequestSendMessage] which contains text of message
      */
     infix fun String.prepareFor(chatId: ChatId): SendParams {
-        return SendParams(chatId = chatId, sendMessage = SendMessage(this))
+        return SendParams(chatId = chatId, sendMessage = RequestSendMessage(this))
     }
 
     /**
      * This method send message with contains data from [SendParams] and [InlineKeyboard] for User
      *
      * @param keyboard - this is [InlineKeyboard] which you want send for User
-     * @receiver - this is [SendParams] which contains [UserId] and [SendMessage] which contains text of message
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @receiver - this is [SendParams] which contains [UserId] and [RequestSendMessage] which contains text of message
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard): ResultSend {
+    suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard): ResultRequest<ResponseSendMessage> {
         val attaches = if (keyboard == EMPTY_INLINE_KEYBOARD) {
             emptyList()
         } else {
             listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
         }
-        return requests.send(userId, SendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
+        return requests.send(userId, RequestSendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
     }
 
     /**
      * This method send message with contains data from [SendParams] and [ImageUrl] for Chat
      *
      * @param imageUrl - this is inline class [ImageUrl] which contains url on Image, which you want send in Chat
-     * @receiver - this is [SendParams] which contains [ChatId] and [SendMessage] which contains text of message
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultSend {
+    suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultRequest<ResponseSendMessage> {
         val sendMessage = createSendMessageForImageUrl(sendMessage, imageUrl)
-        return requests.send(chatId, sendMessage)
-    }
-
-    /**
-     * This method send message with contains data from [SendParams] and [VideoUrl] for Chat
-     *
-     * @param videoUrl - this is inline class [VideoUrl] which contains url on Video, which you want send in Chat
-     * @receiver - this is [SendParams] which contains [ChatId] and [SendMessage] which contains text of message
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
-     */
-    suspend infix fun SendParams.sendWith(videoUrl: VideoUrl): ResultSend {
-        val sendMessage = createSendMessageForVideoUrl(sendMessage, videoUrl)
         return requests.send(chatId, sendMessage)
     }
 
@@ -161,14 +153,20 @@ interface Scope {
      * This method send message with contains data from [SendParams] and [UploadParams] for Chat
      *
      * @param uploadParams - this is inline class [UploadParams] which contains path on file in you system and [UploadType]
-     * @receiver - this is [SendParams] which contains [ChatId] and [SendMessage] which contains text of message
-     * @return - [ResultSend] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
+     * @return - look at [RequestsManager.send]
      */
-    suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultSend {
+    suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultRequest<ResponseSendMessage> {
         val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
         return when (resultUpload) {
-            is ResultUploadUrl.Success -> requests.sendWithUpload(chatId, userId, sendMessage, resultUpload.response, uploadParams)
-            is ResultUploadUrl.Failure -> ResultSend.Failure(resultUpload.exception)
+            is ResultRequest.Success -> requests.sendWithUpload(
+                chatId,
+                userId,
+                sendMessage,
+                resultUpload.response,
+                uploadParams
+            )
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
         }
     }
 
@@ -182,24 +180,27 @@ interface Scope {
      * @return - [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
      */
     suspend infix fun String.prepareReplacementCurrentMessage(answerParams: AnswerParams): PreparedAnswer {
-        val answerCallback = AnswerCallback(message = SendMessage(this))
+        val answerCallback = AnswerCallback(message = RequestSendMessage(this))
         return PreparedAnswer(answerCallback, answerParams)
     }
 
     /**
-     * This method answer on Callback by [CallbackId] with new message
+     * This method answer on Callback by [CallbackId] with new message for replace old message
      *
      * @param callbackId - this is inline class [CallbackId] which contains callbackId
      * @receiver - this is text for new message, which replace old message
-     * @return - [ResultAnswer] which contains Success with current response or Failure with [BadResponseStatusException] or [Exception]
+     * @return - look at [RequestsManager.answer]
      */
-    suspend infix fun String.answerFor(callbackId: CallbackId): ResultAnswer {
-        val answerCallback = AnswerCallback(message = SendMessage(this))
+    suspend infix fun String.answerFor(callbackId: CallbackId): ResultRequest<Default> {
+        val answerCallback = AnswerCallback(message = RequestSendMessage(this))
         return requests.answer(callbackId, answerCallback)
     }
 
-    suspend infix fun String.replaceCurrentMessage(callbackId: CallbackId): ResultAnswer {
-        val answerCallback = AnswerCallback(message = SendMessage(this))
+    /**
+     * @see [answerFor]
+     */
+    suspend infix fun String.replaceCurrentMessage(callbackId: CallbackId): ResultRequest<Default> {
+        val answerCallback = AnswerCallback(message = RequestSendMessage(this))
         return requests.answer(callbackId, answerCallback)
     }
 
@@ -208,9 +209,9 @@ interface Scope {
      *
      * @param answerParams - [AnswerParams] which contains [CallbackId] of [InlineKeyboard] and [UserId]
      * @receiver - this is notification text
-     * @return - [ResultAnswer] which contains Success with current response or Failure with [BadResponseStatusException] or [Exception]
+     * @return - look at [RequestsManager.answer]
      */
-    suspend infix fun String.answerNotification(answerParams: AnswerParams): ResultAnswer {
+    suspend infix fun String.answerNotification(answerParams: AnswerParams): ResultRequest<Default> {
         val answerCallback = AnswerNotificationCallback(answerParams.userId.id, notification = this)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
@@ -220,9 +221,10 @@ interface Scope {
      *
      * @param keyboard - attach [InlineKeyboard], replace attaches in old message with CallbackId
      * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
-     * @return - [ResultAnswer] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     *
+     * @return - look at [RequestsManager.answer]
      */
-    suspend infix fun PreparedAnswer.answerWith(keyboard: InlineKeyboard): ResultAnswer {
+    suspend infix fun PreparedAnswer.answerWith(keyboard: InlineKeyboard): ResultRequest<Default> {
         val answerCallback = createAnswerCallbackForKeyboard(answerCallback.message, keyboard)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
@@ -232,22 +234,11 @@ interface Scope {
      *
      * @param imageUrl - this url send with new message and upload image, replace attaches in old message with CallbackId
      * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
-     * @return - [ResultAnswer] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
-     */
-    suspend infix fun PreparedAnswer.answerWith(imageUrl: ImageUrl): ResultAnswer {
-        val answerCallback = createAnswerCallbackForImageUrl(answerCallback.message, imageUrl)
-        return requests.answer(answerParams.callbackId, answerCallback)
-    }
-
-    /**
-     * This method answer on Callback by [CallbackId] with new message which contains Video attach
      *
-     * @param videoUrl - this url send with new message and upload video, replace attaches in old message with CallbackId
-     * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
-     * @return - [ResultAnswer] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     * @return - look at [RequestsManager.answer]
      */
-    suspend infix fun PreparedAnswer.answerWith(videoUrl: VideoUrl): ResultAnswer {
-        val answerCallback = createAnswerCallbackForVideoUrl(answerCallback.message, videoUrl)
+    suspend infix fun PreparedAnswer.answerWith(imageUrl: ImageUrl): ResultRequest<Default> {
+        val answerCallback = createAnswerCallbackForImageUrl(answerCallback.message, imageUrl)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 
@@ -257,13 +248,19 @@ interface Scope {
      *
      * @param uploadParams - this class contains local path of File (Media) which you want upload to server and contains type of media.
      * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
-     * @return - [ResultAnswer] which contains Success with current response from server or Failure with [BadResponseStatusException] or [Exception]
+     *
+     * @return - look at [RequestsManager.answer]
      */
-    suspend infix fun PreparedAnswer.answerWith(uploadParams: UploadParams): ResultAnswer {
+    suspend infix fun PreparedAnswer.answerWith(uploadParams: UploadParams): ResultRequest<Default> {
         val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
         return when (resultUpload) {
-            is ResultUploadUrl.Success -> requests.answerWithUpload(answerParams.callbackId, answerCallback.message, resultUpload.response, uploadParams)
-            is ResultUploadUrl.Failure -> ResultAnswer.Failure(resultUpload.exception)
+            is ResultRequest.Success -> requests.answerWithUpload(
+                answerParams.callbackId,
+                answerCallback.message,
+                resultUpload.response,
+                uploadParams
+            )
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
         }
     }
 }

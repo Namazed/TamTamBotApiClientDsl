@@ -6,36 +6,31 @@ package chat.tamtam.botsdk.model
 inline class ChatId(val id: Long)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class UserId(val id: Long)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class BotId(val id: Long)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class CallbackId(val id: String)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class MessageId(val id: String)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class Payload(val value: String)
 
 /**
- * look at [ChatId]
+ * @see [ChatId]
  */
 inline class ImageUrl(val value: String)
-
-/**
- * look at [ChatId]
- */
-inline class VideoUrl(val value: String)
