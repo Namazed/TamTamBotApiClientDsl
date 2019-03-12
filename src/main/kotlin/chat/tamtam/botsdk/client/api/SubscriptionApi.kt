@@ -37,7 +37,8 @@ internal interface SubscriptionApi {
 
     @GET("/updates")
     fun getUpdates(
-        @Query(BOT_TOKEN_FIELD) botToken: String
+        @Query(BOT_TOKEN_FIELD) botToken: String,
+        @Query("marker") marker: Long?
     ): Call<Updates>
 
 }

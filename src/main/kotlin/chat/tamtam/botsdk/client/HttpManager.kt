@@ -49,8 +49,8 @@ internal class HttpManager(
         return botService.getBotInfo(botToken).await()
     }
 
-    suspend fun getUpdates(): Updates {
-        val resultUpdates = subscriptionHttpManager.getUpdates()
+    suspend fun getUpdates(marker: Long?): Updates {
+        val resultUpdates = subscriptionHttpManager.getUpdates(marker)
         when (resultUpdates) {
             is Success<Updates> -> return resultUpdates.response
             is Failure<Updates> -> throw HttpException(resultUpdates.response)

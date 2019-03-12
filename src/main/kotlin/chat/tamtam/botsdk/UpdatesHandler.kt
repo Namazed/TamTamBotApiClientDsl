@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory
 
 class UpdatesHandler(
     private val botScope: BotScope,
+    private var marker: Long? = null,
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
@@ -35,7 +36,8 @@ class UpdatesHandler(
     suspend fun run() {
         val updates: Updates
         try {
-            updates = botScope.botHttpManager.getUpdates()
+            updates = botScope.botHttpManager.getUpdates(marker)
+            marker = updates.marker
         } catch (e: Exception) {
             log.error("run: error when get updates", e)
             return
@@ -97,12 +99,4 @@ class UpdatesHandler(
             log.info("forEachParallel: await")
             it.await()
         }
-}
-
-private fun getAvailableThread(): Int {
-    val availableProcessors = Runtime.getRuntime().availableProcessors()
-    return when {
-        availableProcessors > 2 -> availableProcessors - 1
-        else -> availableProcessors
-    }
 }
