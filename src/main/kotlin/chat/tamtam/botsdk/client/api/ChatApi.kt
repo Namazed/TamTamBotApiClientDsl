@@ -29,54 +29,50 @@ interface ChatApi {
 
     @GET("/chats/{chatId}")
     fun getChat(
-        @Query(BOT_TOKEN_FIELD) botToken: String,
-        @Path("chatId") chatId: ChatId
+        @Path("chatId") chatId: ChatId,
+        @Query(BOT_TOKEN_FIELD) botToken: String
     ): Call<Chat>
 
-    @FormUrlEncoded
     @PATCH("/chats/{chatId}")
     fun editChatInfo(
-        @Query(BOT_TOKEN_FIELD) botToken: String,
         @Path("chatId") chatId: ChatId,
+        @Query(BOT_TOKEN_FIELD) botToken: String,
         @Body chatInfo: ChatInfo
     ): Call<Chat>
 
-    @FormUrlEncoded
     @POST("/chats/{chatId}/actions")
     fun sendAction(
-        @Query(BOT_TOKEN_FIELD) botToken: String,
         @Path("chatId") chatId: ChatId,
+        @Query(BOT_TOKEN_FIELD) botToken: String,
         @Body action: ActionWrapper
     ): Call<Default>
 
-    @FormUrlEncoded
     @DELETE("/chats/{chatId}/members/me")
     fun leaveChat(
-        @Query(BOT_TOKEN_FIELD) botToken: String,
-        @Path("chatId") chatId: ChatId
+        @Path("chatId") chatId: ChatId,
+        @Query(BOT_TOKEN_FIELD) botToken: String
     ): Call<Default>
 
     @GET("/chats/{chatId}/members")
     fun getMembers(
+        @Path("chatId") chatId: ChatId,
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query("count") count: Int = 20,
-        @Path("chatId") chatId: ChatId,
         @Query("marker") marker: Long? = null
     ): Call<ChatMembersResult>
 
     @FormUrlEncoded
     @POST("/chats/{chatId}/members")
     fun addMembers(
+        @Path("chatId") chatId: ChatId,
         @Query(BOT_TOKEN_FIELD) botToken: String,
-        @Query("user_ids") userIds: List<Long>,
-        @Path("chatId") chatId: ChatId
+        @Query("user_ids") userIds: List<Long>
     ): Call<Default>
 
-    @FormUrlEncoded
     @DELETE("/chats/{chatId}/members")
     fun removeMember(
+        @Path("chatId") chatId: ChatId,
         @Query(BOT_TOKEN_FIELD) botToken: String,
-        @Query("user_id") userId: UserId,
-        @Path("chatId") chatId: ChatId
+        @Query("user_id") userId: UserId
     ): Call<Default>
 }

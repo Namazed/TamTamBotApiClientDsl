@@ -22,7 +22,6 @@ internal interface SubscriptionApi {
         @Query(BOT_TOKEN_FIELD) botToken: String
     ): Call<List<ResponseSubscription>>
 
-    @FormUrlEncoded
     @POST(SUBSCRIPTIONS_ENDPOINT)
     fun subscribe(
         @Query(BOT_TOKEN_FIELD) botToken: String,

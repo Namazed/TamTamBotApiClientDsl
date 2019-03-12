@@ -90,7 +90,13 @@ class UpdatesHandler(
     }
 
     private suspend fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit =
-        map { parallelScope.async { f(it) } }.forEach { it.await() }
+        map {
+            log.info("forEachParallel: create async")
+            parallelScope.async { f(it) }
+        }.forEach {
+            log.info("forEachParallel: await")
+            it.await()
+        }
 }
 
 private fun getAvailableThread(): Int {

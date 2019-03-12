@@ -21,22 +21,22 @@ class ChatHttpManager internal constructor(
     suspend fun getAllChats(count: Int = 50, marker: Long? = null): HttpResult<List<Chat>> =
         chatService.getChats(botToken, count, marker).await()
 
-    suspend fun getChat(chatId: ChatId): HttpResult<Chat> = chatService.getChat(botToken, chatId).await()
+    suspend fun getChat(chatId: ChatId): HttpResult<Chat> = chatService.getChat(chatId, botToken).await()
 
     suspend fun editChatInfo(chatId: ChatId, chatInfo: ChatInfo): HttpResult<Chat> =
-        chatService.editChatInfo(botToken, chatId, chatInfo).await()
+        chatService.editChatInfo(chatId, botToken, chatInfo).await()
 
     suspend fun sendAction(chatId: ChatId, action: Action): HttpResult<Default> =
-        chatService.sendAction(botToken, chatId, ActionWrapper(action.name)).await()
+        chatService.sendAction(chatId, botToken, ActionWrapper(action.value)).await()
 
-    suspend fun leaveChat(chatId: ChatId): HttpResult<Default> = chatService.leaveChat(botToken, chatId).await()
+    suspend fun leaveChat(chatId: ChatId): HttpResult<Default> = chatService.leaveChat(chatId, botToken).await()
 
     suspend fun getMembers(chatId: ChatId, count: Int = 20, marker: Long? = null): HttpResult<ChatMembersResult> =
-        chatService.getMembers(botToken, count, chatId, marker).await()
+        chatService.getMembers(chatId, botToken, count, marker).await()
 
     suspend fun addMembers(chatId: ChatId, userIds: List<Long>): HttpResult<Default> =
-        chatService.addMembers(botToken, userIds, chatId).await()
+        chatService.addMembers(chatId, botToken, userIds).await()
 
     suspend fun removeMember(chatId: ChatId, userId: UserId): HttpResult<Default> =
-        chatService.removeMember(botToken, userId, chatId).await()
+        chatService.removeMember(chatId, botToken, userId).await()
 }

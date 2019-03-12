@@ -9,9 +9,8 @@ plugins {
 }
 
 group = "chat.tamtam.botsdk"
-version = "0.1"
+version = "0.0.1"
 
-val ktorVersion = "1.1.1"
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
 

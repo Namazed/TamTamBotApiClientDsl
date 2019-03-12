@@ -9,7 +9,6 @@ import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.serializer
 import kotlinx.serialization.withName
 
 @Serializable
@@ -66,12 +65,12 @@ internal object UpdateTypeSerializer : KSerializer<UpdateType> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("UpdateType")
 
-    override fun deserialize(input: Decoder): UpdateType {
-        return updateTypeFrom(input.decodeString())
+    override fun deserialize(decoder: Decoder): UpdateType {
+        return updateTypeFrom(decoder.decodeString())
     }
 
     @UseExperimental(ImplicitReflectionSerializer::class)
-    override fun serialize(output: Encoder, obj: UpdateType) {
-        UpdateType::class.serializer().serialize(output, obj)
+    override fun serialize(encoder: Encoder, obj: UpdateType) {
+        //todo write custom serializer
     }
 }
