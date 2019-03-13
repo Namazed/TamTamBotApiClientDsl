@@ -1,3 +1,4 @@
+[![](https://jitpack.io/v/Namazed/TamTamBotApiClientDsl.svg)](https://jitpack.io/#Namazed/TamTamBotApiClientDsl)
 # TamTamBotApiClientDsl
 
 Kotlin DSL для TamTam Bot API. С помощью этой библиотеки можно упростить работу с Bot API.
@@ -9,6 +10,42 @@ Kotlin DSL для TamTam Bot API. С помощью этой библиотек�
 
 ## Что необходимо, что бы начать
 
+Для доступа к библиотеке необходимо добавить зависимость на ```jitpack```
+
+Gradle
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+Maven
+```xml
+<repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
+</repositories>
+```
+Также необходимо добавить зависимость
+
+Gradle
+```groovy
+dependencies {
+    implementation 'com.github.Namazed:TamTamBotApiClientDsl:current_version'
+}
+```
+Maven
+```xml
+<dependency>
+	 <groupId>com.github.Namazed</groupId>
+	 <artifactId>TamTamBotApiClientDsl</artifactId>
+	 <version>Tag</version>
+</dependency>
+```
 
 ## Примеры
 
