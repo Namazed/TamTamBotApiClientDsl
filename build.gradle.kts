@@ -10,8 +10,7 @@ plugins {
 }
 
 group = "com.github.Namazed"
-//group = "chat.tamtam.botsdk"
-version = "0.0.1"
+version = "0.0.2"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
