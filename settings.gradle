@@ -11,5 +11,6 @@ pluginManagement {
     }
 }
 rootProject.name = 'BotSdk'
+include 'sample', 'library'
 
 
