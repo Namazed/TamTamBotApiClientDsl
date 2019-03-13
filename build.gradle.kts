@@ -9,7 +9,8 @@ plugins {
     `maven-publish`
 }
 
-group = "chat.tamtam.botsdk"
+group = "com.github.Namazed"
+//group = "chat.tamtam.botsdk"
 version = "0.0.1"
 
 val compileKotlin: KotlinCompile by tasks
