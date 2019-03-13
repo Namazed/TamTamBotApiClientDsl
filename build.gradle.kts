@@ -34,8 +34,8 @@ dependencies {
     testCompile("org.junit.jupiter:junit-jupiter:5.4.0")
 }
 
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+tasks.withType<KotlinCompile>().all {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 compileKotlin.kotlinOptions {
