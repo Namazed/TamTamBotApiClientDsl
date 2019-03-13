@@ -132,6 +132,42 @@ messages {
 ```kotlin
 requestsManager.sendText(UserId(commandState.command.message.sender.userId), "Two bananas")
 ```
+Для создания InlineKeyboard, можно воспользоваться keyboard DSL, ниже пример с созданием InlineKeyboard тремя способами с помощью: ```operator unaryPlus```, через infix function ```add```, либо просто вызвать function ```add```.
+```buttonRow``` создает строку с кнопками.
+
+```kotlin
+keyboard {
+    +buttonRow {
+        +Button(
+            ButtonType.CALLBACK.value,
+            "Create dreams",
+            payload = "DREAMS"
+        )
+        +Button(
+            ButtonType.CALLBACK.value,
+            "Imagine that you are Dragon",
+            payload = "DRAGON"
+        )
+    }
+
+    this add buttonRow {
+        this add Button(
+            ButtonType.LINK.value,
+            "Find new dreams"
+        )
+    }
+
+    add(buttonRow {
+        add(
+            Button(
+                ButtonType.LINK.value,
+                "Find new dreams"
+            )
+        )
+    })
+}
+```
+
 ## Contributing
 
 Pull requests приветствуются. Если нашли какие то bugs или есть отличная идея прошу создать для этого issue
