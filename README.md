@@ -95,3 +95,9 @@ messages {
 ```kotlin
 requestsManager.sendText(UserId(commandState.command.message.sender.userId), "Two bananas")
 ```
+## Contributing
+
+Pull requests приветствуются. Если нашли какие то bugs или есть отличная идея прошу создать для этого issue
+
+## License
+Эта библиотека использует лицензию [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
