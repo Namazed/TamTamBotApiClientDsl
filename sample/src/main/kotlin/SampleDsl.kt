@@ -10,6 +10,8 @@ import chat.tamtam.botsdk.model.Payload
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.InlineKeyboard
+import chat.tamtam.botsdk.model.request.UploadParams
+import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.scopes.CommandsScope
 import chat.tamtam.botsdk.state.CommandState
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
@@ -70,11 +72,17 @@ fun main() {
             // when user click on button with payload "HELLO", code below will start
             answerOnCallback(Payload("HELLO")) {
                 val inlineKeyboard = createInlineKeyboard()
-                "Hello" prepareReplacementCurrentMessage AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId)) answerWith inlineKeyboard
+                "Hello" prepareReplacementCurrentMessage
+                        AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId)) answerWith inlineKeyboard
             }
 
             // when user click on button with payload "GOODBYE", code below will start
             answerOnCallback(Payload("GOODBYE")) {
+
+                // send message with upload Photo which replace old message
+                "Goodbye" prepareReplacementCurrentMessage
+                        AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId)) answerWith
+                        UploadParams("local_file_path", UploadType.PHOTO)
 
                 // send message which replace old message
                 "Goodbye" answerFor CallbackId(it.callback.callbackId)
@@ -101,12 +109,12 @@ fun main() {
 
         users {
 
-            // if added user in chat where your bot is member, code below will start
+            // if some user added in chat where your bot is member, code below will start
             onAddedUserToChat {
 
             }
 
-            // if removed user in chat where your bot is member, code below will start
+            // if some user removed in chat where your bot is member, code below will start
             onRemovedUserFromChat {
 
             }
