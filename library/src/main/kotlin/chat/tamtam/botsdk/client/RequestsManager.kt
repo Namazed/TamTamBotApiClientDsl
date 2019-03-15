@@ -16,13 +16,14 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageToken
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForMediaToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageToken
 import chat.tamtam.botsdk.model.request.createSendMessageForMediaToken
-import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMembersResult
+import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Message
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
+import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.typing.TypingController
 import retrofit2.HttpException
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
@@ -41,7 +42,7 @@ class RequestsManager internal constructor(
     /**
      * If you want get information about your bot, which like name or id, you need use this method
      */
-    suspend fun getBotInfo(): BotInfo {
+    suspend fun getBotInfo(): User {
         val httpResult = httpManager.getBotInfo()
         return when (httpResult) {
             is Success -> httpResult.response
@@ -73,7 +74,7 @@ class RequestsManager internal constructor(
     /**
      * This method give you chats from specific marker or without.
      */
-    suspend fun getAllChats(count: Int = 50, marker: Long? = null): ResultRequest<List<Chat>> = startRequest {
+    suspend fun getAllChats(count: Int = 50, marker: Long? = null): ResultRequest<ChatsResult> = startRequest {
         checkCount(count)
         httpManager.chatHttpManager.getAllChats(count, marker)
     }

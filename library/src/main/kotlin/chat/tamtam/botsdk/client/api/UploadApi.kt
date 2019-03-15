@@ -1,4 +1,4 @@
-package com.namazed.orthobot.botsdk.client.api
+package chat.tamtam.botsdk.client.api
 
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.response.Upload

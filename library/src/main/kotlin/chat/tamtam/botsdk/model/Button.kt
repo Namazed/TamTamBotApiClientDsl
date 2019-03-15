@@ -11,6 +11,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.withName
 
+/**
+ * @param type - type of Button [ButtonType]
+ * @param title - visible text of button
+ * @param intent - intent of button. Affects clients representation. [ButtonIntent]
+ * @param payload - button payload
+ */
 @Serializable
 class Button(
     val type: String,

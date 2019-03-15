@@ -11,12 +11,34 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.withName
 
+/**
+ * This class handle when some users use your bot.
+ *
+ * @param listUpdates - Page of updates
+ * @param marker - Pointer to the next data page
+ */
 @Serializable
 class Updates(
     @SerialName("updates") val listUpdates: List<Update>,
     @Optional val marker: Long = -1
 )
 
+/**
+ * Specific update from [Updates]
+ *
+ * @param timestamp - Unix-time when event has occured
+ * @param updateType - type of update see class [UpdateType]
+ * @param messageId - this message id you will get if user removed or restored some message
+ * ([UpdateType.MESSAGE_REMOVED], [UpdateType.MESSAGE_RESTORED])
+ * @param chatId - this chat id you will get in this event [UpdateType.BOT_STARTED], [UpdateType.CHAT_TITLE_CHANGED],
+ * [UpdateType.USER_ADDED], [UpdateType.USER_REMOVED], [UpdateType.BOT_ADDED], [UpdateType.BOT_REMOVED]
+ * @param userId - see bot API docs, this parameter means different, depends on event
+ * @param adminId - Administrator who removed user from chat [UpdateType.USER_REMOVED]
+ * @param inviterId - User who added user to chat [UpdateType.USER_ADDED]
+ * @param newChatTitle - changed title in chat [UpdateType.CHAT_TITLE_CHANGED]
+ * @param message - new or edited message [UpdateType.MESSAGE_CREATED], [UpdateType.MESSAGE_EDITED]
+ * @param callback - this class you will get if user pressed on button [UpdateType.CALLBACK]
+ */
 @Serializable
 class Update(
     val timestamp: Long,
@@ -26,6 +48,7 @@ class Update(
     @SerialName("user_id") @Optional val userId: Long = -1,
     @SerialName("admin_id") @Optional val adminId: Long = -1,
     @SerialName("inviter_id") @Optional val inviterId: Long = -1,
+    @SerialName("title") @Optional val newChatTitle: String = "",
     @Optional val message: Message = EMPTY_MESSAGE,
     @Optional val callback: Callback = EMPTY_CALLBACK
 )

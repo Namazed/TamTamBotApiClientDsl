@@ -4,7 +4,7 @@ import chat.tamtam.botsdk.client.retrofit.HttpResult
 import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Updates
-import com.namazed.orthobot.botsdk.client.api.SubscriptionApi
+import chat.tamtam.botsdk.client.api.SubscriptionApi
 import retrofit2.Retrofit
 import chat.tamtam.botsdk.model.request.Subscription as RequestSubscription
 import chat.tamtam.botsdk.model.response.Subscription as ResponseSubscription

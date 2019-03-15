@@ -1,4 +1,4 @@
-package com.namazed.orthobot.botsdk.client.api
+package chat.tamtam.botsdk.client.api
 
 import chat.tamtam.botsdk.client.BOT_TOKEN_FIELD
 import chat.tamtam.botsdk.model.ChatId
@@ -7,6 +7,7 @@ import chat.tamtam.botsdk.model.request.ActionWrapper
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMembersResult
+import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
 import retrofit2.Call
 import retrofit2.http.Body
@@ -25,7 +26,7 @@ interface ChatApi {
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query("count") count: Int = 50,
         @Query("marker") marker: Long? = null
-    ): Call<List<Chat>>
+    ): Call<ChatsResult>
 
     @GET("/chats/{chatId}")
     fun getChat(
