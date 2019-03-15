@@ -1,5 +1,8 @@
 package chat.tamtam.botsdk.client
 
+import chat.tamtam.botsdk.client.api.AnswerApi
+import chat.tamtam.botsdk.client.api.BotApi
+import chat.tamtam.botsdk.client.api.UploadApi
 import chat.tamtam.botsdk.client.retrofit.Failure
 import chat.tamtam.botsdk.client.retrofit.HttpResult
 import chat.tamtam.botsdk.client.retrofit.RetrofitFactory
@@ -7,14 +10,11 @@ import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.request.UploadType
-import chat.tamtam.botsdk.model.response.BotInfo
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
-import com.namazed.orthobot.botsdk.client.api.AnswerApi
-import com.namazed.orthobot.botsdk.client.api.BotApi
-import com.namazed.orthobot.botsdk.client.api.UploadApi
+import chat.tamtam.botsdk.model.response.User
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -45,7 +45,7 @@ internal class HttpManager(
     private val botService: BotApi = retrofit.create(BotApi::class.java)
 ) {
 
-    suspend fun getBotInfo(): HttpResult<BotInfo> {
+    suspend fun getBotInfo(): HttpResult<User> {
         return botService.getBotInfo(botToken).await()
     }
 

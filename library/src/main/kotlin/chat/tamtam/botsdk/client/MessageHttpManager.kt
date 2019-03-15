@@ -6,7 +6,7 @@ import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.response.Message
-import com.namazed.orthobot.botsdk.client.api.MessageApi
+import chat.tamtam.botsdk.client.api.MessageApi
 import retrofit2.Retrofit
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage

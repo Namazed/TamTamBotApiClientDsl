@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  *
  * @param chatId - identifier of chat where created message
  * @param messageId - unique identifier of created message
- * @param messageId - in most cases same as [chatId]
+ * @param recipientId - in most cases same as [chatId]
  */
 @Serializable
 class SendMessage(

@@ -12,27 +12,27 @@ import kotlinx.serialization.withName
 
 @Serializable(AttachTypeSerializer::class)
 enum class AttachType(val value: String) {
-    IMAGE("IMAGE"),
-    VIDEO("VIDEO"),
-    AUDIO("AUDIO"),
-    FILE("FILE"),
-    CONTACT("CONTACT"),
-    STICKER("STICKER"),
-    SHARE("SHARE"),
-    INLINE_KEYBOARD("INLINE_KEYBOARD"),
-    LOCATION("LOCATION")
+    IMAGE("image"),
+    VIDEO("video"),
+    AUDIO("audio"),
+    FILE("file"),
+    CONTACT("contact"),
+    STICKER("sticker"),
+    SHARE("share"),
+    INLINE_KEYBOARD("inline_keyboard"),
+    LOCATION("location")
 }
 
-fun attachTypeFrom(value: String) = when (value.toUpperCase()) {
-    "IMAGE" -> AttachType.IMAGE
-    "VIDEO" -> AttachType.VIDEO
-    "AUDIO" -> AttachType.AUDIO
-    "FILE" -> AttachType.FILE
-    "CONTACT" -> AttachType.CONTACT
-    "STICKER" -> AttachType.STICKER
-    "SHARE" -> AttachType.SHARE
-    "INLINE_KEYBOARD" -> AttachType.INLINE_KEYBOARD
-    "LOCATION" -> AttachType.LOCATION
+fun attachTypeFrom(value: String) = when (value) {
+    "image" -> AttachType.IMAGE
+    "video" -> AttachType.VIDEO
+    "audio" -> AttachType.AUDIO
+    "file" -> AttachType.FILE
+    "contact" -> AttachType.CONTACT
+    "sticker" -> AttachType.STICKER
+    "share" -> AttachType.SHARE
+    "inline_keyboard" -> AttachType.INLINE_KEYBOARD
+    "location" -> AttachType.LOCATION
     else -> throw IllegalArgumentException("Unknown type")
 }
 

@@ -26,7 +26,7 @@ import kotlinx.coroutines.async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class UpdatesHandler(
+class UpdatesHandler internal constructor(
     private val botScope: BotScope,
     private var marker: Long? = null,
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),

@@ -1,5 +1,6 @@
 package chat.tamtam.botsdk.client
 
+import chat.tamtam.botsdk.client.api.ChatApi
 import chat.tamtam.botsdk.client.retrofit.HttpResult
 import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.ChatId
@@ -9,8 +10,8 @@ import chat.tamtam.botsdk.model.request.ActionWrapper
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMembersResult
+import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
-import com.namazed.orthobot.botsdk.client.api.ChatApi
 import retrofit2.Retrofit
 
 class ChatHttpManager internal constructor(
@@ -18,7 +19,7 @@ class ChatHttpManager internal constructor(
     retrofit: Retrofit,
     private val chatService: ChatApi = retrofit.create(ChatApi::class.java)
 ) {
-    suspend fun getAllChats(count: Int = 50, marker: Long? = null): HttpResult<List<Chat>> =
+    suspend fun getAllChats(count: Int = 50, marker: Long? = null): HttpResult<ChatsResult> =
         chatService.getChats(botToken, count, marker).await()
 
     suspend fun getChat(chatId: ChatId): HttpResult<Chat> = chatService.getChat(chatId, botToken).await()
