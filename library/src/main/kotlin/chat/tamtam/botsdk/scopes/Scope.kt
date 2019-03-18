@@ -20,7 +20,7 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
 import chat.tamtam.botsdk.model.response.Default
-import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -57,7 +57,7 @@ interface Scope {
      * @see [RequestsManager.getAllMessages]
      * @receiver - this is a count of messages [0..100]
      */
-    suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<List<Message>> = requests.getAllMessages(chatId, count = this)
+    suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<Messages> = requests.getAllMessages(chatId, count = this)
 
     /**
      * This method need for send [RequestSendMessage] for User by userId
@@ -166,7 +166,7 @@ interface Scope {
                 resultUpload.response,
                 uploadParams
             )
-            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
         }
     }
 
@@ -260,7 +260,7 @@ interface Scope {
                 resultUpload.response,
                 uploadParams
             )
-            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
         }
     }
 }

@@ -21,7 +21,7 @@ import chat.tamtam.botsdk.model.response.ChatMembersResult
 import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Error
-import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
 import chat.tamtam.botsdk.model.response.User
@@ -137,7 +137,7 @@ class RequestsManager internal constructor(
         fromTime: Long? = null,
         toTime: Long? = null,
         count: Int = 50
-    ): ResultRequest<List<Message>> = startRequest {
+    ): ResultRequest<Messages> = startRequest {
         checkCount(count)
         httpManager.messageHttpManager.getAllMessages(chatId, fromTime, toTime, count)
     }

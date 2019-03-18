@@ -18,15 +18,6 @@ class SubscriptionTest : ClientTest() {
         assert(updates.listUpdates[0].updateType == UpdateType.CALLBACK)
     }
 
-
-    @Test
-    fun `check right behavior and serialization when get update with 500 status`() = runBlocking {
-        mockServer.mockHttpResponse("/json/error.json", 500)
-        val exception = assertThrows<HttpException> {
-            runBlocking { httpManager.getUpdates(null) }
-        }
-    }
-
     @Test
     fun `check right behavior and serialization when get update with 404 status`() = runBlocking {
         mockServer.mockHttpResponse("/json/error.json", 404)
