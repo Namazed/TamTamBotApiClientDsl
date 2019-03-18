@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit
 internal object RetrofitFactory {
     private const val BASE_URL = "https://botapi.tamtam.chat"
 
-    fun createRetrofit(): Retrofit {
+    fun createRetrofit(url: String? = null): Retrofit {
         val contentType = MediaType.get("application/json")
         return Retrofit.Builder()
             .addConverterFactory(Json.asConverterFactory(contentType))
-            .baseUrl(BASE_URL)
+            .baseUrl(url ?: BASE_URL)
             .client(createOkHttpClient())
             .build()
     }

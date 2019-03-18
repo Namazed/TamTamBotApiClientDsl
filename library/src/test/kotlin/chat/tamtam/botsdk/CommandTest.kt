@@ -1,3 +1,5 @@
+package chat.tamtam.botsdk
+
 import chat.tamtam.botsdk.model.isCommand
 import chat.tamtam.botsdk.model.isCommandInChat
 import chat.tamtam.botsdk.model.response.ChatType
