@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "1.3.21"
     id("kotlinx-serialization") version "1.3.21"
     id("org.jetbrains.dokka") version "0.9.17"
     maven
@@ -32,6 +31,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.3.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:3.14.0")
 }
 
 tasks.withType<KotlinCompile>().all {
