@@ -1,0 +1,19 @@
+{
+  "updates": [
+    {
+      "update_type": "message_callback",
+      "timestamp": 101,
+      "callback": {
+        "timestamp": 101,
+        "callback_id": "test_callback_id",
+        "payload": "payload",
+        "user": {
+          "user_id": 17,
+          "name": "Felix",
+          "username": "NotFelix"
+        }
+      }
+    }
+  ],
+  "marker": 0
+}
