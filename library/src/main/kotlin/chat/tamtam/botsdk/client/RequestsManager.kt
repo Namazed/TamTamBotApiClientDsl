@@ -20,12 +20,15 @@ import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMembersResult
 import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
-import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.response.Error
+import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
 import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.typing.TypingController
+import kotlinx.serialization.json.Json
 import retrofit2.HttpException
+import retrofit2.Response
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.request.Subscription as RequestSubscription
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
@@ -134,7 +137,7 @@ class RequestsManager internal constructor(
         fromTime: Long? = null,
         toTime: Long? = null,
         count: Int = 50
-    ): ResultRequest<List<Message>> = startRequest {
+    ): ResultRequest<Messages> = startRequest {
         checkCount(count)
         httpManager.messageHttpManager.getAllMessages(chatId, fromTime, toTime, count)
     }
@@ -255,7 +258,7 @@ class RequestsManager internal constructor(
         val resultUpload = upload(uploadParams, upload)
         return when (resultUpload) {
             is ResultRequest.Success -> sendByUploadType(chatId, userId, uploadParams.uploadType, sendMessage, resultUpload)
-            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
         }
     }
 
@@ -289,7 +292,7 @@ class RequestsManager internal constructor(
         val resultUpload = upload(uploadParams, upload)
         return when (resultUpload) {
             is ResultRequest.Success -> answerByUploadType(callbackId, uploadParams.uploadType, sendMessage, resultUpload)
-            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.exception)
+            is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
         }
     }
 
@@ -316,12 +319,24 @@ class RequestsManager internal constructor(
         val httpResult = request()
         when (httpResult) {
             is Success -> ResultRequest.Success(httpResult.response)
-            is Failure -> ResultRequest.Failure(HttpException(httpResult.response))
+            is Failure -> {
+                val error = parseError(httpResult.response)
+                ResultRequest.Failure(httpResult.response.code(), error, HttpException(httpResult.response))
+            }
         }
     } catch (e: HttpException) {
-        ResultRequest.Failure(e)
+        val error = parseError(e.response())
+
+        ResultRequest.Failure(e.code(), error, e)
     } catch (e: Exception) {
-        ResultRequest.Failure(e)
+        ResultRequest.Failure(-1, Error(code = "general", message = e.message?.let { it } ?: ""), e)
+    }
+
+    private fun <R> parseError(e: Response<R>): Error {
+        return e.errorBody()?.let {
+            val er = Json.parse(Error.serializer(), it.string())
+            er
+        } ?: Error(code = "general", message = e.message())
     }
 
     private fun checkCount(count: Int) {
@@ -349,7 +364,9 @@ sealed class ResultRequest<out R> {
      */
     class Success<R>(val response: R) : ResultRequest<R>()
     /**
+     * @param httpStatusCode - if exception about bad requests or server error is status code, if locale exception is [-1]
+     * @param error - error contains code from server and message, or general code if exception is local
      * @param exception - this exception can contains specific [HttpException] or general [Exception]
      */
-    class Failure<R>(val exception: Exception) : ResultRequest<R>()
+    class Failure<R>(val httpStatusCode: Int, val error: Error, val exception: Exception) : ResultRequest<R>()
 }

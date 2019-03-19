@@ -22,8 +22,8 @@ val EMPTY_PAYLOAD = Payload()
 class Attachment(
     @Serializable(AttachTypeSerializer::class) val type: AttachType,
     @SerialName("callback_id") @Optional val callbackId: String = "",
-    @Optional val latitude: Long = -1,
-    @Optional val longitude: Long = -1,
+    @Optional val latitude: Double = -1.0,
+    @Optional val longitude: Double = -1.0,
     @Optional val payload: Payload = EMPTY_PAYLOAD
 )
 

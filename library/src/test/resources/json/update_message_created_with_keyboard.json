@@ -1,0 +1,51 @@
+{
+  "updates": [
+    {
+      "update_type": "message_created",
+      "timestamp": 101,
+      "message": {
+        "sender": {
+          "user_id": 17,
+          "name": "Felix",
+          "username": "NotFelix"
+        },
+        "recipient": {
+          "chat_id": 18,
+          "chat_type": "dialog",
+          "user_id": 17
+        },
+        "timestamp": 101,
+        "message": {
+          "mid": "mid101",
+          "seq": 0,
+          "text": "test",
+          "attachments": [
+            {
+              "type": "inline_keyboard",
+              "callback_id": "test_callback_id",
+              "payload": {
+                "buttons": [
+                  [
+                    {
+                      "type": "callback",
+                      "text": "test_text",
+                      "intent": "default",
+                      "payload": "test_button"
+                    },
+                    {
+                      "type": "callback",
+                      "text": "test_text",
+                      "intent": "default",
+                      "payload": "test_button"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "marker": 0
+}

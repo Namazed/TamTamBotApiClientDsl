@@ -1,0 +1,40 @@
+{
+  "updates": [
+    {
+      "update_type": "message_created",
+      "timestamp": 101,
+      "message": {
+        "sender": {
+          "user_id": 17,
+          "name": "Felix",
+          "username": "NotFelix"
+        },
+        "recipient": {
+          "chat_id": 18,
+          "chat_type": "dialog",
+          "user_id": 17
+        },
+        "timestamp": 101,
+        "message": {
+          "mid": "mid101",
+          "seq": 0,
+          "text": "test",
+          "attachments": [
+            {
+              "type": "contact",
+              "payload": {
+                "vcfInfo": "test_vcfInfo",
+                "tamInfo": {
+                  "user_id": 17,
+                  "name": "Felix",
+                  "username": "NotFelix"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "marker": 0
+}

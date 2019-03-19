@@ -1,3 +1,5 @@
+package chat.tamtam.botsdk
+
 import chat.tamtam.botsdk.keyboard.keyboard
 import chat.tamtam.botsdk.model.Button
 import chat.tamtam.botsdk.model.ButtonType
