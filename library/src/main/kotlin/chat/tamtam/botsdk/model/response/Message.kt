@@ -51,13 +51,13 @@ internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
         get() = StringDescriptor.withName("ResponseAttachments")
 
     @UseExperimental(ImplicitReflectionSerializer::class)
-    override fun deserialize(input: Decoder): List<Attachment> {
-        return chat.tamtam.botsdk.model.response.Attachment::class.serializer().list.deserialize(input)
+    override fun deserialize(decoder: Decoder): List<Attachment> {
+        return Attachment::class.serializer().list.deserialize(decoder)
     }
 
     @UseExperimental(ImplicitReflectionSerializer::class)
-    override fun serialize(output: Encoder, obj: List<Attachment>) {
-        chat.tamtam.botsdk.model.response.Attachment::class.serializer().list.serialize(output, obj)
+    override fun serialize(encoder: Encoder, obj: List<Attachment>) {
+        Attachment::class.serializer().list.serialize(encoder, obj)
     }
 }
 

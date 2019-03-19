@@ -1,6 +1,5 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.net.URI
 
 plugins {
     id("kotlinx-serialization") version "1.3.21"
@@ -9,18 +8,10 @@ plugins {
 }
 
 group = "com.github.Namazed"
-version = "0.0.2"
+version = "0.0.3"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
-
-repositories {
-    mavenCentral()
-    maven { url = URI("http://dl.bintray.com/kotlin/kotlin-eap/") }
-    maven { url = URI("https://dl.bintray.com/kotlin/kotlinx") }
-    maven { url = URI("https://plugins.gradle.org/m2/") }
-    jcenter()
-}
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))

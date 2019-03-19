@@ -51,11 +51,11 @@ internal object ChatMembersSerializer : KSerializer<List<ChatMember>> {
     override val descriptor: SerialDescriptor
         get() = StringDescriptor.withName("ChatMembers")
 
-    override fun deserialize(input: Decoder): List<ChatMember> {
-        return ChatMember.serializer().list.deserialize(input)
+    override fun deserialize(decoder: Decoder): List<ChatMember> {
+        return ChatMember.serializer().list.deserialize(decoder)
     }
 
-    override fun serialize(output: Encoder, obj: List<ChatMember>) {
-        ChatMember.serializer().list.serialize(output, obj)
+    override fun serialize(encoder: Encoder, obj: List<ChatMember>) {
+        ChatMember.serializer().list.serialize(encoder, obj)
     }
 }
