@@ -19,7 +19,7 @@ class SubscriptionTest : ClientTest() {
     }
 
     @Test
-    fun `check right behavior and serialization when get update with 404 status`() = runBlocking {
+    fun `check right behavior and serialization when get update with 404 status`() {
         mockServer.mockHttpResponse("/json/error.json", 404)
         val updates = assertThrows<HttpException> {
             runBlocking { httpManager.getUpdates(null) }

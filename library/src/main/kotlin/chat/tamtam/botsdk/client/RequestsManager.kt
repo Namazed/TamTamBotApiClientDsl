@@ -8,7 +8,6 @@ import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
-import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.UploadType
@@ -45,12 +44,8 @@ class RequestsManager internal constructor(
     /**
      * If you want get information about your bot, which like name or id, you need use this method
      */
-    suspend fun getBotInfo(): User {
-        val httpResult = httpManager.getBotInfo()
-        return when (httpResult) {
-            is Success -> httpResult.response
-            is Failure -> TODO()
-        }
+    suspend fun getBotInfo(): ResultRequest<User> = startRequest {
+        httpManager.getBotInfo()
     }
 
     /**
@@ -326,7 +321,6 @@ class RequestsManager internal constructor(
         }
     } catch (e: HttpException) {
         val error = parseError(e.response())
-
         ResultRequest.Failure(e.code(), error, e)
     } catch (e: Exception) {
         ResultRequest.Failure(-1, Error(code = "general", message = e.message?.let { it } ?: ""), e)
@@ -334,8 +328,7 @@ class RequestsManager internal constructor(
 
     private fun <R> parseError(e: Response<R>): Error {
         return e.errorBody()?.let {
-            val er = Json.parse(Error.serializer(), it.string())
-            er
+            Json.parse(Error.serializer(), it.string())
         } ?: Error(code = "general", message = e.message())
     }
 
@@ -346,12 +339,6 @@ class RequestsManager internal constructor(
     }
 
 }
-
-//todo вынести в model request
-class PreparedAnswer(
-    val answerCallback: AnswerCallback,
-    val answerParams: AnswerParams
-)
 
 /**
  * This class give you some information about success or error request.

@@ -39,7 +39,7 @@ class WebhookCommunication internal constructor(
 }
 
 /**
- * This class need for start longPolling for your bot.
+ * This class need for start webhook for your bot.
  */
 object webhook {
     operator fun invoke(botToken: String, subscription: Subscription, init: BotScope.() -> Unit): Coordinator {
@@ -57,7 +57,7 @@ private fun Communication.init(
     log: Logger,
     init: BotScope.() -> Unit
 ): Coordinator {
-    log.info("Long polling bot starting")
+    log.info("Webhook bot starting")
     val scope = BotScope(botHttpManager, subscription)
     scope.init()
     return start(scope)
