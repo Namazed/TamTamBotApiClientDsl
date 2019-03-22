@@ -10,7 +10,9 @@ import kotlinx.serialization.Serializable
  * @param filter - Not supported yet on server. Filter updates which you want get
  */
 @Serializable
-class Subscription(
+data class Subscription(
     val url: String,
     @Optional val filter: String = ""
 )
+
+internal fun Subscription.isEmpty(): Boolean = this.url.isEmpty()
