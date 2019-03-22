@@ -20,7 +20,7 @@ import kotlinx.serialization.withName
 @Serializable
 class Updates(
     @SerialName("updates") val listUpdates: List<Update>,
-    @Optional val marker: Long = -1
+    @Optional val marker: Long? = null
 )
 
 /**
