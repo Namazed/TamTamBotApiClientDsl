@@ -14,7 +14,7 @@ val EMPTY_CALLBACK = Callback()
  * @param user - User who pressed the button
  */
 @Serializable
-class Callback(
+data class Callback(
     val timestamp: Long = -1,
     @SerialName("callback_id") val callbackId: String = "",
     val payload: String = "",

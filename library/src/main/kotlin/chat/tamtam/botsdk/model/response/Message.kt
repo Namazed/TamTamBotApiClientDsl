@@ -17,7 +17,7 @@ import kotlinx.serialization.withName
 val EMPTY_MESSAGE = Message()
 
 @Serializable
-class Message(
+data class Message(
     @SerialName("message") val messageInfo: MessageInfo = MessageInfo(),
     val recipient: Recipient = Recipient(),
     val sender: User = User(),
@@ -26,7 +26,7 @@ class Message(
 )
 
 @Serializable
-class MessageInfo(
+data class MessageInfo(
     @SerialName("mid") val messageId: String = "",
     @SerialName("seq") val sequenceIdInChat: Long = -1,
     @Serializable(ResponseAttachmentsSerializer::class) @Optional val attachments: List<Attachment> = emptyList(),
@@ -34,13 +34,13 @@ class MessageInfo(
 )
 
 @Serializable
-class Link(
+data class Link(
     val type: String,
     val message: Message
 )
 
 @Serializable
-class Recipient(
+data class Recipient(
     @SerialName("chat_id") @Optional val chatId: Long = -1,
     @Serializable(ChatTypeSerializer::class) @SerialName("chat_type") val chatType: ChatType = ChatType.UNKNOWN,
     @Optional @SerialName("user_id") val userId: Long = -1

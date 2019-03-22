@@ -23,7 +23,7 @@ private val BOTS_COMMAND_WITH_ARG_PATTERN_FOR_CHAT = Regex("($PROFILE_TAG_PATTER
  * @param timestamp - time when update created
  * @param message - this message contains in update, which handle when user created message, which contains command.
  */
-class Command(
+data class Command(
     val name: String,
     val argument: String,
     val timestamp: Long = -1,

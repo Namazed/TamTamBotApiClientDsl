@@ -36,7 +36,7 @@ class ChatMembersResult(
  * @param isAdmin - this participant is admin in this Chat
  */
 @Serializable
-class ChatMember(
+data class ChatMember(
     @SerialName("user_id") val userId: Long = -1,
     val name: String = "",
     @Optional val username: String = "",

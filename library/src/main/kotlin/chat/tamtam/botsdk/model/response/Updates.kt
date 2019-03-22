@@ -40,7 +40,7 @@ class Updates(
  * @param callback - this class you will get if user pressed on button [UpdateType.CALLBACK]
  */
 @Serializable
-class Update(
+data class Update(
     val timestamp: Long,
     @SerialName("update_type") val updateType: UpdateType,
     @SerialName("message_id") @Optional val messageId: String = "",
