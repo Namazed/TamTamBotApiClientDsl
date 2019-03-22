@@ -23,6 +23,7 @@ import chat.tamtam.botsdk.state.StartedBotState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -33,7 +34,7 @@ class UpdatesHandler internal constructor(
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
 
-    suspend fun run() {
+    internal suspend fun run() {
         val updates: Updates
         try {
             updates = botScope.botHttpManager.getUpdates(marker)
@@ -46,7 +47,22 @@ class UpdatesHandler internal constructor(
         processUpdates(updates)
     }
 
-    public suspend fun processUpdates(updates: Updates) {
+    suspend fun processUpdatesAsync(updates: Updates) {
+        if (updates.listUpdates.isEmpty()) {
+            return
+        }
+
+        if (updates.listUpdates.size > 1) {
+            processUpdates(updates)
+            return
+        }
+
+        withContext(parallelScope.coroutineContext) {
+            process(updates.listUpdates[0])
+        }
+    }
+
+    private suspend fun processUpdates(updates: Updates) {
         if (updates.listUpdates.isEmpty()) {
             return
         }
