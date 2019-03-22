@@ -26,7 +26,7 @@ class CommandsScope internal constructor(
     }
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message with specific command.
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new message with specific command.
      *
      * @param command - text of command.
      * @param action - all actions in this lambda is async.
@@ -37,7 +37,7 @@ class CommandsScope internal constructor(
     }
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message with unknown command.
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new message with unknown command.
      *
      * @param action - all actions in this lambda is async.
      */

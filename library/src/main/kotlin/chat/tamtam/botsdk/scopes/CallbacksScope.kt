@@ -19,7 +19,7 @@ class CallbacksScope internal constructor(
     internal operator fun get(payloadButton: Payload) = callbacksAnswers[payloadButton.value] ?: defaultAnswer
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new Callback which you don't know.
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new Callback which you don't know.
      *
      * @param defaultAnswer - all actions in this lambda is async.
      */
@@ -29,7 +29,7 @@ class CallbacksScope internal constructor(
     }
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new Callback with specific [Payload].
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new Callback with specific [Payload].
      *
      * @param payloadButton - this is inline class [Payload] which contains payload of specific button in [chat.tamtam.botsdk.model.request.InlineKeyboard].
      * @param answer - all actions in this lambda is async.

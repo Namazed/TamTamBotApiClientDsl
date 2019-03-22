@@ -12,7 +12,7 @@ class UserScope internal constructor(
     internal var answerOnRemove: suspend (RemovedUserState) -> Unit = {}
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new update
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new update
      * with type [chat.tamtam.botsdk.model.response.UpdateType.USER_ADDED].
      *
      * @param answer - all actions in this lambda is async.
@@ -22,7 +22,7 @@ class UserScope internal constructor(
     }
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new update
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new update
      * with type [chat.tamtam.botsdk.model.response.UpdateType.USER_REMOVED].
      *
      * @param answer - all actions in this lambda is async.

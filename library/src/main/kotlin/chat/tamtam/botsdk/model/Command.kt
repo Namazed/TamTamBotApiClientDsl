@@ -33,7 +33,7 @@ class Command(
 /**
  * Map String with Update to Command.
  * @receiver - command name, may has some arguments
- * @param - this update handle in [chat.tamtam.botsdk.UpdatesHandler], when user send command for bot.
+ * @param - this update handle in [chat.tamtam.botsdk.UpdatesCoordinator], when user send command for bot.
  */
 fun String.toCommand(update: Update) = Command(getCommandName(update.message.recipient.chatType),
     update.message.messageInfo.text.getCommandArgument(update.message.recipient.chatType), update.timestamp, update.message)

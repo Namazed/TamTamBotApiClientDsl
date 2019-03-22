@@ -27,51 +27,53 @@ import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class UpdatesHandler internal constructor(
-    private val botScope: BotScope,
+class UpdatesCoordinator internal constructor(
+    override val botScope: BotScope,
     private var marker: Long? = null,
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
-) {
+    private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name)
+): Coordinator {
+
+    override suspend fun coordinateAsync(updates: Updates) {
+        if (updates.listUpdates.isEmpty()) {
+            return
+        }
+
+        if (updates.listUpdates.size > 1) {
+            coordinateUpdates(updates)
+            return
+        }
+
+        withContext(parallelScope.coroutineContext) {
+            coordinate(updates.listUpdates[0])
+        }
+    }
 
     internal suspend fun run() {
         val updates: Updates
         try {
-            updates = botScope.botHttpManager.getUpdates(marker)
+            updates = withContext(parallelScope.coroutineContext) {
+                botScope.botHttpManager.getUpdates(marker)
+            }
             marker = updates.marker
         } catch (e: Exception) {
             log.error("run: error when get updates", e)
             return
         }
 
-        processUpdates(updates)
+        coordinateUpdates(updates)
     }
 
-    suspend fun processUpdatesAsync(updates: Updates) {
-        if (updates.listUpdates.isEmpty()) {
-            return
-        }
-
-        if (updates.listUpdates.size > 1) {
-            processUpdates(updates)
-            return
-        }
-
-        withContext(parallelScope.coroutineContext) {
-            process(updates.listUpdates[0])
-        }
-    }
-
-    private suspend fun processUpdates(updates: Updates) {
+    private suspend fun coordinateUpdates(updates: Updates) {
         if (updates.listUpdates.isEmpty()) {
             return
         }
         updates.listUpdates.forEachParallel { update: Update ->
-            process(update)
+            coordinate(update)
         }
     }
 
-    private suspend fun process(update: Update) {
+    private suspend fun coordinate(update: Update) {
         log.info("process: start process update with updateType ${update.updateType}")
         when {
             update.updateType == UpdateType.BOT_STARTED -> {
@@ -93,7 +95,8 @@ class UpdatesHandler internal constructor(
                     UserId(update.userId), UserId(update.adminId)
                 ))
             }
-            isNotEmptyMessage(update.message) && (update.message.messageInfo.text.isCommand() || update.message.messageInfo.text.isCommandInChat()) -> {
+            isNotEmptyMessage(update.message) && (update.message.messageInfo.text.isCommand()
+                    || update.message.messageInfo.text.isCommandInChat()) -> {
                 val command = update.message.messageInfo.text.toCommand(update)
                 botScope.commandScope[command.name](CommandState(update.timestamp, command))
             }
