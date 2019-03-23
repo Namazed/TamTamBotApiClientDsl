@@ -1,20 +1,20 @@
 [![](https://jitpack.io/v/Namazed/TamTamBotApiClientDsl.svg)](https://jitpack.io/#Namazed/TamTamBotApiClientDsl)
 # TamTamBotApiClientDsl
 
-Kotlin DSL для TamTam Bot API. С помощью этой библиотеки можно упростить работу с Bot API.
-С чем помогает эта библиотека:
-* Подписывается на updates с помощью LongPolling (WebHook будет позже)
-* Распределяет updates по определенным зонам ответственности, которые вы опишите. Все updates обрабатываются параллельно.
-* Парсит команды
-* Предоставляет удобный интерфейс для работы с запросами к Bot API
+Kotlin DSL for TamTam Bot API. Using this library you can simplify working with the Bot API. 
+What this library helps with:
+* Subscribes to updates using LongPolling (WebHook will be later)
+* Coordinates updates to specific areas of responsibility that you describe. All updates are processed in parallel.
+* Handles commands
+* Provides a convenient interface for working with requests to the Bot API
 
-Документация по Bot API находится [здесь](https://dev.tamtam.chat).
+The bot API documentation is [here](https://dev.tamtam.chat).
 
 ## Что необходимо, что бы начать
 
-Для доступа к библиотеке необходимо добавить зависимость на ```jitpack```
+To access the library, you must add the dependency on ```jitpack```
 
-Gradle
+### Gradle
 ```groovy
 allprojects {
 	repositories {
@@ -23,7 +23,7 @@ allprojects {
 	}
 }
 ```
-Maven
+### Maven
 ```xml
 <repositories>
 	<repository>
@@ -32,15 +32,15 @@ Maven
 	</repository>
 </repositories>
 ```
-Также необходимо добавить зависимость
+You must also add a dependency.
 
-Gradle
+### Gradle
 ```groovy
 dependencies {
     implementation 'com.github.Namazed:TamTamBotApiClientDsl:current_version'
 }
 ```
-Maven
+### Maven
 ```xml
 <dependency>
 	 <groupId>com.github.Namazed</groupId>
@@ -49,10 +49,10 @@ Maven
 </dependency>
 ```
 
-## Примеры
+## Examples
 
 ### Scopes
-Ниже пример того, как начать процесс longPolling:
+Below you find example of how start process longPolling:
 ```kotlin
 fun main() {
   longPolling("BOT_TOKEN") {
@@ -60,14 +60,14 @@ fun main() {
   }
 }
 ```
-Все остальные методы вызываются из longPolling scope (lambda).
-Для того что бы подписаться на запуск бота, достаточно вызвать метод:
+All other methods are called from longPolling scope (lambda).
+In order to subscribe to the launch of the bot, just call the method:
 ```kotlin
 onStartBot { startedBotState ->
     //some actions
 }
 ```
-Если вы хотите подписаться на какую то определенную команду (например, /actions):
+If you want subscribe on specific ***command*** (for example, /actions):
 ```kotlin
 commands {
 
@@ -81,8 +81,8 @@ commands {
 
 }
 ```
-Для работы с Callbacks (т.е. когда пользователь нажал на кнопку в клавиатуре, которую ваш бот ему отправил), 
-необходимо создать scope callbacks:
+To work with ***Callbacks*** (i.e. when the user pushed a button on the keyboard that your bot sent him),
+need to create scope callbacks:
 ```kotlin
 callbacks {
 
@@ -99,9 +99,9 @@ callbacks {
     }
 }
 ```
-Payload - это inline class, который содержит в себе payload кнопки, update о нажатии на которую будет попадать в эту lambda.
+Payload - this is an inline class, which contains payload of button. The update about click on button will fall into this lambda.
 
-И последний из основных scopes это scope обработки новых сообщений от пользователя (которые не содержат команду):
+And last from main scopes is the scope of processing new messages from the user (which do not contain the command):
 ```kotlin
 messages {
 
@@ -111,31 +111,31 @@ messages {
 
 }
 ```
-Также есть такие методы как: 
+Also have this methods: 
 * ```onAddBotToChat```
 * ```onRemoveBotFromChat``` 
-* Users scope, в котором есть необходимые методы для обработки updates
-связанными с добавлением пользователя в чат или удалением его
+* Users scope, in which there are necessary methods for processing updates
+associated with adding a user to the chat or deleting it
 
-Во всех lambdas, которые были выше указаны есть параметр State, который содержит всю необходимую информацию о текущем update.
-Например CommandState содержит timestamp, когда событие это произошло (т.е. пользователь прислал вам команду) и класс Command.
+In all the lambdas that were mentioned above, there is a [State](https://github.com/Namazed/TamTamBotApiClientDsl/blob/master/library/src/main/kotlin/chat/tamtam/botsdk/state/UpdateState.kt) parameter that contains all the necessary information about the current update.
+For example, a CommandState contains a timestamp when an event occurred (that is, the user sent you a command) and the [Command](https://github.com/Namazed/TamTamBotApiClientDsl/blob/master/library/src/main/kotlin/chat/tamtam/botsdk/model/Command.kt) class.
 
 ### Requests
-Запросы можно слать в большинстве случаев с помощью удобного DSL, либо напрямую вызывая методы у класса ```RequestsManager```, 
-который доступен во всех Scopes.
-Например, если вам необходимо послать какой то текст пользователю, достаточно вызвать метод ```sendFor``` или ```sendText```:
+In most cases, requests can be sent using a convenient DSL, or by directly calling methods on the class [RequestsManager](https://github.com/Namazed/TamTamBotApiClientDsl/blob/master/library/src/main/kotlin/chat/tamtam/botsdk/client/RequestsManager.kt), which is available in all Scopes.
+For example, if you need to send some text to the user, simply call the ```sendFor``` or ```sendText```:
 
-Через DSL
+#### With DSL
 ```kotlin
 "Two bananas" sendFor UserId(commandState.command.message.sender.userId)
 ```
-Пока есть необходимость оборачивать в inline class UserId или ChatId, в будущем эти действия будут не нужны.
-Через RequestsManager
+Now there is a need to wrap in inline class UserId or ChatId, but in the future these actions will not be needed.
+
+#### With RequestsManager
 ```kotlin
 requestsManager.sendText(UserId(commandState.command.message.sender.userId), "Two bananas")
 ```
-Для создания InlineKeyboard, можно воспользоваться keyboard DSL, ниже пример с созданием InlineKeyboard тремя способами с помощью: ```operator unaryPlus```, через infix function ```add```, либо просто вызвать function ```add```.
-```buttonRow``` создает строку с кнопками.
+To create an InlineKeyboard, you can use the keyboard DSL. Below is an example of creating InlineKeyboard in three ways using: ```operator unaryPlus```, via infix function ```add```, or simply call the function ```add```.
+The ```buttonRow``` creates a row with buttons.
 
 ```kotlin
 keyboard {
@@ -172,7 +172,7 @@ keyboard {
 
 ## Contributing
 
-Pull requests приветствуются. Если нашли какие то bugs или есть отличная идея прошу создать для этого issue
+Pull requests are welcome. If you find any bugs or have a great idea, please create an issue for this.
 
 ## License
-Эта библиотека использует лицензию [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+This library uses a license [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
