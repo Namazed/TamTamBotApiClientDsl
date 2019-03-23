@@ -10,7 +10,7 @@ What this library helps with:
 
 The bot API documentation is [here](https://dev.tamtam.chat).
 
-## Что необходимо, что бы начать
+## What you need to start
 
 To access the library, you must add the dependency on ```jitpack```
 
