@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -34,7 +35,13 @@ class UpdatesCoordinator internal constructor(
     private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name)
 ): Coordinator {
 
-    override suspend fun coordinateAsync(updates: Updates) {
+    override suspend fun coordinateAsync(jsonUpdates: String) {
+        val updates: Updates = try {
+            Json.parse(Updates.serializer(), jsonUpdates)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Wrong json, you need pass json with Updates class", e)
+        }
+
         if (updates.listUpdates.isEmpty()) {
             return
         }
