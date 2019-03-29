@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.github.Namazed"
-version = "0.0.3"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
