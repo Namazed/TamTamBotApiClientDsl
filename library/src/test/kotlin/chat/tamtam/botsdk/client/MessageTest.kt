@@ -2,7 +2,6 @@ package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.client.retrofit.Failure
 import chat.tamtam.botsdk.client.retrofit.Success
-import chat.tamtam.botsdk.mockHttpResponse
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Messages

@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.SocketTimeoutException
 
 class UpdatesHandler internal constructor(
     private val botScope: BotScope,
@@ -40,7 +41,9 @@ class UpdatesHandler internal constructor(
             updates = botScope.botHttpManager.getUpdates(marker)
             marker = updates.marker
         } catch (e: Exception) {
-            log.error("run: error when get updates", e)
+            if (e !is SocketTimeoutException) {
+                log.error("run: error when get updates", e)
+            }
             return
         }
 
@@ -82,13 +85,13 @@ class UpdatesHandler internal constructor(
                 val command = update.message.messageInfo.text.toCommand(update)
                 botScope.commandScope[command.name](CommandState(update.timestamp, command))
             }
-            isNotEmptyMessage(update.message) -> {
-                botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message))
-            }
             isNotEmptyCallback(update.callback) -> {
                 val callback = update.callback
                 val message = if (update.message == EMPTY_MESSAGE) null else update.message
                 botScope.callbacksScope[Payload(callback.payload)](CallbackState(update.timestamp, callback, message))
+            }
+            isNotEmptyMessage(update.message) -> {
+                botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message))
             }
         }
     }
