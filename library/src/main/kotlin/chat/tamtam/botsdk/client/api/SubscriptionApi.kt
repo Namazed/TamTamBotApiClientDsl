@@ -1,6 +1,7 @@
 package chat.tamtam.botsdk.client.api
 
 import chat.tamtam.botsdk.client.BOT_TOKEN_FIELD
+import chat.tamtam.botsdk.client.VERSION_FIELD
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Updates
 import retrofit2.Call
@@ -19,7 +20,8 @@ internal interface SubscriptionApi {
 
     @GET(SUBSCRIPTIONS_ENDPOINT)
     fun getSubscriptions(
-        @Query(BOT_TOKEN_FIELD) botToken: String
+        @Query(BOT_TOKEN_FIELD) botToken: String,
+        @Query(VERSION_FIELD) version: String
     ): Call<List<ResponseSubscription>>
 
     @POST(SUBSCRIPTIONS_ENDPOINT)
@@ -32,12 +34,14 @@ internal interface SubscriptionApi {
     @DELETE(SUBSCRIPTIONS_ENDPOINT)
     fun unsubscribe(
         @Query(BOT_TOKEN_FIELD) botToken: String,
+        @Query(VERSION_FIELD) version: String,
         @Query("url") url: String
     ): Call<Default>
 
     @GET("/updates")
     fun getUpdates(
         @Query(BOT_TOKEN_FIELD) botToken: String,
+        @Query(VERSION_FIELD) version: String,
         @Query("marker") marker: Long?
     ): Call<Updates>
 

@@ -5,18 +5,22 @@ import chat.tamtam.botsdk.client.retrofit.HttpResult
 import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
+import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.ChatInfo
+import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageToken
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForMediaToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageToken
 import chat.tamtam.botsdk.model.request.createSendMessageForMediaToken
+import chat.tamtam.botsdk.model.request.createSendMessageForReusablePhotoToken
 import chat.tamtam.botsdk.model.response.Chat
+import chat.tamtam.botsdk.model.response.ChatMember
 import chat.tamtam.botsdk.model.response.ChatMembersResult
 import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
@@ -45,12 +49,15 @@ class RequestsManager internal constructor(
     /**
      * If you want get information about your bot, which like name or id, you need use this method
      */
-    suspend fun getBotInfo(): User {
-        val httpResult = httpManager.getBotInfo()
-        return when (httpResult) {
-            is Success -> httpResult.response
-            is Failure -> TODO()
-        }
+    suspend fun getBotInfo(): ResultRequest<User> = startRequest {
+        httpManager.getBotInfo()
+    }
+
+    /**
+     * If you want get information about your bot in chat (admin, owner, joinTime or etc), you need use this method
+     */
+    suspend fun getMembershipInfoInChat(chatId: ChatId): ResultRequest<ChatMember> = startRequest {
+        httpManager.chatHttpManager.getChatMembershipInfo(chatId)
     }
 
     /**
@@ -134,12 +141,20 @@ class RequestsManager internal constructor(
      */
     suspend fun getAllMessages(
         chatId: ChatId,
+        messagesIds: List<MessageId>? = null,
         fromTime: Long? = null,
         toTime: Long? = null,
         count: Int = 50
     ): ResultRequest<Messages> = startRequest {
         checkCount(count)
-        httpManager.messageHttpManager.getAllMessages(chatId, fromTime, toTime, count)
+        httpManager.messageHttpManager.getAllMessages(chatId, messagesIds, fromTime, toTime, count)
+    }
+
+    /**
+     * If you want delete message in a dialog or in a chat (bot must has permission to delete messages), use this method
+     */
+    suspend fun deleteMessage(messageId: MessageId): ResultRequest<Default> = startRequest {
+        httpManager.messageHttpManager.deleteMessage(messageId)
     }
 
     /**
@@ -159,6 +174,22 @@ class RequestsManager internal constructor(
      */
     suspend fun send(chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<ResponseSendMessage> = startRequest {
         httpManager.messageHttpManager.sendMessage(chatId, sendMessage)
+    }
+
+    /**
+     * Use this method only if you have reusableToken on Photo, which you has already sent
+     *
+     * @param sendParams - look at this class for more information
+     * @param reusablePhotoToken - you get it after you send uploaded photo somewhere
+     *
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [HttpException] or [Exception]
+     */
+    suspend fun sendPhoto(sendParams: SendParams, reusablePhotoToken: String): ResultRequest<ResponseSendMessage> {
+        return when {
+            sendParams.chatId.id != -1L -> send(sendParams.chatId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
+            sendParams.userId.id != -1L -> send(sendParams.userId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
+            else -> ResultRequest.Failure(-1, null, IllegalArgumentException("ChatId and UserId are wrong"))
+        }
     }
 
     /**
@@ -368,5 +399,5 @@ sealed class ResultRequest<out R> {
      * @param error - error contains code from server and message, or general code if exception is local
      * @param exception - this exception can contains specific [HttpException] or general [Exception]
      */
-    class Failure<R>(val httpStatusCode: Int, val error: Error, val exception: Exception) : ResultRequest<R>()
+    class Failure<R>(val httpStatusCode: Int, val error: Error?, val exception: Exception) : ResultRequest<R>()
 }

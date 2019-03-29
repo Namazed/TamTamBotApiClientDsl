@@ -12,7 +12,7 @@
         "user_id": 17
       },
       "timestamp": 10,
-      "message": {
+      "body": {
         "mid": "test_id",
         "seq": 8,
         "text": "test_text",

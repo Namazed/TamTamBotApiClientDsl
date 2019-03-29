@@ -1,5 +1,7 @@
 package chat.tamtam.botsdk.client.api
 
+import chat.tamtam.botsdk.client.BOT_TOKEN_FIELD
+import chat.tamtam.botsdk.client.VERSION_FIELD
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
@@ -22,7 +24,8 @@ internal interface UploadApi {
 
     @POST("/uploads")
     fun uploadUrl(
-        @Query("access_token") botToken: String,
+        @Query(BOT_TOKEN_FIELD) botToken: String,
+        @Query(VERSION_FIELD) version: String,
         @Query("type") uploadType: UploadType
     ): Call<Upload>
 
