@@ -26,7 +26,7 @@ internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: In
 
 internal fun createSendMessageForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): SendMessage {
     return SendMessage(sendMessage.text,
-        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser)
+        listOf(AttachmentPhotoWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser)
 }
 
 internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage: SendMessage, response: UploadInfo): SendMessage {
@@ -36,6 +36,10 @@ internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage:
         UploadType.AUDIO -> SendMessage(sendMessage.text, listOf(AttachmentMediaWithId(AttachType.FILE.value, response)), sendMessage.notifyUser)
         else -> throw IllegalArgumentException("Incorrect uploadType for this method")
     }
+}
+
+internal fun createSendMessageForReusablePhotoToken(sendMessage: SendMessage, reusablePhotoToken: String): SendMessage {
+    return SendMessage(sendMessage.text, listOf(AttachmentPhotoWithToken(AttachType.IMAGE.value, PayloadToken(reusablePhotoToken))), sendMessage.notifyUser)
 }
 
 internal fun createSendMessageForImageToken(sendMessage: SendMessage, response: UploadInfo): SendMessage {

@@ -34,7 +34,7 @@ internal fun createAnswerCallbackForKeyboard(sendMessage: SendMessage, keyboard:
 
 internal fun createAnswerCallbackForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): AnswerCallback {
     return AnswerCallback(SendMessage(sendMessage.text,
-        listOf(AttachmentMediaWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser))
+        listOf(AttachmentPhotoWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser))
 }
 
 internal fun createAnswerCallbackForMediaToken(uploadType: UploadType, sendMessage: SendMessage, response: UploadInfo): AnswerCallback {
@@ -44,6 +44,10 @@ internal fun createAnswerCallbackForMediaToken(uploadType: UploadType, sendMessa
         UploadType.AUDIO -> AnswerCallback(SendMessage(sendMessage.text, listOf(AttachmentMediaWithId(AttachType.FILE.value, response)), sendMessage.notifyUser))
         else -> throw IllegalArgumentException("Incorrect uploadType for this method")
     }
+}
+
+internal fun createAnswerCallbackForReusablePhotoToken(sendMessage: SendMessage, reusablePhotoToken: String): AnswerCallback {
+    return AnswerCallback(SendMessage(sendMessage.text, listOf(AttachmentPhotoWithToken(AttachType.IMAGE.value, PayloadToken(reusablePhotoToken))), sendMessage.notifyUser))
 }
 
 internal fun createAnswerCallbackForImageToken(sendMessage: SendMessage, response: UploadInfo): AnswerCallback {

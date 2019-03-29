@@ -2,7 +2,6 @@ package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.client.retrofit.Failure
 import chat.tamtam.botsdk.client.retrofit.Success
-import chat.tamtam.botsdk.mockHttpResponse
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Messages
@@ -16,13 +15,13 @@ class MessageTest : ClientTest() {
     @Test
     fun `check right behavior and serialization when send message to chat`() {
         runBlocking {
-            mockServer.mockHttpResponse("/json/send_message.json", 200)
+            mockServer.mockHttpResponse("/json/message.json", 200)
             val result = httpManager.messageHttpManager.sendMessage(ChatId(101L), RequestSendMessage("text"))
             when (result) {
                 is Success<ResponseSendMessage> -> {
                     result.response.apply {
-                        assert(chatId == 101L)
-                        assert(messageId == "test_id")
+                        assert(message.recipient.chatId == 18L)
+                        assert(message.messageInfo.messageId == "test_id")
                     }
                 }
                 else -> {}
@@ -52,7 +51,7 @@ class MessageTest : ClientTest() {
     fun `check right behavior and serialization when get all messages`() {
         runBlocking {
             mockServer.mockHttpResponse("/json/messages.json", 200)
-            val result = httpManager.messageHttpManager.getAllMessages(ChatId(101L), 15L, 18L)
+            val result = httpManager.messageHttpManager.getAllMessages(ChatId(101L), null, 15L, 18L)
             when (result) {
                 is Success<Messages> -> {
                     result.response.messages.apply {

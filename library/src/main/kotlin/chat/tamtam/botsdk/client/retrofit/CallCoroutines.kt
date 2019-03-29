@@ -10,7 +10,7 @@ import kotlin.coroutines.resumeWithException
 /**
  * The result of all requests, which contains Success and Failure
  * Generic is Response type
- * Failure contains [Response] which contains response type, and simple message
+ * Failure contains [Response] which contains response type, and simple message "Body is empty" or "Response isn't successful"
  */
 sealed class HttpResult<out R>
 class Success<R>(val response: R) : HttpResult<R>()

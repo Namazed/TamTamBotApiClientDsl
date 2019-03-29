@@ -1,6 +1,5 @@
-package chat.tamtam.botsdk
+package chat.tamtam.botsdk.client
 
-import chat.tamtam.botsdk.client.ClientTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import java.io.File
