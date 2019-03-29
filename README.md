@@ -169,6 +169,13 @@ keyboard {
     })
 }
 ```
+## Dependencies
+- [Kotlinx Coroutines](https://github.com/Kotlin/kotlinx.coroutines)
+- [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization)
+- [Retrofit](https://square.github.io/retrofit/)
+- [Logback](https://logback.qos.ch/)
+- [JUnit 5](https://junit.org/junit5/)
+- [MockWebServer](https://github.com/square/okhttp/tree/master/mockwebserver)
 
 ## Contributing
 
