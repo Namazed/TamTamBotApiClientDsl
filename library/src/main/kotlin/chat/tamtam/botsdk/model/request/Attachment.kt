@@ -32,10 +32,10 @@ interface Attachment {
             val type: AttachType = attachTypeFrom(obj.type)
             when (type) {
                 AttachType.IMAGE -> {
-                    if (obj is AttachmentPhoto) {
-                        AttachmentPhoto.serializer().serialize(encoder, obj)
-                    } else {
-                        AttachmentMediaWithUrl.serializer().serialize(encoder, obj as AttachmentMediaWithUrl)
+                    when (obj) {
+                        is AttachmentPhoto -> AttachmentPhoto.serializer().serialize(encoder, obj)
+                        is AttachmentPhotoWithToken -> AttachmentPhotoWithToken.serializer().serialize(encoder, obj)
+                        is AttachmentPhotoWithUrl -> AttachmentPhotoWithUrl.serializer().serialize(encoder, obj)
                     }
                 }
                 AttachType.VIDEO -> AttachmentMediaWithId.serializer().serialize(encoder, obj as AttachmentMediaWithId)
@@ -76,13 +76,19 @@ class AttachmentPhoto(
 ) : Attachment
 
 @Serializable
+class AttachmentPhotoWithToken(
+    override val type: String,
+    val payload: PayloadToken
+) : Attachment
+
+@Serializable
 class AttachmentMediaWithId(
     override val type: String,
     val payload: UploadInfo
 ) : Attachment
 
 @Serializable
-class AttachmentMediaWithUrl(
+class AttachmentPhotoWithUrl(
     override val type: String,
     val payload: PayloadUrl
 ) : Attachment
@@ -97,6 +103,11 @@ class AttachmentLocation(
 @Serializable
 class PayloadUrl(
     val url: String
+)
+
+@Serializable
+class PayloadToken(
+    val token: String
 )
 
 @Serializable

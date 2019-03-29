@@ -18,6 +18,7 @@ import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
+import chat.tamtam.botsdk.model.request.createAnswerCallbackForReusablePhotoToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Messages
@@ -150,6 +151,18 @@ interface Scope {
     }
 
     /**
+     * You need use it if you have reusablePhotoToken!
+     * This method send message with contains data from [SendParams] and [UploadParams] for Chat
+     *
+     * @param reusablePhotoToken - you get it after you send uploaded photo somewhere
+     * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
+     * @return - look at [RequestsManager.send]
+     */
+    suspend infix fun SendParams.sendWith(reusablePhotoToken: String): ResultRequest<ResponseSendMessage> {
+        return requests.sendPhoto(this, reusablePhotoToken)
+    }
+
+    /**
      * This method send message with contains data from [SendParams] and [UploadParams] for Chat
      *
      * @param uploadParams - this is inline class [UploadParams] which contains path on file in you system and [UploadType]
@@ -239,6 +252,20 @@ interface Scope {
      */
     suspend infix fun PreparedAnswer.answerWith(imageUrl: ImageUrl): ResultRequest<Default> {
         val answerCallback = createAnswerCallbackForImageUrl(answerCallback.message, imageUrl)
+        return requests.answer(answerParams.callbackId, answerCallback)
+    }
+
+    /**
+     * You need use it if you have reusablePhotoToken!
+     * This method answer on Callback by [CallbackId] with new message which contains Image attach
+     *
+     * @param reusablePhotoToken - you get it after you send uploaded photo somewhere
+     * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
+     *
+     * @return - look at [RequestsManager.answer]
+     */
+    suspend infix fun PreparedAnswer.answerWith(reusablePhotoToken: String): ResultRequest<Default> {
+        val answerCallback = createAnswerCallbackForReusablePhotoToken(answerCallback.message, reusablePhotoToken)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 

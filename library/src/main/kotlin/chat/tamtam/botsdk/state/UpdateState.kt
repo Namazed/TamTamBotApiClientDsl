@@ -57,8 +57,9 @@ data class RemovedUserState(val timestamp: Long, val chatId: ChatId, val userId:
  * This class created when somebody clicked on [chat.tamtam.botsdk.model.Button] [chat.tamtam.botsdk.model.ButtonType.CALLBACK]
  * @param timestamp - unix time when somebody clicked
  * @param callback - class [Callback] which contains all needed information about click action
+ * @param message - class [Message] which contains keyboard, must be null
  */
-data class CallbackState(val timestamp: Long, val callback: Callback) : UpdateState()
+data class CallbackState(val timestamp: Long, val callback: Callback, val message: Message?) : UpdateState()
 
 /**
  * This class created when somebody send message for your bot in chat

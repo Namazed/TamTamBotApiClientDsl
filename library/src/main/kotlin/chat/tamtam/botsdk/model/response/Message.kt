@@ -18,7 +18,7 @@ val EMPTY_MESSAGE = Message()
 
 @Serializable
 data class Message(
-    @SerialName("message") val messageInfo: MessageInfo = MessageInfo(),
+    @SerialName("body") val messageInfo: MessageInfo = MessageInfo(),
     val recipient: Recipient = Recipient(),
     val sender: User = User(),
     val timestamp: Long = -1,

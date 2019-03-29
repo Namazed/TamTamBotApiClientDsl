@@ -27,26 +27,29 @@ import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 internal const val BOT_TOKEN_FIELD = "access_token"
+internal const val VERSION_FIELD = "v"
 
 internal val IMAGE_MEDIA_TYPE = MediaType.parse("image/*")
 internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
 internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
 internal val ALL_MEDIA_TYPE = MediaType.parse("all")
 
+internal const val API_VERSION = "0.1.3"
+
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
     internal val botToken: String,
     retrofit: Retrofit = RetrofitFactory.createRetrofit(),
-    internal val messageHttpManager: MessageHttpManager = MessageHttpManager(botToken, retrofit),
-    internal val chatHttpManager: ChatHttpManager = ChatHttpManager(botToken, retrofit),
-    internal val subscriptionHttpManager: SubscriptionHttpManager = SubscriptionHttpManager(botToken, retrofit),
+    internal val messageHttpManager: MessageHttpManager = MessageHttpManager(botToken, API_VERSION, retrofit),
+    internal val chatHttpManager: ChatHttpManager = ChatHttpManager(botToken, API_VERSION, retrofit),
+    internal val subscriptionHttpManager: SubscriptionHttpManager = SubscriptionHttpManager(botToken, API_VERSION, retrofit),
     private val answerService: AnswerApi = retrofit.create(AnswerApi::class.java),
     private val uploadService: UploadApi = retrofit.create(UploadApi::class.java),
     private val botService: BotApi = retrofit.create(BotApi::class.java)
 ) {
 
     suspend fun getBotInfo(): HttpResult<User> {
-        return botService.getBotInfo(botToken).await()
+        return botService.getBotInfo(botToken, API_VERSION).await()
     }
 
     suspend fun getUpdates(marker: Long?): Updates {
@@ -58,12 +61,12 @@ internal class HttpManager(
     }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback): HttpResult<Default> =
-        answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
+        answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback): HttpResult<Default> =
-        answerService.answerOnCallback(botToken, callbackId, answerCallback).await()
+        answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
 
-    suspend fun getUploadUrl(uploadType: UploadType): HttpResult<Upload> = uploadService.uploadUrl(botToken, uploadType).await()
+    suspend fun getUploadUrl(uploadType: UploadType): HttpResult<Upload> = uploadService.uploadUrl(botToken, API_VERSION, uploadType).await()
 
     suspend fun upload(url: String, uploadType: UploadType, filePath: String): HttpResult<UploadInfo> {
         val file = File(filePath)

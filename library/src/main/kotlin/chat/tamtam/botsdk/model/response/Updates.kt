@@ -36,7 +36,8 @@ class Updates(
  * @param adminId - Administrator who removed user from chat [UpdateType.USER_REMOVED]
  * @param inviterId - User who added user to chat [UpdateType.USER_ADDED]
  * @param newChatTitle - changed title in chat [UpdateType.CHAT_TITLE_CHANGED]
- * @param message - new or edited message [UpdateType.MESSAGE_CREATED], [UpdateType.MESSAGE_EDITED]
+ * @param message - new or edited message or message where exists botKeyboard [UpdateType.CALLBACK] [UpdateType.MESSAGE_CREATED],
+ * [UpdateType.MESSAGE_EDITED], if message equals [EMPTY_MESSAGE], that mean message is null return from server
  * @param callback - this class you will get if user pressed on button [UpdateType.CALLBACK]
  */
 @Serializable

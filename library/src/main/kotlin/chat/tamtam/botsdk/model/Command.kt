@@ -56,7 +56,7 @@ private fun String.getCommandName(chatType: ChatType): String = if (chatType == 
     split(Regex(SPACE))[0]
 } else {
     val splitString = split(Regex(SPACE))
-    "${splitString[0]} ${splitString[1]}"
+    "${if (splitString.isNotEmpty()) splitString[0] else ""} ${if (splitString.size > 1) splitString[1] else ""}"
 }
 
 private fun String.getCommandArgument(chatType: ChatType): String = if (chatType == ChatType.DIALOG) {
