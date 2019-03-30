@@ -12,13 +12,14 @@ The bot API documentation is [here](https://dev.tamtam.chat).
 
 ## What you need to start
 
-To access the library, you must add the dependency on ```jitpack```
+To access the library, you must add the dependency on ```jitpack``` and ```kotlinx```
 
 ### Gradle
 ```groovy
 allprojects {
 	repositories {
 		...
+		maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
 		maven { url 'https://jitpack.io' }
 	}
 }
@@ -26,6 +27,10 @@ allprojects {
 ### Maven
 ```xml
 <repositories>
+	<repository>
+	    <id>kotlinx</id>
+	    <url>https://dl.bintray.com/kotlin/kotlinx</url>
+	</repository>
 	<repository>
 	    <id>jitpack.io</id>
 	    <url>https://jitpack.io</url>
