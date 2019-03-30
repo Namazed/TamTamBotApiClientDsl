@@ -56,6 +56,8 @@ dependencies {
 
 ## Examples
 
+The example of a finished bot can be found [here](https://github.com/Namazed/TamTamOrthoBot).
+
 ### Scopes
 Below you find example of how start process longPolling:
 ```kotlin
