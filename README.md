@@ -12,6 +12,8 @@ The bot API documentation is [here](https://dev.tamtam.chat).
 
 ## What you need to start
 
+You should build your project with JDK 8.
+
 To access the library, you must add the dependency on ```jitpack``` and ```kotlinx```
 
 ### Gradle
