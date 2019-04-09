@@ -1,7 +1,6 @@
 package chat.tamtam.botsdk
 
 import chat.tamtam.botsdk.client.HttpManager
-import chat.tamtam.botsdk.model.Payload
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Message
@@ -45,7 +44,7 @@ class UpdatesHandlerTest {
     fun `check that updates handler work correct when processing callback`() {
         val processed = AtomicBoolean()
         botScope.callbacks {
-            answerOnCallback(Payload("CHUI")) {
+            answerOnCallback("CHUI") {
                 processed.set(true)
             }
         }

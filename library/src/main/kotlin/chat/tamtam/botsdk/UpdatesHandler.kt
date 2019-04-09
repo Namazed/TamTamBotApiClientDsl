@@ -1,10 +1,11 @@
 package chat.tamtam.botsdk
 
 import chat.tamtam.botsdk.model.ChatId
-import chat.tamtam.botsdk.model.Payload
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.isCommand
 import chat.tamtam.botsdk.model.isCommandInChat
+import chat.tamtam.botsdk.model.map
+import chat.tamtam.botsdk.model.mapOrNull
 import chat.tamtam.botsdk.model.response.EMPTY_MESSAGE
 import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
@@ -88,10 +89,10 @@ class UpdatesHandler internal constructor(
             isNotEmptyCallback(update.callback) -> {
                 val callback = update.callback
                 val message = if (update.message == EMPTY_MESSAGE) null else update.message
-                botScope.callbacksScope[Payload(callback.payload)](CallbackState(update.timestamp, callback, message))
+                botScope.callbacksScope[callback.payload](CallbackState(update.timestamp, callback.map(), message.mapOrNull()))
             }
             isNotEmptyMessage(update.message) -> {
-                botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message))
+                botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message.map()))
             }
         }
     }
