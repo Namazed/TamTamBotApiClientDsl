@@ -8,6 +8,7 @@ import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.map
+import chat.tamtam.botsdk.model.mapOrNull
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.ChatsList
 import chat.tamtam.botsdk.model.request.AnswerCallback
@@ -107,8 +108,13 @@ class RequestsManager internal constructor(
     /**
      * This method give you members from specific chat. By default from first page with 20 count.
      */
-    suspend fun getMembers(chatId: ChatId, count: Int = 20, marker: Long? = null): ResultRequest<ChatMembersList> = startRequest {
-        httpManager.chatHttpManager.getMembers(chatId, count, marker)
+    suspend fun getMembers(
+        chatId: ChatId,
+        count: Int = 20,
+        marker: Long? = null,
+        usersIds: List<UserId>? = null
+    ): ResultRequest<ChatMembersList> = startRequest {
+        httpManager.chatHttpManager.getMembers(chatId, count, marker, usersIds.mapOrNull())
     }
 
     /**

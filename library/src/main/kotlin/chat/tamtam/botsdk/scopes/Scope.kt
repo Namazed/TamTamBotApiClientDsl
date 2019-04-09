@@ -8,6 +8,7 @@ import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.UserId
+import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
@@ -59,6 +60,18 @@ interface Scope {
      * @receiver - this is a count of messages [0..100]
      */
     suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<List<Message>> = requests.getAllMessages(chatId, count = this)
+
+    /**
+     * @see [RequestsManager.getMembers]
+     * @receiver - this is a count of members [0..100]
+     */
+    suspend infix fun Int.membersIn(chatId: ChatId): ResultRequest<ChatMembersList> = requests.getMembers(chatId, count = this)
+
+    /**
+     * @see [RequestsManager.getMembers]
+     * @receiver - this is a list of users identifiers to get their membership.
+     */
+    suspend infix fun List<UserId>.membersIn(chatId: ChatId): ResultRequest<ChatMembersList> = requests.getMembers(chatId, usersIds = this)
 
     /**
      * This method need for send [RequestSendMessage] for User by userId

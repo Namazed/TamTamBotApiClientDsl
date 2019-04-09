@@ -44,6 +44,14 @@ import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 import chat.tamtam.botsdk.model.prepared.Recipient as PreparedRecipient
 import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 
+fun List<UserId>?.mapOrNull(): List<Long>? {
+    return this?.let {
+        it.asSequence()
+            .map { userId -> userId.id }
+            .toList()
+    }
+}
+
 internal fun User.map(): PreparedUser = PreparedUser(UserId(userId), name, username, avatarUrl, fullAvatarUrl)
 
 internal fun ChatMember.map(): PreparedChatMember = PreparedChatMember(PreparedUser(UserId(userId), name, username, avatarUrl,
