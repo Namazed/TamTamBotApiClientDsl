@@ -2,6 +2,7 @@ package chat.tamtam.botsdk
 
 import chat.tamtam.botsdk.model.isCommand
 import chat.tamtam.botsdk.model.isCommandInChat
+import chat.tamtam.botsdk.model.map
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Message
 import chat.tamtam.botsdk.model.response.MessageInfo
@@ -61,7 +62,7 @@ class CommandTest {
         val textWithCommand = "$commandName $argument"
         val update = Update(-1L, UpdateType.MESSAGE_CREATED, message = Message(
             recipient = Recipient(chatType = ChatType.DIALOG), messageInfo = MessageInfo(text = textWithCommand)))
-        val command = textWithCommand.toCommand(update)
+        val command = textWithCommand.toCommand(update.message!!.map(), update.timestamp)
         assertEquals(commandName, command.name)
         assertEquals(argument, command.argument)
     }
@@ -73,7 +74,7 @@ class CommandTest {
         val textWithCommand = "$commandName $argument"
         val update = Update(-1L, UpdateType.MESSAGE_CREATED, message = Message(
             recipient = Recipient(chatType = ChatType.CHAT), messageInfo = MessageInfo(text = textWithCommand)))
-        val command = textWithCommand.toCommand(update)
+        val command = textWithCommand.toCommand(update.message!!.map(), update.timestamp)
         assertEquals(commandName, command.name)
         assertEquals(argument, command.argument)
     }

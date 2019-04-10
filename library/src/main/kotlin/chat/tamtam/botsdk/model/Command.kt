@@ -1,8 +1,8 @@
 package chat.tamtam.botsdk.model
 
+import chat.tamtam.botsdk.UpdatesHandler
+import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.response.ChatType
-import chat.tamtam.botsdk.model.response.Update
-import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 
 private const val SPACE = "\\s"
 private val PROFILE_TAG_PATTERN = Regex("@([A-Za-z0-9_-]+)")
@@ -26,16 +26,16 @@ class Command(
     val name: String,
     val argument: String,
     val timestamp: Long = -1,
-    val message: PreparedMessage
+    val message: Message
 )
 
 /**
  * Map String with Update to Command.
  * @receiver - command name, may has some arguments
- * @param - this update handle in [chat.tamtam.botsdk.UpdatesHandler], when user send command for bot.
+ * @param - this update handle in [UpdatesHandler], when user send command for bot.
  */
-fun String.toCommand(update: Update) = Command(getCommandName(update.message.recipient.chatType),
-    update.message.messageInfo.text.getCommandArgument(update.message.recipient.chatType), update.timestamp, update.message.map())
+fun String.toCommand(message: Message, timestamp: Long) = Command(getCommandName(message.recipient.chatType),
+    message.body.text.getCommandArgument(message.recipient.chatType), timestamp, message)
 
 /**
  * This method check that String is command in Dialog.

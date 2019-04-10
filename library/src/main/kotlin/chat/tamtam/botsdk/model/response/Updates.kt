@@ -18,7 +18,7 @@ import kotlinx.serialization.withName
  * @param marker - Pointer to the next data page
  */
 @Serializable
-class Updates(
+internal class Updates(
     @SerialName("updates") val listUpdates: List<Update>,
     @Optional val marker: Long? = null
 )
@@ -41,7 +41,7 @@ class Updates(
  * @param callback - this class you will get if user pressed on button [UpdateType.CALLBACK]
  */
 @Serializable
-class Update(
+internal class Update(
     val timestamp: Long,
     @SerialName("update_type") val updateType: UpdateType,
     @SerialName("message_id") @Optional val messageId: String = "",
@@ -50,8 +50,8 @@ class Update(
     @SerialName("admin_id") @Optional val adminId: Long = -1,
     @SerialName("inviter_id") @Optional val inviterId: Long = -1,
     @SerialName("title") @Optional val newChatTitle: String = "",
-    @Optional val message: Message = EMPTY_MESSAGE,
-    @Optional val callback: Callback = EMPTY_CALLBACK
+    @Optional val message: Message? = null,
+    @Optional val callback: Callback? = null
 )
 
 @Serializable(UpdateTypeSerializer::class)
@@ -60,7 +60,6 @@ enum class UpdateType(val type: String) {
     MESSAGE_CREATED("message_created"),
     MESSAGE_REMOVED("message_removed"),
     MESSAGE_EDITED("message_edited"),
-    MESSAGE_RESTORED("message_restored"),
     BOT_ADDED("bot_added"),
     BOT_REMOVED("bot_removed"),
     USER_ADDED("user_added"),
@@ -75,7 +74,6 @@ fun updateTypeFrom(value: String) = when(value) {
     "message_created" -> UpdateType.MESSAGE_CREATED
     "message_removed" -> UpdateType.MESSAGE_REMOVED
     "message_edited" -> UpdateType.MESSAGE_EDITED
-    "message_restored" -> UpdateType.MESSAGE_RESTORED
     "bot_added" -> UpdateType.BOT_ADDED
     "bot_removed" -> UpdateType.BOT_REMOVED
     "user_added" -> UpdateType.USER_ADDED

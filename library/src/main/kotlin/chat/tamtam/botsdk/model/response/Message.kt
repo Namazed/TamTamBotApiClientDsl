@@ -14,8 +14,6 @@ import kotlinx.serialization.list
 import kotlinx.serialization.serializer
 import kotlinx.serialization.withName
 
-val EMPTY_MESSAGE = Message()
-
 @Serializable
 class Message(
     @SerialName("body") val messageInfo: MessageInfo = MessageInfo(),

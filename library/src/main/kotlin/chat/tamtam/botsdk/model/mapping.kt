@@ -23,6 +23,15 @@ import chat.tamtam.botsdk.model.prepared.PayloadContact
 import chat.tamtam.botsdk.model.prepared.PayloadKeyboard
 import chat.tamtam.botsdk.model.prepared.PayloadMedia
 import chat.tamtam.botsdk.model.prepared.PayloadPhoto
+import chat.tamtam.botsdk.model.prepared.UpdateBot
+import chat.tamtam.botsdk.model.prepared.UpdateCallback
+import chat.tamtam.botsdk.model.prepared.UpdateChatTitle
+import chat.tamtam.botsdk.model.prepared.UpdateMessage
+import chat.tamtam.botsdk.model.prepared.UpdateMessageRemoved
+import chat.tamtam.botsdk.model.prepared.UpdateUnknown
+import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
+import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
+import chat.tamtam.botsdk.model.prepared.UpdatesList
 import chat.tamtam.botsdk.model.response.Attachment
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.Chat
@@ -34,6 +43,9 @@ import chat.tamtam.botsdk.model.response.Message
 import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Permissions
 import chat.tamtam.botsdk.model.response.Recipient
+import chat.tamtam.botsdk.model.response.Update
+import chat.tamtam.botsdk.model.response.UpdateType
+import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.model.prepared.Attachment as PreparedAttachment
 import chat.tamtam.botsdk.model.prepared.Callback as PreparedCallback
@@ -42,6 +54,7 @@ import chat.tamtam.botsdk.model.prepared.ChatMember as PreparedChatMember
 import chat.tamtam.botsdk.model.prepared.Link as PreparedLink
 import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 import chat.tamtam.botsdk.model.prepared.Recipient as PreparedRecipient
+import chat.tamtam.botsdk.model.prepared.Update as PreparedUpdate
 import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 
 fun List<UserId>?.mapOrNull(): List<Long>? {
@@ -113,6 +126,26 @@ internal fun ChatsResult.map(): ChatsList {
     return ChatsList(list, marker)
 }
 
+internal fun Update.map(): PreparedUpdate {
+    return when(updateType) {
+        UpdateType.CALLBACK -> UpdateCallback(updateType, timestamp, message.mapOrNull(), callback!!.map())
+        UpdateType.MESSAGE_CREATED, UpdateType.MESSAGE_EDITED -> UpdateMessage(updateType, timestamp, message!!.map())
+        UpdateType.MESSAGE_REMOVED -> UpdateMessageRemoved(updateType, timestamp, MessageId(messageId))
+        UpdateType.BOT_ADDED, UpdateType.BOT_REMOVED, UpdateType.BOT_STARTED -> UpdateBot(updateType, timestamp, ChatId(chatId), UserId(userId))
+        UpdateType.USER_ADDED -> UpdateUserAdded(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(inviterId))
+        UpdateType.USER_REMOVED -> UpdateUserRemoved(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(adminId))
+        UpdateType.CHAT_TITLE_CHANGED -> UpdateChatTitle(updateType, timestamp, ChatId(chatId), UserId(userId), newChatTitle)
+        UpdateType.UNKNOWN -> UpdateUnknown(updateType, timestamp)
+    }
+}
+
+internal fun Updates.map(): UpdatesList {
+    val list = listUpdates.asSequence()
+        .map { update -> update.map() }
+        .toList()
+    return UpdatesList(list, marker)
+}
+
 internal inline fun <reified R, reified PR> R.map(): PR {
     return when(this) {
         is User -> this.map() as PR
@@ -123,6 +156,8 @@ internal inline fun <reified R, reified PR> R.map(): PR {
         is Chat -> this.map() as PR
         is ChatsResult -> this.map() as PR
         is Callback -> this.map() as PR
+        is Update -> this.map() as PR
+        is Updates -> this.map() as PR
         else -> this as PR
     }
 }
