@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
  * @param message - Message in chat
  */
 @Serializable
-class SendMessage(
+internal class SendMessage(
     val message: Message
 )

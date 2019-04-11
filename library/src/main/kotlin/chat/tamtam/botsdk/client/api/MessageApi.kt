@@ -19,7 +19,7 @@ import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 private const val MESSAGES_ENDPOINT = "/messages"
 
-interface MessageApi {
+internal interface MessageApi {
 
     @GET(MESSAGES_ENDPOINT)
     fun getMessages(
