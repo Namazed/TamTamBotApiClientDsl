@@ -43,6 +43,7 @@ import chat.tamtam.botsdk.model.response.Message
 import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Permissions
 import chat.tamtam.botsdk.model.response.Recipient
+import chat.tamtam.botsdk.model.response.SendMessage
 import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
@@ -102,6 +103,10 @@ internal fun Messages.map(): List<PreparedMessage> = messages.asSequence()
     .map(Message::map)
     .toList()
 
+internal fun SendMessage.map(): PreparedMessage {
+    return message.map()
+}
+
 internal fun Callback.map(): PreparedCallback = PreparedCallback(timestamp, CallbackId(callbackId), payload, user.map())
 
 internal fun Attachment.map(): PreparedAttachment {
@@ -151,6 +156,7 @@ internal inline fun <reified R, reified PR> R.map(): PR {
         is User -> this.map() as PR
         is Message -> this.map() as PR
         is Messages -> this.map() as PR
+        is SendMessage -> this.map() as PR
         is ChatMember -> this.map() as PR
         is ChatMembersResult -> this.map() as PR
         is Chat -> this.map() as PR
