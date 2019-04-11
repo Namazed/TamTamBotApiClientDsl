@@ -4,10 +4,6 @@ import chat.tamtam.botsdk.communications.longPolling
 import chat.tamtam.botsdk.keyboard.keyboard
 import chat.tamtam.botsdk.model.Button
 import chat.tamtam.botsdk.model.ButtonType
-import chat.tamtam.botsdk.model.CallbackId
-import chat.tamtam.botsdk.model.ChatId
-import chat.tamtam.botsdk.model.Payload
-import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.InlineKeyboard
 import chat.tamtam.botsdk.model.request.UploadParams
@@ -15,7 +11,6 @@ import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.scopes.CommandsScope
 import chat.tamtam.botsdk.state.CommandState
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 fun main() {
 
@@ -41,10 +36,18 @@ fun main() {
             onCommand("/dinner") {
                 val inlineKeyboard = createInlineKeyboard()
                 // send text for user
-                "Your dinner is two bananas" sendFor UserId(it.command.message.sender.userId)
+                "Your dinner is two bananas" sendFor it.command.message.sender.userId
 
                 // first prepare text and userId then send for user prepared text with InlineKeyboard or other Attach
-                "Choose you dinner" prepareFor UserId(it.command.message.sender.userId) sendWith inlineKeyboard
+                "Choose you dinner" prepareFor it.command.message.sender.userId sendWith inlineKeyboard
+
+                //simple request first 5 messages in chat
+                val resultRequest = 5 messagesIn it.command.message.recipient.chatId
+                // you can check result of your request
+                when(resultRequest) {
+                    is ResultRequest.Success -> resultRequest.response.size
+                    is ResultRequest.Failure -> resultRequest.error
+                }
 
                 // You can create extension function if you don't want to leave code here, but you need know,
                 // that all extension functions for Scopes, need be 'suspend'.
@@ -53,7 +56,7 @@ fun main() {
 
             onUnknownCommand {
                 """I'm sorry, but I don't know this command, you can try write /help
-                    |if you don't remember all my available command.""".trimMargin() sendFor UserId(it.command.message.sender.userId)
+                    |if you don't remember all my available command.""".trimMargin() sendFor it.command.message.sender.userId
             }
 
         }
@@ -61,7 +64,7 @@ fun main() {
         callbacks {
 
             defaultAnswer {
-                val resultAnswer = "It's default answer" replaceCurrentMessage CallbackId(it.callback.callbackId)
+                val resultAnswer = "It's default answer" replaceCurrentMessage it.callback.callbackId
 
                 when (resultAnswer) {
                     is ResultRequest.Success -> resultAnswer.response
@@ -70,25 +73,25 @@ fun main() {
             }
 
             // when user click on button with payload "HELLO", code below will start
-            answerOnCallback(Payload("HELLO")) {
+            answerOnCallback("HELLO") {
                 val inlineKeyboard = createInlineKeyboard()
                 "Hello" prepareReplacementCurrentMessage
-                        AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId)) answerWith inlineKeyboard
+                        AnswerParams(it.callback.callbackId, it.callback.user.userId) answerWith inlineKeyboard
             }
 
             // when user click on button with payload "GOODBYE", code below will start
-            answerOnCallback(Payload("GOODBYE")) {
+            answerOnCallback("GOODBYE") {
 
                 // send message with upload Photo which replace old message
                 "Goodbye" prepareReplacementCurrentMessage
-                        AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId)) answerWith
+                        AnswerParams(it.callback.callbackId, it.callback.user.userId) answerWith
                         UploadParams("local_file_path", UploadType.PHOTO)
 
                 // send message which replace old message
-                "Goodbye" answerFor CallbackId(it.callback.callbackId)
+                "Goodbye" answerFor it.callback.callbackId
 
                 // send notification (as Toast) for User
-                "Goodbye" answerNotification AnswerParams(CallbackId(it.callback.callbackId), UserId(it.callback.user.userId))
+                "Goodbye" answerNotification AnswerParams(it.callback.callbackId, it.callback.user.userId)
             }
         }
 
@@ -96,13 +99,13 @@ fun main() {
 
             // if current update is message, but not contains command, code below will start
             answerOnMessage { messageState ->
-                typingOn(ChatId(messageState.message.recipient.chatId))
-                val result = RequestSendMessage("I'm tired") sendFor ChatId(messageState.message.recipient.chatId)
+                typingOn(messageState.message.recipient.chatId)
+                val result = RequestSendMessage("I'm tired") sendFor messageState.message.recipient.chatId
                 when (result) {
                     is ResultRequest.Success -> result.response
                     is ResultRequest.Failure -> result.exception
                 }
-                typingOff(ChatId(messageState.message.recipient.chatId))
+                typingOff(messageState.message.recipient.chatId)
             }
 
         }
@@ -125,19 +128,19 @@ fun main() {
 }
 
 private suspend fun CommandsScope.sendTextWithKeyboard(state: CommandState, keyboard: InlineKeyboard) {
-    "Choose you dinner" prepareFor UserId(state.command.message.sender.userId) sendWith keyboard
+    "Choose you dinner" prepareFor state.command.message.sender.userId sendWith keyboard
 }
 
 private fun createInlineKeyboard(): InlineKeyboard {
     return keyboard {
         +buttonRow {
             +Button(
-                ButtonType.CALLBACK.value,
+                ButtonType.CALLBACK,
                 "Create dreams",
                 payload = "DREAMS"
             )
             +Button(
-                ButtonType.CALLBACK.value,
+                ButtonType.CALLBACK,
                 "Imagine that you are Dragon",
                 payload = "DRAGON"
             )
@@ -145,16 +148,18 @@ private fun createInlineKeyboard(): InlineKeyboard {
 
         this add buttonRow {
             this add Button(
-                ButtonType.LINK.value,
-                "Find new dreams"
+                ButtonType.LINK,
+                "Find new dreams",
+                url = "http://dreams.com/"
             )
         }
 
         add(buttonRow {
             add(
                 Button(
-                    ButtonType.LINK.value,
-                    "Find new dreams"
+                    ButtonType.LINK,
+                    "Find new dreams",
+                    url = "http://dreams.com/"
                 )
             )
         })

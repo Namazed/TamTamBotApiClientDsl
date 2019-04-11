@@ -37,8 +37,8 @@ class ChatHttpManager internal constructor(
 
     suspend fun leaveChat(chatId: ChatId): HttpResult<Default> = chatService.leaveChat(chatId, botToken, version).await()
 
-    suspend fun getMembers(chatId: ChatId, count: Int = 20, marker: Long? = null): HttpResult<ChatMembersResult> =
-        chatService.getMembers(chatId, botToken, version, count, marker).await()
+    suspend fun getMembers(chatId: ChatId, count: Int = 20, marker: Long? = null, userIds: List<Long>? = null): HttpResult<ChatMembersResult> =
+        chatService.getMembers(chatId, botToken, version, count, marker, userIds).await()
 
     suspend fun addMembers(chatId: ChatId, userIds: List<Long>): HttpResult<Default> =
         chatService.addMembers(chatId, botToken, version, userIds).await()

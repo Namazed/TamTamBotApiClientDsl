@@ -7,6 +7,10 @@ import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
+import chat.tamtam.botsdk.model.map
+import chat.tamtam.botsdk.model.mapOrNull
+import chat.tamtam.botsdk.model.prepared.ChatMembersList
+import chat.tamtam.botsdk.model.prepared.ChatsList
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
@@ -19,20 +23,18 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForMediaToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageToken
 import chat.tamtam.botsdk.model.request.createSendMessageForMediaToken
 import chat.tamtam.botsdk.model.request.createSendMessageForReusablePhotoToken
-import chat.tamtam.botsdk.model.response.Chat
-import chat.tamtam.botsdk.model.response.ChatMember
-import chat.tamtam.botsdk.model.response.ChatMembersResult
-import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Error
-import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
-import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.typing.TypingController
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import retrofit2.Response
+import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
+import chat.tamtam.botsdk.model.prepared.ChatMember as PreparedChatMember
+import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
+import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.request.Subscription as RequestSubscription
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
@@ -49,14 +51,14 @@ class RequestsManager internal constructor(
     /**
      * If you want get information about your bot, which like name or id, you need use this method
      */
-    suspend fun getBotInfo(): ResultRequest<User> = startRequest {
+    suspend fun getBotInfo(): ResultRequest<PreparedUser> = startRequest {
         httpManager.getBotInfo()
     }
 
     /**
      * If you want get information about your bot in chat (admin, owner, joinTime or etc), you need use this method
      */
-    suspend fun getMembershipInfoInChat(chatId: ChatId): ResultRequest<ChatMember> = startRequest {
+    suspend fun getMembershipInfoInChat(chatId: ChatId): ResultRequest<PreparedChatMember> = startRequest {
         httpManager.chatHttpManager.getChatMembershipInfo(chatId)
     }
 
@@ -84,7 +86,7 @@ class RequestsManager internal constructor(
     /**
      * This method give you chats from specific marker or without.
      */
-    suspend fun getAllChats(count: Int = 50, marker: Long? = null): ResultRequest<ChatsResult> = startRequest {
+    suspend fun getAllChats(count: Int = 50, marker: Long? = null): ResultRequest<ChatsList> = startRequest {
         checkCount(count)
         httpManager.chatHttpManager.getAllChats(count, marker)
     }
@@ -92,7 +94,7 @@ class RequestsManager internal constructor(
     /**
      * This method give you chat by chat id
      */
-    suspend fun getChat(chatId: ChatId): ResultRequest<Chat> = startRequest {
+    suspend fun getChat(chatId: ChatId): ResultRequest<PreparedChat> = startRequest {
         httpManager.chatHttpManager.getChat(chatId)
     }
 
@@ -106,8 +108,13 @@ class RequestsManager internal constructor(
     /**
      * This method give you members from specific chat. By default from first page with 20 count.
      */
-    suspend fun getMembers(chatId: ChatId, count: Int = 20, marker: Long? = null): ResultRequest<ChatMembersResult> = startRequest {
-        httpManager.chatHttpManager.getMembers(chatId, count, marker)
+    suspend fun getMembers(
+        chatId: ChatId,
+        count: Int = 20,
+        marker: Long? = null,
+        usersIds: List<UserId>? = null
+    ): ResultRequest<ChatMembersList> = startRequest {
+        httpManager.chatHttpManager.getMembers(chatId, count, marker, usersIds.mapOrNull())
     }
 
     /**
@@ -131,7 +138,7 @@ class RequestsManager internal constructor(
      * @param chatId - this is inline class [ChatId] which contains chatId
      * @param chatInfo - this class contains new title or icon for chat [Icon]
      */
-    suspend fun editChatInfo(chatId: ChatId, chatInfo: ChatInfo): ResultRequest<Chat> = startRequest {
+    suspend fun editChatInfo(chatId: ChatId, chatInfo: ChatInfo): ResultRequest<PreparedChat> = startRequest {
         httpManager.chatHttpManager.editChatInfo(chatId, chatInfo)
     }
 
@@ -145,7 +152,7 @@ class RequestsManager internal constructor(
         fromTime: Long? = null,
         toTime: Long? = null,
         count: Int = 50
-    ): ResultRequest<Messages> = startRequest {
+    ): ResultRequest<List<PreparedMessage>> = startRequest {
         checkCount(count)
         httpManager.messageHttpManager.getAllMessages(chatId, messagesIds, fromTime, toTime, count)
     }
@@ -165,14 +172,14 @@ class RequestsManager internal constructor(
      *
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [HttpException] or [Exception]
      */
-    suspend fun send(userId: UserId, sendMessage: RequestSendMessage): ResultRequest<ResponseSendMessage> = startRequest {
+    suspend fun send(userId: UserId, sendMessage: RequestSendMessage): ResultRequest<PreparedMessage> = startRequest {
         httpManager.messageHttpManager.sendMessage(userId, sendMessage)
     }
 
     /**
      * @see [send]
      */
-    suspend fun send(chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<ResponseSendMessage> = startRequest {
+    suspend fun send(chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<PreparedMessage> = startRequest {
         httpManager.messageHttpManager.sendMessage(chatId, sendMessage)
     }
 
@@ -184,7 +191,7 @@ class RequestsManager internal constructor(
      *
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [HttpException] or [Exception]
      */
-    suspend fun sendPhoto(sendParams: SendParams, reusablePhotoToken: String): ResultRequest<ResponseSendMessage> {
+    suspend fun sendPhoto(sendParams: SendParams, reusablePhotoToken: String): ResultRequest<PreparedMessage> {
         return when {
             sendParams.chatId.id != -1L -> send(sendParams.chatId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
             sendParams.userId.id != -1L -> send(sendParams.userId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
@@ -201,12 +208,12 @@ class RequestsManager internal constructor(
      *
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [HttpException] or [Exception]
      */
-    suspend fun sendText(chatId: ChatId, text: String): ResultRequest<ResponseSendMessage> = send(chatId, RequestSendMessage(text))
+    suspend fun sendText(chatId: ChatId, text: String): ResultRequest<PreparedMessage> = send(chatId, RequestSendMessage(text))
 
     /**
      * @see [sendText]
      */
-    suspend fun sendText(userId: UserId, text: String): ResultRequest<ResponseSendMessage> = send(userId, RequestSendMessage(text))
+    suspend fun sendText(userId: UserId, text: String): ResultRequest<PreparedMessage> = send(userId, RequestSendMessage(text))
 
     /**
      * If you want send users in chat some notification that you now sending something in chat, you just need use this method.
@@ -285,7 +292,7 @@ class RequestsManager internal constructor(
         sendMessage: RequestSendMessage,
         upload: Upload,
         uploadParams: UploadParams
-    ): ResultRequest<ResponseSendMessage> {
+    ): ResultRequest<PreparedMessage> {
         val resultUpload = upload(uploadParams, upload)
         return when (resultUpload) {
             is ResultRequest.Success -> sendByUploadType(chatId, userId, uploadParams.uploadType, sendMessage, resultUpload)
@@ -303,7 +310,7 @@ class RequestsManager internal constructor(
         uploadType: UploadType,
         sendMessage: RequestSendMessage,
         resultUpload: ResultRequest.Success<UploadInfo>
-    ): ResultRequest<ResponseSendMessage> = if (uploadType == UploadType.PHOTO) {
+    ): ResultRequest<PreparedMessage> = if (uploadType == UploadType.PHOTO) {
         val message = createSendMessageForImageToken(sendMessage, resultUpload.response)
         if (chatId.id == -1L) send(userId, message) else send(chatId, message)
     } else {
@@ -346,10 +353,10 @@ class RequestsManager internal constructor(
      * General request method, which contains try catch for some exceptions when we call Http request.
      * @param request - this is Http request from [HttpManager] and his delegates [MessageHttpManager] and etc.
      */
-    private inline fun <R> startRequest(request: () -> HttpResult<R>): ResultRequest<R> = try {
+    private inline fun <reified R, reified PR> startRequest(request: () -> HttpResult<R>): ResultRequest<PR> = try {
         val httpResult = request()
         when (httpResult) {
-            is Success -> ResultRequest.Success(httpResult.response)
+            is Success -> ResultRequest.Success(httpResult.response.map())
             is Failure -> {
                 val error = parseError(httpResult.response)
                 ResultRequest.Failure(httpResult.response.code(), error, HttpException(httpResult.response))
@@ -371,7 +378,7 @@ class RequestsManager internal constructor(
     }
 
     private fun checkCount(count: Int) {
-        check(count !in 0..100) {
+        check(count in 0..100) {
             "Count must be from 0 to 100, current count $count"
         }
     }

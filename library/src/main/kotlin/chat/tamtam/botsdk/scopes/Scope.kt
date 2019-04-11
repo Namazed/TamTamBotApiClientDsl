@@ -8,6 +8,8 @@ import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.UserId
+import chat.tamtam.botsdk.model.prepared.ChatMembersList
+import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
@@ -21,7 +23,6 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForReusablePhotoToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
 import chat.tamtam.botsdk.model.response.Default
-import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -58,7 +59,19 @@ interface Scope {
      * @see [RequestsManager.getAllMessages]
      * @receiver - this is a count of messages [0..100]
      */
-    suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<Messages> = requests.getAllMessages(chatId, count = this)
+    suspend infix fun Int.messagesIn(chatId: ChatId): ResultRequest<List<Message>> = requests.getAllMessages(chatId, count = this)
+
+    /**
+     * @see [RequestsManager.getMembers]
+     * @receiver - this is a count of members [0..100]
+     */
+    suspend infix fun Int.membersIn(chatId: ChatId): ResultRequest<ChatMembersList> = requests.getMembers(chatId, count = this)
+
+    /**
+     * @see [RequestsManager.getMembers]
+     * @receiver - this is a list of users identifiers to get their membership.
+     */
+    suspend infix fun List<UserId>.membersIn(chatId: ChatId): ResultRequest<ChatMembersList> = requests.getMembers(chatId, usersIds = this)
 
     /**
      * This method need for send [RequestSendMessage] for User by userId
@@ -67,7 +80,7 @@ interface Scope {
      * @receiver - this is [RequestSendMessage] which you send for User
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun RequestSendMessage.sendFor(userId: UserId): ResultRequest<ResponseSendMessage> = requests.send(userId, this)
+    suspend infix fun RequestSendMessage.sendFor(userId: UserId): ResultRequest<Message> = requests.send(userId, this)
 
     /**
      * This method need for send [RequestSendMessage] with text of message for User by userId
@@ -76,7 +89,7 @@ interface Scope {
      * @receiver - this is text for message which you send for User
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun String.sendFor(userId: UserId): ResultRequest<ResponseSendMessage> = RequestSendMessage(this).sendFor(userId)
+    suspend infix fun String.sendFor(userId: UserId): ResultRequest<Message> = RequestSendMessage(this).sendFor(userId)
 
     /**
      * This method need for send [RequestSendMessage] with text of message for Chat by chatId
@@ -85,7 +98,7 @@ interface Scope {
      * @receiver - this is [RequestSendMessage] which you send for Chat
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun RequestSendMessage.sendFor(chatId: ChatId): ResultRequest<ResponseSendMessage> = requests.send(chatId, this)
+    suspend infix fun RequestSendMessage.sendFor(chatId: ChatId): ResultRequest<Message> = requests.send(chatId, this)
 
     /**
      * This method need for send [RequestSendMessage] with text of message for Chat by chatId
@@ -95,7 +108,7 @@ interface Scope {
      * @receiver - this is text for message which you send for Chat
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun String.sendFor(chatId: ChatId): ResultRequest<ResponseSendMessage> = RequestSendMessage(this).sendFor(chatId)
+    suspend infix fun String.sendFor(chatId: ChatId): ResultRequest<Message> = RequestSendMessage(this).sendFor(chatId)
 
     /**
      * This method need for connect with [sendWith] and pass [SendParams]
@@ -129,7 +142,7 @@ interface Scope {
      * @receiver - this is [SendParams] which contains [UserId] and [RequestSendMessage] which contains text of message
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard): ResultRequest<ResponseSendMessage> {
+    suspend infix fun SendParams.sendWith(keyboard: InlineKeyboard): ResultRequest<Message> {
         val attaches = if (keyboard == EMPTY_INLINE_KEYBOARD) {
             emptyList()
         } else {
@@ -145,7 +158,7 @@ interface Scope {
      * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
      */
-    suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultRequest<ResponseSendMessage> {
+    suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultRequest<Message> {
         val sendMessage = createSendMessageForImageUrl(sendMessage, imageUrl)
         return requests.send(chatId, sendMessage)
     }
@@ -158,7 +171,7 @@ interface Scope {
      * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
      * @return - look at [RequestsManager.send]
      */
-    suspend infix fun SendParams.sendWith(reusablePhotoToken: String): ResultRequest<ResponseSendMessage> {
+    suspend infix fun SendParams.sendWith(reusablePhotoToken: String): ResultRequest<Message> {
         return requests.sendPhoto(this, reusablePhotoToken)
     }
 
@@ -169,7 +182,7 @@ interface Scope {
      * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
      * @return - look at [RequestsManager.send]
      */
-    suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultRequest<ResponseSendMessage> {
+    suspend infix fun SendParams.sendWith(uploadParams: UploadParams): ResultRequest<Message> {
         val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
         return when (resultUpload) {
             is ResultRequest.Success -> requests.sendWithUpload(

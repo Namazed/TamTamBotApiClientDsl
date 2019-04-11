@@ -11,11 +11,11 @@ class KeyboardFactoryTest {
     fun `checking that the keyboard is being created correctly using unary plus`() {
         val inlineKeyboard = keyboard {
             +buttonRow {
-                +Button(ButtonType.CALLBACK.value, "test1")
-                +Button(ButtonType.CALLBACK.value, "test2")
+                +Button(ButtonType.CALLBACK, "test1")
+                +Button(ButtonType.CALLBACK, "test2")
             }
             +buttonRow {
-                +Button(ButtonType.CALLBACK.value, "test3")
+                +Button(ButtonType.CALLBACK, "test3")
             }
         }
 
@@ -28,13 +28,13 @@ class KeyboardFactoryTest {
     fun `checking that the keyboard is being created correctly using add function`() {
         val inlineKeyboard = keyboard {
             this add buttonRow {
-                this add Button(ButtonType.CALLBACK.value, "test1")
-                this add Button(ButtonType.CALLBACK.value, "test2")
+                this add Button(ButtonType.CALLBACK, "test1")
+                this add Button(ButtonType.CALLBACK, "test2")
             }
             this add buttonRow {
-                this add Button(ButtonType.CALLBACK.value, "test3")
-                this add Button(ButtonType.CALLBACK.value, "test4")
-                this add Button(ButtonType.CALLBACK.value, "test5")
+                this add Button(ButtonType.CALLBACK, "test3")
+                this add Button(ButtonType.CALLBACK, "test4")
+                this add Button(ButtonType.CALLBACK, "test5")
             }
         }
 

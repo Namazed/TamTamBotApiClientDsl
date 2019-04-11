@@ -34,7 +34,7 @@ internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
 internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
 internal val ALL_MEDIA_TYPE = MediaType.parse("all")
 
-internal const val API_VERSION = "0.1.3"
+internal const val API_VERSION = "0.1.4"
 
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(

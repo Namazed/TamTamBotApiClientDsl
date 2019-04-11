@@ -1,16 +1,16 @@
 package chat.tamtam.botsdk
 
-import chat.tamtam.botsdk.model.ChatId
-import chat.tamtam.botsdk.model.Payload
-import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.isCommand
 import chat.tamtam.botsdk.model.isCommandInChat
-import chat.tamtam.botsdk.model.response.EMPTY_MESSAGE
-import chat.tamtam.botsdk.model.response.Update
+import chat.tamtam.botsdk.model.map
+import chat.tamtam.botsdk.model.prepared.Update
+import chat.tamtam.botsdk.model.prepared.UpdateBot
+import chat.tamtam.botsdk.model.prepared.UpdateCallback
+import chat.tamtam.botsdk.model.prepared.UpdateMessage
+import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
+import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
+import chat.tamtam.botsdk.model.prepared.UpdatesList
 import chat.tamtam.botsdk.model.response.UpdateType
-import chat.tamtam.botsdk.model.response.Updates
-import chat.tamtam.botsdk.model.response.isNotEmptyCallback
-import chat.tamtam.botsdk.model.response.isNotEmptyMessage
 import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
 import chat.tamtam.botsdk.state.AddedBotState
@@ -36,9 +36,9 @@ class UpdatesHandler internal constructor(
 ) {
 
     suspend fun run() {
-        val updates: Updates
+        val updates: UpdatesList
         try {
-            updates = botScope.botHttpManager.getUpdates(marker)
+            updates = botScope.botHttpManager.getUpdates(marker).map()
             marker = updates.marker
         } catch (e: Exception) {
             if (e !is SocketTimeoutException) {
@@ -50,47 +50,43 @@ class UpdatesHandler internal constructor(
         processUpdates(updates)
     }
 
-    public suspend fun processUpdates(updates: Updates) {
-        if (updates.listUpdates.isEmpty()) {
+    suspend fun processUpdates(updatesList: UpdatesList) {
+        if (updatesList.updates.isEmpty()) {
             return
         }
-        updates.listUpdates.forEachParallel { update: Update ->
+        updatesList.updates.forEachParallel { update: Update ->
             process(update)
         }
     }
 
     private suspend fun process(update: Update) {
-        log.info("process: start process update with updateType ${update.updateType}")
+        log.info("process: start process update with updateType ${update.type}")
         when {
-            update.updateType == UpdateType.BOT_STARTED -> {
-                botScope.answerOnStart(StartedBotState(update.timestamp, ChatId(update.chatId), UserId(update.userId)))
+            update.type == UpdateType.BOT_STARTED && update is UpdateBot -> {
+                botScope.answerOnStart(StartedBotState(update.timestamp, update.chatId, update.userId))
             }
-            update.updateType == UpdateType.BOT_ADDED -> {
-                botScope.answerOnAdd(AddedBotState(update.timestamp, ChatId(update.chatId), UserId(update.userId)))
+            update.type == UpdateType.BOT_ADDED && update is UpdateBot -> {
+                botScope.answerOnAdd(AddedBotState(update.timestamp, update.chatId, update.userId))
             }
-            update.updateType == UpdateType.BOT_REMOVED -> {
-                botScope.answerOnRemove(RemovedBotState(update.timestamp, ChatId(update.chatId), UserId(update.userId)))
+            update.type == UpdateType.BOT_REMOVED && update is UpdateBot -> {
+                botScope.answerOnRemove(RemovedBotState(update.timestamp, update.chatId, update.userId))
             }
-            update.updateType == UpdateType.USER_ADDED -> {
-                botScope.userScope.answerOnAdd(AddedUserState(update.timestamp, ChatId(update.chatId),
-                    UserId(update.userId), UserId(update.inviterId)
-                ))
+            update.type == UpdateType.USER_ADDED && update is UpdateUserAdded -> {
+                botScope.userScope.answerOnAdd(AddedUserState(update.timestamp, update.chatId, update.userId, update.inviterId))
             }
-            update.updateType == UpdateType.USER_REMOVED -> {
-                botScope.userScope.answerOnRemove(RemovedUserState(update.timestamp, ChatId(update.chatId),
-                    UserId(update.userId), UserId(update.adminId)
-                ))
+            update.type == UpdateType.USER_REMOVED && update is UpdateUserRemoved -> {
+                botScope.userScope.answerOnRemove(RemovedUserState(update.timestamp, update.chatId, update.userId, update.adminId))
             }
-            isNotEmptyMessage(update.message) && (update.message.messageInfo.text.isCommand() || update.message.messageInfo.text.isCommandInChat()) -> {
-                val command = update.message.messageInfo.text.toCommand(update)
+            update.type == UpdateType.MESSAGE_CREATED && update is UpdateMessage && (update.message.body.text.isCommand()
+                    || update.message.body.text.isCommandInChat()) -> {
+                val command = update.message.body.text.toCommand(update.message, update.timestamp)
                 botScope.commandScope[command.name](CommandState(update.timestamp, command))
             }
-            isNotEmptyCallback(update.callback) -> {
-                val callback = update.callback
-                val message = if (update.message == EMPTY_MESSAGE) null else update.message
-                botScope.callbacksScope[Payload(callback.payload)](CallbackState(update.timestamp, callback, message))
+            update.type == UpdateType.CALLBACK && update is UpdateCallback -> {
+                val payload = update.callback.payload
+                botScope.callbacksScope[payload](CallbackState(update.timestamp, update.callback.map(), update.message))
             }
-            isNotEmptyMessage(update.message) -> {
+            update.type == UpdateType.MESSAGE_CREATED && update is UpdateMessage -> {
                 botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message))
             }
         }

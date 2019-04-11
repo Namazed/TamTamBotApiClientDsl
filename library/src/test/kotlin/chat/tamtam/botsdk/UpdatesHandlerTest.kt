@@ -1,7 +1,7 @@
 package chat.tamtam.botsdk
 
 import chat.tamtam.botsdk.client.HttpManager
-import chat.tamtam.botsdk.model.Payload
+import chat.tamtam.botsdk.model.map
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Message
@@ -32,9 +32,10 @@ class UpdatesHandlerTest {
         val message = Message(timestamp = 1)
         val update = Update(1, UpdateType.MESSAGE_CREATED, message = message)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed message created update"
             }
@@ -45,7 +46,7 @@ class UpdatesHandlerTest {
     fun `check that updates handler work correct when processing callback`() {
         val processed = AtomicBoolean()
         botScope.callbacks {
-            answerOnCallback(Payload("CHUI")) {
+            answerOnCallback("CHUI") {
                 processed.set(true)
             }
         }
@@ -53,9 +54,10 @@ class UpdatesHandlerTest {
         val message = Message(timestamp = 1)
         val update = Update(1, UpdateType.CALLBACK, callback = callback, message = message)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed callback update"
             }
@@ -73,9 +75,10 @@ class UpdatesHandlerTest {
         val message = Message(MessageInfo(text = "/chui"), recipient = Recipient(chatType = ChatType.DIALOG), timestamp = 1)
         val update = Update(1, UpdateType.MESSAGE_CREATED, message = message)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed message created which contains command"
             }
@@ -92,9 +95,10 @@ class UpdatesHandlerTest {
         }
         val update = Update(1, UpdateType.USER_REMOVED)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed user removed update"
             }
@@ -111,9 +115,10 @@ class UpdatesHandlerTest {
         }
         val update = Update(1, UpdateType.USER_ADDED)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed user added update"
             }
@@ -128,9 +133,10 @@ class UpdatesHandlerTest {
         }
         val update = Update(1, UpdateType.BOT_REMOVED)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot removed update"
             }
@@ -145,9 +151,10 @@ class UpdatesHandlerTest {
         }
         val update = Update(1, UpdateType.BOT_ADDED)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot added update"
             }
@@ -162,9 +169,10 @@ class UpdatesHandlerTest {
         }
         val update = Update(1, UpdateType.BOT_STARTED)
         val updates = Updates(listOf(update))
+        val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updates)
+            handler.processUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot started update"
             }
