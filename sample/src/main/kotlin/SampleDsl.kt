@@ -11,7 +11,6 @@ import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.scopes.CommandsScope
 import chat.tamtam.botsdk.state.CommandState
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 fun main() {
 
@@ -42,6 +41,7 @@ fun main() {
                 // first prepare text and userId then send for user prepared text with InlineKeyboard or other Attach
                 "Choose you dinner" prepareFor it.command.message.sender.userId sendWith inlineKeyboard
 
+                //simple request first 5 messages in chat
                 val resultRequest = 5 messagesIn it.command.message.recipient.chatId
                 // you can check result of your request
                 when(resultRequest) {
@@ -135,12 +135,12 @@ private fun createInlineKeyboard(): InlineKeyboard {
     return keyboard {
         +buttonRow {
             +Button(
-                ButtonType.CALLBACK.value,
+                ButtonType.CALLBACK,
                 "Create dreams",
                 payload = "DREAMS"
             )
             +Button(
-                ButtonType.CALLBACK.value,
+                ButtonType.CALLBACK,
                 "Imagine that you are Dragon",
                 payload = "DRAGON"
             )
@@ -148,16 +148,18 @@ private fun createInlineKeyboard(): InlineKeyboard {
 
         this add buttonRow {
             this add Button(
-                ButtonType.LINK.value,
-                "Find new dreams"
+                ButtonType.LINK,
+                "Find new dreams",
+                url = "http://dreams.com/"
             )
         }
 
         add(buttonRow {
             add(
                 Button(
-                    ButtonType.LINK.value,
-                    "Find new dreams"
+                    ButtonType.LINK,
+                    "Find new dreams",
+                    url = "http://dreams.com/"
                 )
             )
         })
