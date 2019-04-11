@@ -122,7 +122,7 @@ internal fun Attachment.map(): PreparedAttachment {
 
 internal fun List<Attachment>.map(): List<PreparedAttachment> = map { attachment -> attachment.map() }
 
-internal fun Chat.map(): PreparedChat = PreparedChat(ChatId(chatId), type, status, title, ChatIcon(icon.url), lastEventTime,
+internal fun Chat.map(): PreparedChat = PreparedChat(ChatId(chatId), type, status, title, ChatIcon(icon?.url ?: ""), lastEventTime,
     participantsCount, ownerId, participants, public, linkOnChat, description)
 
 internal fun ChatsResult.map(): ChatsList {
