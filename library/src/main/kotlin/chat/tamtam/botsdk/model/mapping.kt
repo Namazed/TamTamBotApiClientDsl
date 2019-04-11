@@ -48,6 +48,7 @@ import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.User
+import chat.tamtam.botsdk.model.response.permissionFrom
 import chat.tamtam.botsdk.model.prepared.Attachment as PreparedAttachment
 import chat.tamtam.botsdk.model.prepared.Callback as PreparedCallback
 import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
@@ -81,7 +82,7 @@ internal fun ChatMembersResult.map(): ChatMembersList {
 private fun List<String>?.mapPermissions(): List<Permissions> {
     return this?.let {
         it.asSequence()
-            .map { s: String -> Permissions.valueOf(s) }
+            .map { s: String -> permissionFrom(s) }
             .toList()
     } ?: emptyList()
 }
