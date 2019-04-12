@@ -28,9 +28,4 @@ inline class MessageId(val id: String)
 /**
  * @see [ChatId]
  */
-inline class Payload(val value: String)
-
-/**
- * @see [ChatId]
- */
 inline class ImageUrl(val value: String)

@@ -1,6 +1,8 @@
 package chat.tamtam.botsdk.model.prepared
 
+import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
+import chat.tamtam.botsdk.model.response.LinkType
 
 data class Message(
     val body: Body,
@@ -18,6 +20,8 @@ data class Body(
 )
 
 class Link(
-    val type: String,
-    val message: Message
+    val type: LinkType,
+    val sender: User,
+    val chatId: ChatId,
+    val body: Body
 )

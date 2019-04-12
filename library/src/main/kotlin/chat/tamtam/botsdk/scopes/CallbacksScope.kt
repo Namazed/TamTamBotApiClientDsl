@@ -1,7 +1,6 @@
 package chat.tamtam.botsdk.scopes
 
 import chat.tamtam.botsdk.client.RequestsManager
-import chat.tamtam.botsdk.model.Payload
 import chat.tamtam.botsdk.state.CallbackState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,9 +28,9 @@ class CallbacksScope internal constructor(
     }
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new Callback with specific [Payload].
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new Callback with specific payload.
      *
-     * @param payloadButton - this is inline class [Payload] which contains payload of specific button in [chat.tamtam.botsdk.model.request.InlineKeyboard].
+     * @param payloadButton - payload of specific button in [chat.tamtam.botsdk.model.request.InlineKeyboard].
      * @param answer - all actions in this lambda is async.
      */
     fun answerOnCallback(payloadButton: String, answer: suspend (callbackState: CallbackState) -> Unit) {

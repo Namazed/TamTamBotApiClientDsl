@@ -40,6 +40,7 @@ import chat.tamtam.botsdk.model.response.ChatMembersResult
 import chat.tamtam.botsdk.model.response.ChatsResult
 import chat.tamtam.botsdk.model.response.Link
 import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.response.MessageInfo
 import chat.tamtam.botsdk.model.response.Messages
 import chat.tamtam.botsdk.model.response.Permissions
 import chat.tamtam.botsdk.model.response.Recipient
@@ -48,6 +49,8 @@ import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.User
+import chat.tamtam.botsdk.model.response.linkTypeFrom
+import chat.tamtam.botsdk.model.response.permissionFrom
 import chat.tamtam.botsdk.model.prepared.Attachment as PreparedAttachment
 import chat.tamtam.botsdk.model.prepared.Callback as PreparedCallback
 import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
@@ -78,22 +81,23 @@ internal fun ChatMembersResult.map(): ChatMembersList {
     return ChatMembersList(list, marker)
 }
 
-private fun List<String>?.mapPermissions(): List<Permissions> {
+internal fun List<String>?.mapPermissions(): List<Permissions> {
     return this?.let {
         it.asSequence()
-            .map { s: String -> Permissions.valueOf(s) }
+            .map { s: String -> permissionFrom(s) }
             .toList()
     } ?: emptyList()
 }
 
 internal fun Recipient.map(): PreparedRecipient = PreparedRecipient(ChatId(chatId), chatType, UserId(userId))
 
-internal fun Link.map(): PreparedLink = PreparedLink(type, message.map())
+internal fun Link.map(): PreparedLink = PreparedLink(linkTypeFrom(type), sender.map(), ChatId(chatId), message.map())
 
 internal fun Message.map(): PreparedMessage {
-    return PreparedMessage(Body(MessageId(messageInfo.messageId), messageInfo.sequenceIdInChat,
-        messageInfo.attachments.map(), messageInfo.text), recipient.map(), sender.map(), timestamp, link?.map())
+    return PreparedMessage(messageInfo.map(), recipient.map(), sender.map(), timestamp, link?.map())
 }
+
+internal fun MessageInfo.map(): Body = Body(MessageId(messageId), sequenceIdInChat, attachments.map(), text)
 
 internal fun Message?.mapOrNull(): PreparedMessage? {
     return this?.map()
@@ -121,7 +125,7 @@ internal fun Attachment.map(): PreparedAttachment {
 
 internal fun List<Attachment>.map(): List<PreparedAttachment> = map { attachment -> attachment.map() }
 
-internal fun Chat.map(): PreparedChat = PreparedChat(ChatId(chatId), type, status, title, ChatIcon(icon.url), lastEventTime,
+internal fun Chat.map(): PreparedChat = PreparedChat(ChatId(chatId), type, status, title, ChatIcon(icon?.url ?: ""), lastEventTime,
     participantsCount, ownerId, participants, public, linkOnChat, description)
 
 internal fun ChatsResult.map(): ChatsList {
