@@ -1,6 +1,5 @@
 package chat.tamtam.botsdk.model.response
 
-import chat.tamtam.botsdk.model.AttachType
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -28,18 +27,20 @@ internal class MessageInfo(
     @SerialName("mid") val messageId: String = "",
     @SerialName("seq") val sequenceIdInChat: Long = -1,
     @Serializable(ResponseAttachmentsSerializer::class) @Optional val attachments: List<Attachment> = emptyList(),
-    val text: String = ""
+    @Optional val text: String = ""
 )
 
 @Serializable
 internal class Link(
     val type: String,
-    val message: Message
+    val sender: User = User(),
+    @Optional @SerialName("chat_id") val chatId: Long = -1,
+    val message: MessageInfo
 )
 
 @Serializable
 internal class Recipient(
-    @SerialName("chat_id") @Optional val chatId: Long = -1,
+    @Optional @SerialName("chat_id") val chatId: Long = -1,
     @Serializable(ChatTypeSerializer::class) @SerialName("chat_type") val chatType: ChatType = ChatType.UNKNOWN,
     @Optional @SerialName("user_id") val userId: Long = -1
 )
@@ -59,13 +60,13 @@ internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
     }
 }
 
-enum class LinkType(val type: String) {
-    FORWARD("FORWARD"),
-    REPLY("REPLY")
+enum class LinkType(val value: String) {
+    FORWARD("forward"),
+    REPLY("reply")
 }
 
-fun linkTypeFrom(value: String) = when (value.toUpperCase()) {
-    "FORWARD" -> AttachType.IMAGE
-    "REPLY" -> AttachType.VIDEO
+fun linkTypeFrom(value: String) = when (value) {
+    "forward" -> LinkType.FORWARD
+    "reply" -> LinkType.REPLY
     else -> throw IllegalArgumentException("Unknown type")
 }
