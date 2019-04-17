@@ -69,6 +69,16 @@ data class AttachmentMedia(
 /**
  * This object may contains in [SendMessage]
  *
+ * @param payload - see [PayloadMedia].
+ */
+data class AttachmentFile(
+    override val type: AttachType,
+    val payload: PayloadFile
+) : Attachment
+
+/**
+ * This object may contains in [SendMessage]
+ *
  * @param payload - see [PayloadContact].
  */
 data class AttachmentContact(
@@ -104,9 +114,22 @@ data class PayloadPhoto(
  * This object may contains in [Attachment]
  *
  * @param url - For media attaches. Url of media (video, audio, etc)
+ * @param id - For media attaches. Reusable id (video, audio) for send with other messages. For Share and Sticker the id is -1
  */
 data class PayloadMedia(
-    val url: String
+    val url: String,
+    val id: Long = -1
+)
+
+/**
+ * This object may contains in [Attachment]
+ *
+ * @param url - For media attaches. Url of media (video, audio, etc)
+ * @param fileId - For file attaches. Reusable fileId for send with other messages
+ */
+data class PayloadFile(
+    val url: String,
+    val fileId: Long
 )
 
 /**

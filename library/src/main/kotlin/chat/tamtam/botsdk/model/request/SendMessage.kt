@@ -15,9 +15,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class SendMessage(
-    val text: String,
-    @Serializable() val attachments: List<Attachment> = emptyList(),
-    @SerialName("notify") val notifyUser: Boolean = true
+    val text: String? = null,
+    @Serializable val attachments: List<Attachment> = emptyList(),
+    @SerialName("notify") val notifyUser: Boolean = true,
+    @Serializable val link: LinkOnMessage? = null
 )
 
 internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): SendMessage {

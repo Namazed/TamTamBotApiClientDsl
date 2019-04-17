@@ -16,6 +16,7 @@ import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.request.EMPTY_INLINE_KEYBOARD
 import chat.tamtam.botsdk.model.request.InlineKeyboard
+import chat.tamtam.botsdk.model.request.LinkOnMessage
 import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
@@ -92,6 +93,24 @@ interface Scope {
     suspend infix fun String.sendFor(userId: UserId): ResultRequest<Message> = RequestSendMessage(this).sendFor(userId)
 
     /**
+     * This method need for send [RequestSendMessage] with text of message for User by userId
+     *
+     * @param userId - this is inline class [UserId] which contains userId
+     * @receiver - this is [LinkOnMessage] which you send for User, link with type like forward or reply
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
+     */
+    suspend infix fun LinkOnMessage.sendFor(userId: UserId): ResultRequest<Message> = RequestSendMessage(link = this).sendFor(userId)
+
+    /**
+     * This method need for send [RequestSendMessage] with text of message for User by userId
+     *
+     * @param chatId - this is inline class [ChatId] which contains chatId
+     * @receiver - this is [LinkOnMessage] which you send for Chat, link with type like forward or reply
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
+     */
+    suspend infix fun LinkOnMessage.sendFor(chatId: ChatId): ResultRequest<Message> = RequestSendMessage(link = this).sendFor(chatId)
+
+    /**
      * This method need for send [RequestSendMessage] with text of message for Chat by chatId
      *
      * @param chatId - this is inline class [ChatId] which contains chatId
@@ -138,6 +157,17 @@ interface Scope {
     /**
      * This method send message with contains data from [SendParams] and [InlineKeyboard] for User
      *
+     * @param link - this is [LinkOnMessage] which you send for Chat or User, link with type like forward or reply
+     * @receiver - this is [SendParams] which contains [UserId] and [RequestSendMessage] which contains text of message
+     * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
+     */
+    suspend infix fun SendParams.sendWith(link: LinkOnMessage): ResultRequest<Message> {
+        return sendForUserOrChat(userId, chatId, RequestSendMessage(sendMessage.text, notifyUser = sendMessage.notifyUser, link = link))
+    }
+
+    /**
+     * This method send message with contains data from [SendParams] and [InlineKeyboard] for User
+     *
      * @param keyboard - this is [InlineKeyboard] which you want send for User
      * @receiver - this is [SendParams] which contains [UserId] and [RequestSendMessage] which contains text of message
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [retrofit2.HttpException] or [Exception]
@@ -148,7 +178,7 @@ interface Scope {
         } else {
             listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value.toLowerCase(), keyboard))
         }
-        return requests.send(userId, RequestSendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
+        return sendForUserOrChat(userId, chatId, RequestSendMessage(sendMessage.text, attaches, sendMessage.notifyUser))
     }
 
     /**
@@ -160,7 +190,7 @@ interface Scope {
      */
     suspend infix fun SendParams.sendWith(imageUrl: ImageUrl): ResultRequest<Message> {
         val sendMessage = createSendMessageForImageUrl(sendMessage, imageUrl)
-        return requests.send(chatId, sendMessage)
+        return sendForUserOrChat(userId, chatId, sendMessage)
     }
 
     /**
@@ -301,6 +331,17 @@ interface Scope {
                 uploadParams
             )
             is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
+        }
+    }
+
+    private suspend fun sendForUserOrChat(userId: UserId, chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<Message> {
+        check(chatId.id != -1L && userId.id != -1L) {
+            "ChatId or UserId must be correct, current both are -1L"
+        }
+        return if (chatId.id == -1L) {
+            requests.send(userId, sendMessage)
+        } else {
+            requests.send(chatId, sendMessage)
         }
     }
 }

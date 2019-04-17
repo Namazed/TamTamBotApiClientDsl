@@ -70,7 +70,9 @@ internal object ButtonSerializer : KSerializer<Button> {
         val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
         compositeOutput.encodeStringElement(descriptor, 0, obj.type.value)
         compositeOutput.encodeStringElement(descriptor, 1, obj.title)
-        compositeOutput.encodeStringElement(descriptor, 2, obj.intent.value)
+        if (obj.type == ButtonType.CALLBACK) {
+            compositeOutput.encodeStringElement(descriptor, 2, obj.intent.value)
+        }
         if (obj.url.isNotEmpty()) {
             compositeOutput.encodeStringElement(descriptor, 3, obj.url)
         }
