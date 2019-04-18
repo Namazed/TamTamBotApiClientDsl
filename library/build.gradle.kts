@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.Namazed"
-version = "0.2.1"
+version = "0.2.2"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
