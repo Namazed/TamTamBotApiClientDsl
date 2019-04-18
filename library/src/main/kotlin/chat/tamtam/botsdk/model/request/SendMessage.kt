@@ -6,7 +6,6 @@ import chat.tamtam.botsdk.model.response.UploadInfo
 import kotlinx.serialization.CompositeEncoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,7 +14,6 @@ import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.list
 
 @Serializable
-@Polymorphic
 interface SendMessageContract {
     val notifyUser: Boolean
 
