@@ -3,8 +3,51 @@ package chat.tamtam.botsdk.model.request
 import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.ImageUrl
 import chat.tamtam.botsdk.model.response.UploadInfo
+import kotlinx.serialization.CompositeEncoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.internal.SerialClassDescImpl
+import kotlinx.serialization.list
+
+@Serializable
+@Polymorphic
+interface SendMessageContract {
+    val notifyUser: Boolean
+
+    @Serializer(forClass = SendMessageContract::class)
+    companion object : KSerializer<SendMessageContract> {
+
+        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("SendMessageContract") {
+            init {
+                addElement("text", true)
+                addElement("attachments", true)
+                addElement("notify", true)
+                addElement("link", true)
+            }
+        }
+
+        override fun serialize(encoder: Encoder, obj: SendMessageContract) {
+            val sendMessage = obj as SendMessage
+            val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
+            sendMessage.text?.let {
+                compositeOutput.encodeStringElement(descriptor, 0, it)
+            }
+            sendMessage.attachments?.let {
+                compositeOutput.encodeSerializableElement(descriptor, 1, Attachment.serializer().list, it)
+            }
+            compositeOutput.encodeBooleanElement(descriptor, 2, obj.notifyUser)
+            sendMessage.link?.let {
+                compositeOutput.encodeSerializableElement(descriptor, 3, LinkOnMessageSerializer, it)
+            }
+            compositeOutput.endStructure(descriptor)
+        }
+    }
+}
 
 /**
  * This class need use when you want send message.
@@ -16,10 +59,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 class SendMessage(
     val text: String? = null,
-    @Serializable val attachments: List<Attachment> = emptyList(),
-    @SerialName("notify") val notifyUser: Boolean = true,
-    @Serializable val link: LinkOnMessage? = null
-)
+    val attachments: List<Attachment>? = null,
+    @SerialName("notify") override val notifyUser: Boolean = true,
+    val link: LinkOnMessage? = null
+): SendMessageContract
 
 internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): SendMessage {
     return SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard)), sendMessage.notifyUser)

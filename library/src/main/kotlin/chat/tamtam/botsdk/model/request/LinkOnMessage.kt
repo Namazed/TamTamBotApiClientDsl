@@ -7,14 +7,13 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.SerialClassDescImpl
 
 @Serializable(with = LinkOnMessageSerializer::class)
 class LinkOnMessage(
     val type: LinkType,
-    @SerialName("mid") val messageId: MessageId
+    val messageId: MessageId
 )
 
 internal object LinkOnMessageSerializer : KSerializer<LinkOnMessage> {

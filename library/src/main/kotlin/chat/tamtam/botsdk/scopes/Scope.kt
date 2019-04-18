@@ -335,7 +335,7 @@ interface Scope {
     }
 
     private suspend fun sendForUserOrChat(userId: UserId, chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<Message> {
-        check(chatId.id != -1L && userId.id != -1L) {
+        check(chatId.id != -1L || userId.id != -1L) {
             "ChatId or UserId must be correct, current both are -1L"
         }
         return if (chatId.id == -1L) {
