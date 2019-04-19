@@ -2,7 +2,6 @@ package chat.tamtam.botsdk.model.request
 
 import chat.tamtam.botsdk.model.AttachType
 import chat.tamtam.botsdk.model.ImageUrl
-import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.response.UploadInfo
 import kotlinx.serialization.CompositeEncoder
 import kotlinx.serialization.Decoder
@@ -22,7 +21,7 @@ import kotlinx.serialization.internal.SerialClassDescImpl
 @Serializable
 class AnswerCallback(
     val message: SendMessage? = null,
-    val userId: UserId? = null,
+    val userId: Long? = null,
     val notification: String? = null
 ) {
     @Serializer(forClass = AnswerCallback::class)
@@ -45,7 +44,7 @@ class AnswerCallback(
                 compositeOutput.encodeSerializableElement(descriptor, 0, SendMessage.serializer(), it)
             }
             obj.userId?.let {
-                compositeOutput.encodeLongElement(descriptor, 1, it.id)
+                compositeOutput.encodeLongElement(descriptor, 1, it)
             }
             obj.notification?.let {
                 compositeOutput.encodeStringElement(descriptor, 2, it)

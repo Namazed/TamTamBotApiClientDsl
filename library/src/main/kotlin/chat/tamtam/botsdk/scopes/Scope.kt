@@ -269,7 +269,7 @@ interface Scope {
      * @return - look at [RequestsManager.answer]
      */
     suspend infix fun String.answerNotification(answerParams: AnswerParams): ResultRequest<Default> {
-        val answerCallback = AnswerCallback(userId = answerParams.userId, notification = this)
+        val answerCallback = AnswerCallback(userId = answerParams.userId.id, notification = this)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 
