@@ -20,42 +20,42 @@ import kotlinx.serialization.list
  * @param attachments - list of attaches, for example [AttachmentKeyboard], [AttachmentLocation], [AttachmentMediaWithUploadData] and etc.
  * @param notifyUser - this flag use in chat, when you want send quiet message or not.
  */
-@Serializable(with = SendMessageSerializer::class)
+@Serializable
 class SendMessage(
     val text: String? = null,
     val attachments: List<AttachmentContract>? = null,
     val notifyUser: Boolean = true,
     val link: LinkOnMessage? = null
-)
+) {
+    @Serializer(forClass = SendMessage::class)
+    companion object : KSerializer<SendMessage> {
+        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("SendMessage") {
+            init {
+                addElement("text", true)
+                addElement("attachments", true)
+                addElement("notify", true)
+                addElement("link", true)
+            }
+        }
 
-@Serializer(forClass = SendMessage::class)
-object SendMessageSerializer : KSerializer<SendMessage> {
-    override val descriptor: SerialDescriptor = object : SerialClassDescImpl("SendMessage") {
-        init {
-            addElement("text", true)
-            addElement("attachments", true)
-            addElement("notify", true)
-            addElement("link", true)
+        override fun deserialize(decoder: Decoder): SendMessage {
+            return SendMessage()
         }
-    }
 
-    override fun deserialize(decoder: Decoder): SendMessage {
-        return SendMessage()
-    }
-
-    override fun serialize(encoder: Encoder, obj: SendMessage) {
-        val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
-        obj.text?.let {
-            compositeOutput.encodeStringElement(descriptor, 0, it)
+        override fun serialize(encoder: Encoder, obj: SendMessage) {
+            val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
+            obj.text?.let {
+                compositeOutput.encodeStringElement(descriptor, 0, it)
+            }
+            obj.attachments?.let {
+                compositeOutput.encodeSerializableElement(descriptor, 1, AttachmentContract.serializer().list, it)
+            }
+            compositeOutput.encodeBooleanElement(descriptor, 2, obj.notifyUser)
+            obj.link?.let {
+                compositeOutput.encodeSerializableElement(descriptor, 3, LinkOnMessageSerializer, it)
+            }
+            compositeOutput.endStructure(descriptor)
         }
-        obj.attachments?.let {
-            compositeOutput.encodeSerializableElement(descriptor, 1, AttachmentContract.serializer().list, it)
-        }
-        compositeOutput.encodeBooleanElement(descriptor, 2, obj.notifyUser)
-        obj.link?.let {
-            compositeOutput.encodeSerializableElement(descriptor, 3, LinkOnMessageSerializer, it)
-        }
-        compositeOutput.endStructure(descriptor)
     }
 }
 

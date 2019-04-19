@@ -10,6 +10,7 @@ import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.internal.SerialClassDescImpl
 
 /**
@@ -18,38 +19,39 @@ import kotlinx.serialization.internal.SerialClassDescImpl
  *
  * @param message - message which replace old message (with keyboard) where user click on button, look at [SendMessage]
  */
-@Serializable(with = AnswerCallbackSerializer::class)
+@Serializable
 class AnswerCallback(
     val message: SendMessage? = null,
     val userId: UserId? = null,
     val notification: String? = null
-)
+) {
+    @Serializer(forClass = AnswerCallback::class)
+    companion object : KSerializer<AnswerCallback> {
+        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("AnswerCallback") {
+            init {
+                addElement("message", true)
+                addElement("user_id", true)
+                addElement("notification", true)
+            }
+        }
 
-object AnswerCallbackSerializer : KSerializer<AnswerCallback> {
-    override val descriptor: SerialDescriptor = object : SerialClassDescImpl("AnswerCallback") {
-        init {
-            addElement("message", true)
-            addElement("user_id", true)
-            addElement("notification", true)
+        override fun deserialize(decoder: Decoder): AnswerCallback {
+            return AnswerCallback()
         }
-    }
 
-    override fun deserialize(decoder: Decoder): AnswerCallback {
-        return AnswerCallback()
-    }
-
-    override fun serialize(encoder: Encoder, obj: AnswerCallback) {
-        val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
-        obj.message?.let {
-            compositeOutput.encodeSerializableElement(descriptor, 0, SendMessageSerializer, it)
+        override fun serialize(encoder: Encoder, obj: AnswerCallback) {
+            val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
+            obj.message?.let {
+                compositeOutput.encodeSerializableElement(descriptor, 0, SendMessage.serializer(), it)
+            }
+            obj.userId?.let {
+                compositeOutput.encodeLongElement(descriptor, 1, it.id)
+            }
+            obj.notification?.let {
+                compositeOutput.encodeStringElement(descriptor, 2, it)
+            }
+            compositeOutput.endStructure(descriptor)
         }
-        obj.userId?.let {
-            compositeOutput.encodeLongElement(descriptor, 1, it.id)
-        }
-        obj.notification?.let {
-            compositeOutput.encodeStringElement(descriptor, 2, it)
-        }
-        compositeOutput.endStructure(descriptor)
     }
 }
 
