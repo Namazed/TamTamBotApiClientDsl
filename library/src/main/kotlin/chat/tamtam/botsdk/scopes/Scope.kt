@@ -343,6 +343,34 @@ interface Scope {
         }
     }
 
+    /**
+     * This method prepare notification
+     * This method use only like connector for [answerWith] methods, which contains parameter [RequestSendMessage]
+     *
+     * You need use it if you want answer on Callback with notification and message in one time
+     *
+     * @param answerParams - [AnswerParams] which contains [CallbackId] of [InlineKeyboard] and [UserId]
+     * @receiver - this is text for notification (Toast) for User
+     * @return - [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
+     */
+    suspend infix fun String.prepareNotification(answerParams: AnswerParams): PreparedAnswer {
+        val answerCallback = AnswerCallback(notification = this, userId = answerParams.userId.id)
+        return PreparedAnswer(answerCallback, answerParams)
+    }
+
+    /**
+     * This method answer on Callback by [CallbackId] with new message
+     * You can use it, if you want answer with notification and message in one time.
+     *
+     * @param sendMessage - message which you want send
+     * @receiver - this is [PreparedAnswer] which contains [AnswerParams] and [AnswerCallback]
+     *
+     * @return - look at [RequestsManager.answer]
+     */
+    suspend infix fun PreparedAnswer.answerWith(sendMessage: RequestSendMessage): ResultRequest<Default> {
+        return requests.answer(answerParams.callbackId, AnswerCallback(sendMessage, answerCallback.userId, answerCallback.notification))
+    }
+
     private suspend fun sendForUserOrChat(userId: UserId, chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<Message> {
         check(chatId.id != -1L || userId.id != -1L) {
             "ChatId or UserId must be correct, current both are -1L"
