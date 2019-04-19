@@ -8,8 +8,8 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialDescriptor
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.list
 
@@ -24,10 +24,11 @@ import kotlinx.serialization.list
 class SendMessage(
     val text: String? = null,
     val attachments: List<AttachmentContract>? = null,
-    @SerialName("notify") val notifyUser: Boolean = true,
+    val notifyUser: Boolean = true,
     val link: LinkOnMessage? = null
 )
 
+@Serializer(forClass = SendMessage::class)
 object SendMessageSerializer : KSerializer<SendMessage> {
     override val descriptor: SerialDescriptor = object : SerialClassDescImpl("SendMessage") {
         init {

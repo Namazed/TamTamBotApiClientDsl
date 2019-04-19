@@ -2,7 +2,12 @@ package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.client.retrofit.Failure
 import chat.tamtam.botsdk.client.retrofit.Success
+import chat.tamtam.botsdk.keyboard.keyboard
+import chat.tamtam.botsdk.model.AttachType
+import chat.tamtam.botsdk.model.Button
+import chat.tamtam.botsdk.model.ButtonType
 import chat.tamtam.botsdk.model.ChatId
+import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Messages
 import kotlinx.coroutines.runBlocking
@@ -22,6 +27,31 @@ class MessageTest : ClientTest() {
                     result.response.apply {
                         assert(message.recipient.chatId == 18L)
                         assert(message.messageInfo.messageId == "test_id")
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    @Test
+    fun `check right behavior and serialization when send message to chat with keyboard`() {
+        runBlocking {
+            mockServer.mockHttpResponse("/json/message_with_keyboard.json", 200)
+            val keyboard = keyboard {
+                +buttonRow {
+                    +Button(ButtonType.CALLBACK, "test_text", payload = "test_button")
+                    +Button(ButtonType.CALLBACK, "test_text", payload = "test_button")
+                }
+            }
+            val result = httpManager.messageHttpManager.sendMessage(ChatId(101L),
+                RequestSendMessage("test_text", attachments = listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard))))
+            when (result) {
+                is Success<ResponseSendMessage> -> {
+                    result.response.apply {
+                        assert(message.recipient.chatId == 18L)
+                        assert(message.messageInfo.messageId == "test_id")
+                        assert(message.messageInfo.attachments[0].payload.buttons[0][0].title == "test_text")
                     }
                 }
                 else -> {}
