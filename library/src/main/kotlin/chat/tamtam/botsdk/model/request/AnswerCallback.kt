@@ -25,7 +25,7 @@ class AnswerCallback(
     val notification: String? = null
 )
 
-internal object AnswerCallbackSerializer : KSerializer<AnswerCallback> {
+object AnswerCallbackSerializer : KSerializer<AnswerCallback> {
     override val descriptor: SerialDescriptor = object : SerialClassDescImpl("AnswerCallback") {
         init {
             addElement("message", true)

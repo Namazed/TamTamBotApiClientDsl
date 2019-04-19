@@ -28,7 +28,7 @@ class SendMessage(
     val link: LinkOnMessage? = null
 )
 
-internal object SendMessageSerializer : KSerializer<SendMessage> {
+object SendMessageSerializer : KSerializer<SendMessage> {
     override val descriptor: SerialDescriptor = object : SerialClassDescImpl("SendMessage") {
         init {
             addElement("text", true)
