@@ -11,14 +11,15 @@ import chat.tamtam.botsdk.model.UserId
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.request.AnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.request.EMPTY_INLINE_KEYBOARD
 import chat.tamtam.botsdk.model.request.InlineKeyboard
 import chat.tamtam.botsdk.model.request.LinkOnMessage
+import chat.tamtam.botsdk.model.request.ReusableMediaParams
 import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
+import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageUrl
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForKeyboard
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForReusablePhotoToken
@@ -194,15 +195,15 @@ interface Scope {
     }
 
     /**
-     * You need use it if you have reusablePhotoToken!
+     * You need use it if you have reusableId or reusableFileId!
      * This method send message with contains data from [SendParams] and [UploadParams] for Chat
      *
      * @param reusablePhotoToken - you get it after you send uploaded photo somewhere
      * @receiver - this is [SendParams] which contains [ChatId] and [RequestSendMessage] which contains text of message
      * @return - look at [RequestsManager.send]
      */
-    suspend infix fun SendParams.sendWith(reusablePhotoToken: String): ResultRequest<Message> {
-        return requests.sendPhoto(this, reusablePhotoToken)
+    suspend infix fun SendParams.sendWith(reusableMediaParams: ReusableMediaParams): ResultRequest<Message> {
+        return requests.sendMedia(this, reusableMediaParams)
     }
 
     /**
@@ -268,7 +269,7 @@ interface Scope {
      * @return - look at [RequestsManager.answer]
      */
     suspend infix fun String.answerNotification(answerParams: AnswerParams): ResultRequest<Default> {
-        val answerCallback = AnswerNotificationCallback(answerParams.userId.id, notification = this)
+        val answerCallback = AnswerCallback(userId = answerParams.userId, notification = this)
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 
@@ -281,7 +282,9 @@ interface Scope {
      * @return - look at [RequestsManager.answer]
      */
     suspend infix fun PreparedAnswer.answerWith(keyboard: InlineKeyboard): ResultRequest<Default> {
-        val answerCallback = createAnswerCallbackForKeyboard(answerCallback.message, keyboard)
+        val answerCallback = answerCallback.message?.let {
+            createAnswerCallbackForKeyboard(it, keyboard)
+        } ?: return getFailureForNullableMessage()
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 
@@ -294,9 +297,14 @@ interface Scope {
      * @return - look at [RequestsManager.answer]
      */
     suspend infix fun PreparedAnswer.answerWith(imageUrl: ImageUrl): ResultRequest<Default> {
-        val answerCallback = createAnswerCallbackForImageUrl(answerCallback.message, imageUrl)
+        val answerCallback = answerCallback.message?.let {
+            createAnswerCallbackForImageUrl(it, imageUrl)
+        } ?: return getFailureForNullableMessage()
         return requests.answer(answerParams.callbackId, answerCallback)
     }
+
+    fun getFailureForNullableMessage(): ResultRequest.Failure<Default> =
+        ResultRequest.Failure(-1, null, IllegalStateException("Message mustn't be null"))
 
     /**
      * You need use it if you have reusablePhotoToken!
@@ -308,7 +316,9 @@ interface Scope {
      * @return - look at [RequestsManager.answer]
      */
     suspend infix fun PreparedAnswer.answerWith(reusablePhotoToken: String): ResultRequest<Default> {
-        val answerCallback = createAnswerCallbackForReusablePhotoToken(answerCallback.message, reusablePhotoToken)
+        val answerCallback = answerCallback.message?.let {
+            createAnswerCallbackForReusablePhotoToken(it, reusablePhotoToken)
+        } ?: return getFailureForNullableMessage()
         return requests.answer(answerParams.callbackId, answerCallback)
     }
 
@@ -324,12 +334,11 @@ interface Scope {
     suspend infix fun PreparedAnswer.answerWith(uploadParams: UploadParams): ResultRequest<Default> {
         val resultUpload = requests.getUploadUrl(uploadParams.uploadType)
         return when (resultUpload) {
-            is ResultRequest.Success -> requests.answerWithUpload(
-                answerParams.callbackId,
-                answerCallback.message,
-                resultUpload.response,
-                uploadParams
-            )
+            is ResultRequest.Success -> {
+                answerCallback.message?.let {
+                    requests.answerWithUpload(answerParams.callbackId, it, resultUpload.response, uploadParams)
+                } ?: return getFailureForNullableMessage()
+            }
             is ResultRequest.Failure -> ResultRequest.Failure(resultUpload.httpStatusCode, resultUpload.error, resultUpload.exception)
         }
     }

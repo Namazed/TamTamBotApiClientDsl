@@ -5,7 +5,6 @@ import chat.tamtam.botsdk.client.VERSION_FIELD
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.MessageId
 import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.request.SendMessageContract
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Messages
 import retrofit2.Call
@@ -45,7 +44,7 @@ internal interface MessageApi {
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query(VERSION_FIELD) version: String,
         @Query("user_id") userId: UserId,
-        @Body sendMessage: SendMessageContract
+        @Body sendMessage: RequestSendMessage
     ): Call<ResponseSendMessage>
 
     @POST(MESSAGES_ENDPOINT)
@@ -53,7 +52,7 @@ internal interface MessageApi {
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query(VERSION_FIELD) version: String,
         @Query("chat_id") chatId: ChatId,
-        @Body sendMessage: SendMessageContract
+        @Body sendMessage: RequestSendMessage
     ): Call<ResponseSendMessage>
 
     @PUT(MESSAGES_ENDPOINT)
@@ -61,7 +60,7 @@ internal interface MessageApi {
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query(VERSION_FIELD) version: String,
         @Query("message_id") messageId: MessageId,
-        @Body sendMessage: SendMessageContract
+        @Body sendMessage: RequestSendMessage
     ): Call<Default>
 
 }

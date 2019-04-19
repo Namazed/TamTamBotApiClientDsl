@@ -12,9 +12,9 @@ import chat.tamtam.botsdk.model.mapOrNull
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.ChatsList
 import chat.tamtam.botsdk.model.request.AnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.ChatInfo
+import chat.tamtam.botsdk.model.request.ReusableMediaParams
 import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.UploadType
@@ -22,7 +22,7 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForImageToken
 import chat.tamtam.botsdk.model.request.createAnswerCallbackForMediaToken
 import chat.tamtam.botsdk.model.request.createSendMessageForImageToken
 import chat.tamtam.botsdk.model.request.createSendMessageForMediaToken
-import chat.tamtam.botsdk.model.request.createSendMessageForReusablePhotoToken
+import chat.tamtam.botsdk.model.request.createSendMessageForReusableMedia
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Error
 import chat.tamtam.botsdk.model.response.Upload
@@ -184,19 +184,15 @@ class RequestsManager internal constructor(
     }
 
     /**
-     * Use this method only if you have reusableToken on Photo, which you has already sent
+     * Use this method only if you have reusableInfo (id, fileId, photoToken) on Media, which you has already sent
      *
      * @param sendParams - look at this class for more information
-     * @param reusablePhotoToken - you get it after you send uploaded photo somewhere
+     * @param reusableMediaParams - this class contains reusable info about media which had already uploaded
      *
      * @return - [ResultRequest] which contains Success with current response from server or Failure with [HttpException] or [Exception]
      */
-    suspend fun sendPhoto(sendParams: SendParams, reusablePhotoToken: String): ResultRequest<PreparedMessage> {
-        return when {
-            sendParams.chatId.id != -1L -> send(sendParams.chatId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
-            sendParams.userId.id != -1L -> send(sendParams.userId, createSendMessageForReusablePhotoToken(sendParams.sendMessage, reusablePhotoToken))
-            else -> ResultRequest.Failure(-1, null, IllegalArgumentException("ChatId and UserId are wrong"))
-        }
+    suspend fun sendMedia(sendParams: SendParams, reusableMediaParams: ReusableMediaParams): ResultRequest<PreparedMessage> {
+        return sendForUserOrChat(sendParams.userId, sendParams.chatId, createSendMessageForReusableMedia(sendParams.sendMessage, reusableMediaParams))
     }
 
     /**
@@ -232,10 +228,12 @@ class RequestsManager internal constructor(
     }
 
     /**
-     * This method need you if you want answer User with message for replace for old message with keyboard, on button click (on callback by Payload)
+     * This method need you if you want answer User with message for replace for old message with keyboard and/or if you want
+     * answer User with Notification (Toast), on button click (on callback by Payload)
      *
      * @param callbackId - inline class which contains unique identifier of keyboard for specific message
      * @param requestAnswerCallback - this class contains message for replace for old message with keyboard, where user click on button.
+     * Also contains userId and notification if you want send Toast for user
      *
      * @return you get [ResultRequest] class which may contains [ResultRequest.Success] or [ResultRequest.Failure],
      * success contains [Default] class which you say, that answer was success,
@@ -243,18 +241,6 @@ class RequestsManager internal constructor(
      */
     suspend fun answer(callbackId: CallbackId, requestAnswerCallback: AnswerCallback): ResultRequest<Default> = startRequest {
         httpManager.answerOnCallback(callbackId, requestAnswerCallback)
-    }
-
-    /**
-     * This method need you if you want answer User with Notification (Toast) on button click (on callback by Payload)
-     * @see [answer]
-     * @param requestAnswerNotificationCallback - this class contains user id and text of notification.
-     */
-    suspend fun answer(
-        callbackId: CallbackId,
-        requestAnswerNotificationCallback: AnswerNotificationCallback
-    ): ResultRequest<Default> = startRequest {
-        httpManager.answerOnCallback(callbackId, requestAnswerNotificationCallback)
     }
 
     /**
@@ -380,6 +366,17 @@ class RequestsManager internal constructor(
     private fun checkCount(count: Int) {
         check(count in 0..100) {
             "Count must be from 0 to 100, current count $count"
+        }
+    }
+
+    private suspend fun sendForUserOrChat(userId: UserId, chatId: ChatId, sendMessage: RequestSendMessage): ResultRequest<PreparedMessage> {
+        check(chatId.id != -1L || userId.id != -1L) {
+            "ChatId or UserId must be correct, current both are -1L"
+        }
+        return if (chatId.id == -1L) {
+            send(userId, sendMessage)
+        } else {
+            send(chatId, sendMessage)
         }
     }
 

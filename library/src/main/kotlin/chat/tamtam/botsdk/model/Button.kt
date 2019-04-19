@@ -86,7 +86,7 @@ internal object ButtonSerializer : KSerializer<Button> {
         val compositeDecoder: CompositeDecoder = decoder.beginStructure(descriptor)
         var type = ""
         var title = ""
-        var intent = ""
+        var intent: String? = null
         var url = ""
         var payload = ""
         loop@ while (true) {
@@ -101,6 +101,6 @@ internal object ButtonSerializer : KSerializer<Button> {
             }
         }
         compositeDecoder.endStructure(descriptor)
-        return Button(buttonTypeFrom(type), title, buttonIntentFrom(intent), url, payload)
+        return Button(buttonTypeFrom(type), title, buttonIntentFrom(intent ?: "default"), url, payload)
     }
 }

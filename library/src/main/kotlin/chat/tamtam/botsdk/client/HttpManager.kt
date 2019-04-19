@@ -22,7 +22,6 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.File
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerNotificationCallback as RequestAnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -61,9 +60,6 @@ internal class HttpManager(
     }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback): HttpResult<Default> =
-        answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
-
-    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback): HttpResult<Default> =
         answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
 
     suspend fun getUploadUrl(uploadType: UploadType): HttpResult<Upload> = uploadService.uploadUrl(botToken, API_VERSION, uploadType).await()
