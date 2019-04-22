@@ -3,8 +3,8 @@ package chat.tamtam.botsdk.state
 import chat.tamtam.botsdk.model.ChatId
 import chat.tamtam.botsdk.model.Command
 import chat.tamtam.botsdk.model.UserId
-import chat.tamtam.botsdk.model.response.Callback
-import chat.tamtam.botsdk.model.response.Message
+import chat.tamtam.botsdk.model.prepared.Callback
+import chat.tamtam.botsdk.model.prepared.Message
 
 /**
  * Main class for all update states

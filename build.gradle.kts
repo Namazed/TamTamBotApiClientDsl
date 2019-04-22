@@ -1,15 +1,11 @@
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "1.3.21"
-    id("org.jetbrains.dokka") version "0.9.17"
-    id("kotlinx-serialization") version "1.3.21"
+    kotlin("jvm") version "1.3.30"
 }
 
 project(":library") {
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "org.jetbrains.dokka")
-    apply(plugin = "kotlinx-serialization")
 }
 
 project(":sample") {

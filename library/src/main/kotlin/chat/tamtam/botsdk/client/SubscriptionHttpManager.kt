@@ -23,7 +23,7 @@ class SubscriptionHttpManager internal constructor(
 
     suspend fun unsubscribe(url: String): HttpResult<Default> = subscriptionService.unsubscribe(botToken, version, url).await()
 
-    suspend fun getUpdates(marker: Long?): HttpResult<Updates> = subscriptionService.getUpdates(botToken, version, marker).await()
+    internal suspend fun getUpdates(marker: Long?): HttpResult<Updates> = subscriptionService.getUpdates(botToken, version, marker).await()
 }
 
 

@@ -19,19 +19,19 @@ class MessageHttpManager internal constructor(
     retrofit: Retrofit,
     private val messageService: MessageApi = retrofit.create(MessageApi::class.java)
 ) {
-    suspend fun getAllMessages(chatId: ChatId, messageIds: List<MessageId>?, fromTime: Long?, toTime: Long?, count: Int = 50): HttpResult<Messages> =
+    internal suspend fun getAllMessages(chatId: ChatId, messageIds: List<MessageId>?, fromTime: Long?, toTime: Long?, count: Int = 50): HttpResult<Messages> =
         messageService.getMessages(botToken, version, messageIds, count, fromTime, toTime, chatId).await()
 
-    suspend fun deleteMessage(messageId: MessageId): HttpResult<Default> =
+    internal suspend fun deleteMessage(messageId: MessageId): HttpResult<Default> =
         messageService.deleteMessage(botToken, version, messageId).await()
 
-    suspend fun sendMessage(userId: UserId, sendMessage: RequestSendMessage): HttpResult<ResponseSendMessage> =
+    internal suspend fun sendMessage(userId: UserId, sendMessage: RequestSendMessage): HttpResult<ResponseSendMessage> =
         messageService.sendMessage(botToken, version, userId, sendMessage).await()
 
-    suspend fun sendMessage(chatId: ChatId, sendMessage: RequestSendMessage): HttpResult<ResponseSendMessage> =
+    internal suspend fun sendMessage(chatId: ChatId, sendMessage: RequestSendMessage): HttpResult<ResponseSendMessage> =
         messageService.sendMessage(botToken, version, chatId, sendMessage).await()
 
-    suspend fun editMessage(messageId: MessageId, sendMessage: RequestSendMessage): HttpResult<Default> =
+    internal suspend fun editMessage(messageId: MessageId, sendMessage: RequestSendMessage): HttpResult<Default> =
         messageService.editMessage(botToken, version, messageId, sendMessage).await()
 
 }

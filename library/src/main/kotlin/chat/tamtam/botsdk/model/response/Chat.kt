@@ -33,15 +33,15 @@ data class Chat(
     @SerialName("chat_id") val chatId: Long,
     @Serializable(ChatTypeSerializer::class) val type: ChatType,
     @Serializable(ChatStatusSerializer::class) val status: Status,
-    val title: String,
-    val icon: ChatIcon,
+    @Optional val title: String = "",
+    @Optional val icon: ChatIcon? = null,
     @SerialName("last_event_time") val lastEventTime: Long,
     @SerialName("participants_count") val participantsCount: Int,
     @SerialName("owner_id") @Optional val ownerId: Long = -1,
     @Optional val participants: Map<Long, Long> = emptyMap(),
     @SerialName("is_public") val public: Boolean,
     @SerialName("link") @Optional val linkOnChat: String = "",
-    val description: String
+    @Optional val description: String = ""
 )
 
 fun chatTypeFrom(value: String) = when(value) {

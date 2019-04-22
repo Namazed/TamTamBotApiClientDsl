@@ -1,6 +1,5 @@
 package chat.tamtam.botsdk.model.response
 
-import chat.tamtam.botsdk.model.AttachType
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
@@ -14,10 +13,8 @@ import kotlinx.serialization.list
 import kotlinx.serialization.serializer
 import kotlinx.serialization.withName
 
-val EMPTY_MESSAGE = Message()
-
 @Serializable
-data class Message(
+internal class Message(
     @SerialName("body") val messageInfo: MessageInfo = MessageInfo(),
     val recipient: Recipient = Recipient(),
     val sender: User = User(),
@@ -26,7 +23,7 @@ data class Message(
 )
 
 @Serializable
-data class MessageInfo(
+internal class MessageInfo(
     @SerialName("mid") val messageId: String = "",
     @SerialName("seq") val sequenceIdInChat: Long = -1,
     @Serializable(ResponseAttachmentsSerializer::class) @Optional val attachments: List<Attachment> = emptyList(),
@@ -34,16 +31,18 @@ data class MessageInfo(
 )
 
 @Serializable
-data class Link(
+internal class Link(
     val type: String,
-    val message: Message
+    val sender: User = User(),
+    @SerialName("chat_id") val chatId: Long = -1,
+    val message: MessageInfo
 )
 
 @Serializable
-data class Recipient(
-    @SerialName("chat_id") @Optional val chatId: Long = -1,
+internal class Recipient(
+    @SerialName("chat_id") val chatId: Long = -1,
     @Serializable(ChatTypeSerializer::class) @SerialName("chat_type") val chatType: ChatType = ChatType.UNKNOWN,
-    @Optional @SerialName("user_id") val userId: Long = -1
+    @SerialName("user_id") val userId: Long = -1
 )
 
 internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
@@ -61,15 +60,13 @@ internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {
     }
 }
 
-internal fun isNotEmptyMessage(message: Message?) = message != null && message.timestamp != -1L
-
-enum class LinkType(val type: String) {
-    FORWARD("FORWARD"),
-    REPLY("REPLY")
+enum class LinkType(val value: String) {
+    FORWARD("forward"),
+    REPLY("reply")
 }
 
-fun linkTypeFrom(value: String) = when (value.toUpperCase()) {
-    "FORWARD" -> AttachType.IMAGE
-    "REPLY" -> AttachType.VIDEO
+fun linkTypeFrom(value: String) = when (value) {
+    "forward" -> LinkType.FORWARD
+    "reply" -> LinkType.REPLY
     else -> throw IllegalArgumentException("Unknown type")
 }

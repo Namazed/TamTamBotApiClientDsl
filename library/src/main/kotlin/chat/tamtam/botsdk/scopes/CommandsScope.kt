@@ -32,7 +32,7 @@ class CommandsScope internal constructor(
      * @param action - all actions in this lambda is async.
      */
     fun onCommand(command: String, action: suspend (CommandState) -> Unit) {
-        saveCommand(command, action)
+        saveCommand(command.toLowerCase(), action)
         log.info("onCommand: saved command -> $command")
     }
 

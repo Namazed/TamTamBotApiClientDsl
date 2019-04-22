@@ -1,9 +1,8 @@
 package chat.tamtam.botsdk.model
 
+import chat.tamtam.botsdk.UpdatesCoordinator
+import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.response.ChatType
-import chat.tamtam.botsdk.model.response.EMPTY_MESSAGE
-import chat.tamtam.botsdk.model.response.Message
-import chat.tamtam.botsdk.model.response.Update
 
 private const val SPACE = "\\s"
 private val PROFILE_TAG_PATTERN = Regex("@([A-Za-z0-9_-]+)")
@@ -27,16 +26,16 @@ data class Command(
     val name: String,
     val argument: String,
     val timestamp: Long = -1,
-    val message: Message = EMPTY_MESSAGE
+    val message: Message
 )
 
 /**
  * Map String with Update to Command.
  * @receiver - command name, may has some arguments
- * @param - this update handle in [chat.tamtam.botsdk.UpdatesCoordinator], when user send command for bot.
+ * @param - this update handle in [UpdatesCoordinator], when user send command for bot.
  */
-fun String.toCommand(update: Update) = Command(getCommandName(update.message.recipient.chatType),
-    update.message.messageInfo.text.getCommandArgument(update.message.recipient.chatType), update.timestamp, update.message)
+fun String.toCommand(message: Message, timestamp: Long) = Command(getCommandName(message.recipient.chatType),
+    message.body.text.getCommandArgument(message.recipient.chatType), timestamp, message)
 
 /**
  * This method check that String is command in Dialog.
@@ -53,9 +52,9 @@ private fun findCommand(text: String, commandRegex: Regex): Boolean {
 }
 
 private fun String.getCommandName(chatType: ChatType): String = if (chatType == ChatType.DIALOG) {
-    split(Regex(SPACE))[0]
+    toLowerCase().split(Regex(SPACE))[0]
 } else {
-    val splitString = split(Regex(SPACE))
+    val splitString = toLowerCase().split(Regex(SPACE))
     "${if (splitString.isNotEmpty()) splitString[0] else ""} ${if (splitString.size > 1) splitString[1] else ""}"
 }
 

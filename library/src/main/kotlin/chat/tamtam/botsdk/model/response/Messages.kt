@@ -3,6 +3,6 @@ package chat.tamtam.botsdk.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Messages(
+internal class Messages(
     val messages: List<Message>
 )

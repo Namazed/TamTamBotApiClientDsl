@@ -17,12 +17,12 @@ import kotlinx.serialization.withName
  * You will get it after call [RequestsManager.getMembers]
  *
  * @param members - Participants in chat with time of last activity. Visible only for chat admins
- * @param marker - Pointer to the next data page
+ * @param marker - Pointer to the next data page, can be null
  */
 @Serializable
 class ChatMembersResult(
     @Serializable(ChatMembersSerializer::class) val members: List<ChatMember>,
-    @Optional val marker: Long = -1L
+    @Optional val marker: Long? = null
 )
 
 /**

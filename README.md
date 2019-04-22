@@ -12,13 +12,16 @@ The bot API documentation is [here](https://dev.tamtam.chat).
 
 ## What you need to start
 
-To access the library, you must add the dependency on ```jitpack```
+You should build your project with JDK 8.
+
+To access the library, you must add the dependency on ```jitpack``` and ```kotlinx```
 
 ### Gradle
 ```groovy
 allprojects {
 	repositories {
 		...
+		maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
 		maven { url 'https://jitpack.io' }
 	}
 }
@@ -26,6 +29,10 @@ allprojects {
 ### Maven
 ```xml
 <repositories>
+	<repository>
+	    <id>kotlinx</id>
+	    <url>https://dl.bintray.com/kotlin/kotlinx</url>
+	</repository>
 	<repository>
 	    <id>jitpack.io</id>
 	    <url>https://jitpack.io</url>
@@ -37,7 +44,7 @@ You must also add a dependency.
 ### Gradle
 ```groovy
 dependencies {
-    implementation 'com.github.Namazed:TamTamBotApiClientDsl:current_version'
+    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.2.2'
 }
 ```
 ### Maven
@@ -45,17 +52,27 @@ dependencies {
 <dependency>
 	 <groupId>com.github.Namazed</groupId>
 	 <artifactId>TamTamBotApiClientDsl</artifactId>
-	 <version>Tag</version>
+	 <version>0.2.2</version>
 </dependency>
 ```
 
 ## Examples
 
+The example of a finished bot can be found [here](https://github.com/Namazed/TamTamOrthoBot).
+
 ### Scopes
-Below you find example of how start process longPolling:
+Below you find example of how start process sync longPolling on main thread:
 ```kotlin
 fun main() {
   longPolling("BOT_TOKEN") {
+
+  }
+}
+```
+Async longPolling on other single thread:
+```kotlin
+fun main() {
+  longPolling("BOT_TOKEN", true) {
 
   }
 }
@@ -90,16 +107,16 @@ callbacks {
         //some actions
     }
 
-    answerOnCallback(Payload("test_button_one")) { callbackState ->
+    answerOnCallback("test_button_one") { callbackState ->
         //some actions
     }
 
-    answerOnCallback(Payload("test_button_two")) { callbackState ->
+    answerOnCallback("test_button_two") { callbackState ->
         //some actions
     }
 }
 ```
-Payload - this is an inline class, which contains payload of button. The update about click on button will fall into this lambda.
+The update about click on button will fall into this lambda.
 
 And last from main scopes is the scope of processing new messages from the user (which do not contain the command):
 ```kotlin
@@ -126,13 +143,12 @@ For example, if you need to send some text to the user, simply call the ```sendF
 
 #### With DSL
 ```kotlin
-"Two bananas" sendFor UserId(commandState.command.message.sender.userId)
+"Two bananas" sendFor commandState.command.message.sender.userId
 ```
-Now there is a need to wrap in inline class UserId or ChatId, but in the future these actions will not be needed.
 
 #### With RequestsManager
 ```kotlin
-requestsManager.sendText(UserId(commandState.command.message.sender.userId), "Two bananas")
+requestsManager.sendText(commandState.command.message.sender.userId, "Two bananas")
 ```
 To create an InlineKeyboard, you can use the keyboard DSL. Below is an example of creating InlineKeyboard in three ways using: ```operator unaryPlus```, via infix function ```add```, or simply call the function ```add```.
 The ```buttonRow``` creates a row with buttons.
@@ -141,12 +157,12 @@ The ```buttonRow``` creates a row with buttons.
 keyboard {
     +buttonRow {
         +Button(
-            ButtonType.CALLBACK.value,
+            ButtonType.CALLBACK,
             "Create dreams",
             payload = "DREAMS"
         )
         +Button(
-            ButtonType.CALLBACK.value,
+            ButtonType.CALLBACK,
             "Imagine that you are Dragon",
             payload = "DRAGON"
         )
@@ -154,16 +170,18 @@ keyboard {
 
     this add buttonRow {
         this add Button(
-            ButtonType.LINK.value,
-            "Find new dreams"
+            ButtonType.LINK,
+            "Find new dreams",
+	    url = "dreams.com"
         )
     }
 
     add(buttonRow {
         add(
             Button(
-                ButtonType.LINK.value,
-                "Find new dreams"
+                ButtonType.LINK,
+                "Find new dreams",
+		url = "dreams.com"
             )
         )
     })

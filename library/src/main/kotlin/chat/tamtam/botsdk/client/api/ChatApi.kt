@@ -76,7 +76,8 @@ interface ChatApi {
         @Query(BOT_TOKEN_FIELD) botToken: String,
         @Query(VERSION_FIELD) version: String,
         @Query("count") count: Int = 20,
-        @Query("marker") marker: Long? = null
+        @Query("marker") marker: Long? = null,
+        @Query("user_ids") userIds: List<Long>? = null
     ): Call<ChatMembersResult>
 
     @FormUrlEncoded
