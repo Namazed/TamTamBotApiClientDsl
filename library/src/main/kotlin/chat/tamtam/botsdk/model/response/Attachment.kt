@@ -42,6 +42,8 @@ class Payload(
     @SerialName("photo_id") @Optional val photoId: Long = -1,
     @Optional val token: String = "",
     @Optional val url: String = "",
+    @Optional val id: Long = -1,
+    @Optional val fileId: Long = -1,
     @Optional val vcfInfo: String = "",
     @Optional val tamInfo: User = User(),
     @Optional val buttons: List<List<Button>> = emptyList()

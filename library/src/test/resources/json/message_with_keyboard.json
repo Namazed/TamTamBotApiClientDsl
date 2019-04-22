@@ -1,0 +1,44 @@
+{
+  "message": {
+    "sender": {
+      "user_id": 17,
+      "name": "Felix",
+      "username": "NotFelix"
+    },
+    "recipient": {
+      "chat_id": 18,
+      "chat_type": "dialog",
+      "user_id": 17
+    },
+    "timestamp": 10,
+    "body": {
+      "mid": "test_id",
+      "seq": 8,
+      "text": "test_text",
+      "attachments": [
+        {
+          "type": "inline_keyboard",
+          "callback_id": "test_callback_id",
+          "payload": {
+            "buttons": [
+              [
+                {
+                  "type": "callback",
+                  "text": "test_text",
+                  "intent": "default",
+                  "payload": "test_button"
+                },
+                {
+                  "type": "callback",
+                  "text": "test_text",
+                  "intent": "default",
+                  "payload": "test_button"
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

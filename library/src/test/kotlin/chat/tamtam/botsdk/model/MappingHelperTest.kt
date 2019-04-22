@@ -1,6 +1,7 @@
 package chat.tamtam.botsdk.model
 
 import chat.tamtam.botsdk.model.prepared.AttachmentContact
+import chat.tamtam.botsdk.model.prepared.AttachmentFile
 import chat.tamtam.botsdk.model.prepared.AttachmentKeyboard
 import chat.tamtam.botsdk.model.prepared.AttachmentLocation
 import chat.tamtam.botsdk.model.prepared.AttachmentMedia
@@ -416,13 +417,31 @@ internal class MappingHelperTest {
 
     @Test
     fun `check that Attachment with video type correct map to AttachmentMedia from prepared package`() {
-        val attachment = Attachment(AttachType.VIDEO, payload = Payload(url = "url"))
+        val attachment = Attachment(AttachType.VIDEO, payload = Payload(url = "url", id = 21))
         val preparedAttachment = attachment.map() as AttachmentMedia
         assert(attachment.type == preparedAttachment.type) {
             getAssertString("Type of Attachment", "type", attachment.type, preparedAttachment.type)
         }
         assert(attachment.payload.url == preparedAttachment.payload.url) {
             getAssertString("Url of Attachment", "url", attachment.payload.url, preparedAttachment.payload.url)
+        }
+        assert(attachment.payload.id == preparedAttachment.payload.id) {
+            getAssertString("Id of Attachment", "id", attachment.payload.id, preparedAttachment.payload.id)
+        }
+    }
+
+    @Test
+    fun `check that Attachment with file type correct map to AttachmentFile from prepared package`() {
+        val attachment = Attachment(AttachType.FILE, payload = Payload(url = "url", id = 32))
+        val preparedAttachment = attachment.map() as AttachmentFile
+        assert(attachment.type == preparedAttachment.type) {
+            getAssertString("Type of Attachment", "type", attachment.type, preparedAttachment.type)
+        }
+        assert(attachment.payload.url == preparedAttachment.payload.url) {
+            getAssertString("Url of Attachment", "url", attachment.payload.url, preparedAttachment.payload.url)
+        }
+        assert(attachment.payload.fileId == preparedAttachment.payload.fileId) {
+            getAssertString("FileId of Attachment", "fileId", attachment.payload.fileId, preparedAttachment.payload.fileId)
         }
     }
 

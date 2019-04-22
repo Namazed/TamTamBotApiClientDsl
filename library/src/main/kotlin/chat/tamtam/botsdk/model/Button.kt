@@ -70,7 +70,9 @@ internal object ButtonSerializer : KSerializer<Button> {
         val compositeOutput: CompositeEncoder = encoder.beginStructure(descriptor)
         compositeOutput.encodeStringElement(descriptor, 0, obj.type.value)
         compositeOutput.encodeStringElement(descriptor, 1, obj.title)
-        compositeOutput.encodeStringElement(descriptor, 2, obj.intent.value)
+        if (obj.type == ButtonType.CALLBACK) {
+            compositeOutput.encodeStringElement(descriptor, 2, obj.intent.value)
+        }
         if (obj.url.isNotEmpty()) {
             compositeOutput.encodeStringElement(descriptor, 3, obj.url)
         }
@@ -84,7 +86,7 @@ internal object ButtonSerializer : KSerializer<Button> {
         val compositeDecoder: CompositeDecoder = decoder.beginStructure(descriptor)
         var type = ""
         var title = ""
-        var intent = ""
+        var intent: String? = null
         var url = ""
         var payload = ""
         loop@ while (true) {
@@ -99,6 +101,6 @@ internal object ButtonSerializer : KSerializer<Button> {
             }
         }
         compositeDecoder.endStructure(descriptor)
-        return Button(buttonTypeFrom(type), title, buttonIntentFrom(intent), url, payload)
+        return Button(buttonTypeFrom(type), title, buttonIntentFrom(intent ?: "default"), url, payload)
     }
 }

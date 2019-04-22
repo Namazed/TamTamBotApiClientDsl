@@ -22,7 +22,6 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.File
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerNotificationCallback as RequestAnswerNotificationCallback
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -34,7 +33,7 @@ internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
 internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
 internal val ALL_MEDIA_TYPE = MediaType.parse("all")
 
-internal const val API_VERSION = "0.1.4"
+internal const val API_VERSION = "0.1.5"
 
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
@@ -61,9 +60,6 @@ internal class HttpManager(
     }
 
     suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerCallback): HttpResult<Default> =
-        answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
-
-    suspend fun answerOnCallback(callbackId: CallbackId, answerCallback: RequestAnswerNotificationCallback): HttpResult<Default> =
         answerService.answerOnCallback(botToken, API_VERSION, callbackId, answerCallback).await()
 
     suspend fun getUploadUrl(uploadType: UploadType): HttpResult<Upload> = uploadService.uploadUrl(botToken, API_VERSION, uploadType).await()
