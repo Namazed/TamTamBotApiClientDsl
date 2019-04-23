@@ -5,7 +5,6 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -22,7 +21,7 @@ import kotlinx.serialization.withName
 @Serializable
 class ChatMembersResult(
     @Serializable(ChatMembersSerializer::class) val members: List<ChatMember>,
-    @Optional val marker: Long? = null
+    val marker: Long? = null
 )
 
 /**
@@ -44,14 +43,14 @@ class ChatMembersResult(
 class ChatMember(
     @SerialName("user_id") val userId: Long = -1,
     val name: String = "",
-    @Optional val username: String = "",
-    @SerialName("avatar_url") @Optional val avatarUrl: String = "",
-    @SerialName("full_avatar_url") @Optional val fullAvatarUrl: String = "",
+    val username: String = "",
+    @SerialName("avatar_url") val avatarUrl: String = "",
+    @SerialName("full_avatar_url") val fullAvatarUrl: String = "",
     @SerialName("last_access_time") val lastAccessTime: Long,
     @SerialName("is_owner") val isOwner: Boolean,
-    @SerialName("is_admin") @Optional val isAdmin: Boolean? = null,
-    @SerialName("join_time") @Optional val joinTime: Long? = null,
-    @Optional val permissions: List<String>? = null
+    @SerialName("is_admin") val isAdmin: Boolean? = null,
+    @SerialName("join_time") val joinTime: Long? = null,
+    val permissions: List<String>? = null
 )
 
 enum class Permissions(val type: String) {

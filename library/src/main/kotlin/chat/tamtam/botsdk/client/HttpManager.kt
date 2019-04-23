@@ -38,7 +38,8 @@ internal const val API_VERSION = "0.1.5"
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
     internal val botToken: String,
-    retrofit: Retrofit = RetrofitFactory.createRetrofit(),
+    internal val httpLogsEnabled: Boolean = false,
+    retrofit: Retrofit = RetrofitFactory.createRetrofit(httpLogsEnabled = httpLogsEnabled),
     internal val messageHttpManager: MessageHttpManager = MessageHttpManager(botToken, API_VERSION, retrofit),
     internal val chatHttpManager: ChatHttpManager = ChatHttpManager(botToken, API_VERSION, retrofit),
     internal val subscriptionHttpManager: SubscriptionHttpManager = SubscriptionHttpManager(botToken, API_VERSION, retrofit),

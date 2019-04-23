@@ -62,7 +62,7 @@ class CommandTest {
 
     @Test
     fun `check that commands case-insensitive`() {
-        val botHttpManager = HttpManager("")
+        val botHttpManager = HttpManager("", true)
         val botScope = BotScope(botHttpManager)
         val handler = UpdatesHandler(botScope)
 

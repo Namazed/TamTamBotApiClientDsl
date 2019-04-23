@@ -4,7 +4,6 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -19,30 +18,30 @@ internal class Message(
     val recipient: Recipient = Recipient(),
     val sender: User = User(),
     val timestamp: Long = -1,
-    @Optional val link: Link? = null
+    val link: Link? = null
 )
 
 @Serializable
 internal class MessageInfo(
     @SerialName("mid") val messageId: String = "",
     @SerialName("seq") val sequenceIdInChat: Long = -1,
-    @Serializable(ResponseAttachmentsSerializer::class) @Optional val attachments: List<Attachment> = emptyList(),
-    @Optional val text: String = ""
+    @Serializable(ResponseAttachmentsSerializer::class) val attachments: List<Attachment> = emptyList(),
+    val text: String = ""
 )
 
 @Serializable
 internal class Link(
     val type: String,
     val sender: User = User(),
-    @Optional @SerialName("chat_id") val chatId: Long = -1,
+    @SerialName("chat_id") val chatId: Long = -1,
     val message: MessageInfo
 )
 
 @Serializable
 internal class Recipient(
-    @Optional @SerialName("chat_id") val chatId: Long = -1,
+    @SerialName("chat_id") val chatId: Long = -1,
     @Serializable(ChatTypeSerializer::class) @SerialName("chat_type") val chatType: ChatType = ChatType.UNKNOWN,
-    @Optional @SerialName("user_id") val userId: Long = -1
+    @SerialName("user_id") val userId: Long = -1
 )
 
 internal object ResponseAttachmentsSerializer : KSerializer<List<Attachment>> {

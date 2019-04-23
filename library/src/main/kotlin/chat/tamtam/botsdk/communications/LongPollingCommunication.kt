@@ -52,11 +52,13 @@ object longPolling {
     /**
      * @param botToken - token of your bot, you can give it from primeBot in TamTam
      * @param async - this flag mean that longPolling start polling on another single thread
+     * @param httpLogsEnabled - this flag mean that you want see http logs (when send some request).
+     * The SocketTimeoutException in httpLogs is normal for longPolling.
      */
-    operator fun invoke(botToken: String, async: Boolean = false, init: BotScope.() -> Unit): BotScope {
+    operator fun invoke(botToken: String, async: Boolean = false, httpLogsEnabled: Boolean = false, init: BotScope.() -> Unit): BotScope {
         check(botToken.isNotEmpty()) { "Bot token must is not empty" }
         val longPollingCommunication = LongPollingCommunication(botToken)
-        val botHttpManager = HttpManager(longPollingCommunication.botToken)
+        val botHttpManager = HttpManager(longPollingCommunication.botToken, httpLogsEnabled)
         return longPollingCommunication.init(botHttpManager, longPollingCommunication.log, async, init)
     }
 }
