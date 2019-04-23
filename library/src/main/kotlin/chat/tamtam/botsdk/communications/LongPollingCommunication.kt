@@ -29,7 +29,7 @@ class LongPollingCommunication(
         return coordinator
     }
 
-    private fun runAsync(coordinator: Coordinator) {
+    private fun runAsync(coordinator: UpdatesCoordinator) {
         longPollingCoroutineScope.launch {
             while (isActive) {
                 coordinator.run()
@@ -37,7 +37,7 @@ class LongPollingCommunication(
         }
     }
 
-    private fun run(coordinator: Coordinator) {
+    private fun run(coordinator: UpdatesCoordinator) {
         runBlocking {
             while (isActive) {
                 coordinator.run()

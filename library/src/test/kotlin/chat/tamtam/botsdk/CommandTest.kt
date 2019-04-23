@@ -64,7 +64,7 @@ class CommandTest {
     fun `check that commands case-insensitive`() {
         val botHttpManager = HttpManager("")
         val botScope = BotScope(botHttpManager)
-        val handler = UpdatesHandler(botScope)
+        val handler = UpdatesCoordinator(botScope)
 
         val processed = AtomicBoolean()
         botScope.commands {
@@ -78,7 +78,7 @@ class CommandTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed message created update with command"
             }

@@ -14,6 +14,6 @@ internal interface Communication {
      * @param botScope - main scope, which contains all other scopes, RequestsManager and TypingController
      * @param async - this flag mean that longPolling communication start polling on another single thread
      */
-    fun start(botScope: BotScope, async: Boolean): Coordinator
+    fun start(botScope: BotScope, async: Boolean = false): Coordinator
 
 }

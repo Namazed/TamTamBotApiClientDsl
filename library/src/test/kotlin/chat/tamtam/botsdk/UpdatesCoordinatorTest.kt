@@ -15,11 +15,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicBoolean
 
-class UpdatesHandlerTest {
+class UpdatesCoordinatorTest {
 
     private val botHttpManager = HttpManager("")
     private val botScope = BotScope(botHttpManager)
-    private val handler = UpdatesHandler(botScope)
+    private val handler = UpdatesCoordinator(botScope)
 
     @Test
     fun `check that updates handler work correct when processing message created`() {
@@ -35,7 +35,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed message created update"
             }
@@ -57,7 +57,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed callback update"
             }
@@ -78,7 +78,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed message created which contains command"
             }
@@ -98,7 +98,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed user removed update"
             }
@@ -118,7 +118,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed user added update"
             }
@@ -136,7 +136,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot removed update"
             }
@@ -154,7 +154,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot added update"
             }
@@ -172,7 +172,7 @@ class UpdatesHandlerTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.processUpdates(updatesList)
+            handler.coordinateUpdates(updatesList)
             assert(processed.get()) {
                 "The handler doesn't processed bot started update"
             }

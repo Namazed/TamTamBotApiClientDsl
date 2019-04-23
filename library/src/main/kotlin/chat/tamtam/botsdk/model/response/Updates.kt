@@ -4,7 +4,6 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +19,7 @@ import kotlinx.serialization.withName
 @Serializable
 internal class Updates(
     @SerialName("updates") val listUpdates: List<Update>,
-    @Optional val marker: Long? = null
+    val marker: Long? = null
 )
 
 /**

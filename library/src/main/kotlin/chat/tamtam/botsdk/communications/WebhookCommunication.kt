@@ -18,20 +18,19 @@ class WebhookCommunication internal constructor(
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
 
-    override fun start(botScope: BotScope): Coordinator {
+    override fun start(botScope: BotScope, async: Boolean): Coordinator {
         subscribeIfNeeded(botScope)
         return UpdatesCoordinator(botScope)
     }
 
     private fun subscribeIfNeeded(botScope: BotScope) {
         subscriptionScope.launch {
-            val result = botScope.requests.subscribe(botScope.subscription)
-            when(result) {
+            when(val result = botScope.requests.subscribe(botScope.subscription)) {
                 is ResultRequest.Success -> log.info("Subscribed with success")
                 is ResultRequest.Failure -> log.error("""Subscribed with failure.
                 |HttpCode: ${result.httpStatusCode}
-                |ErrorCode: ${result.error.code}
-                |ErrorMessage: ${result.error.message}""".trimMargin(), result.exception)
+                |ErrorCode: ${result.error?.code}
+                |ErrorMessage: ${result.error?.message}""".trimMargin(), result.exception)
             }
         }
     }

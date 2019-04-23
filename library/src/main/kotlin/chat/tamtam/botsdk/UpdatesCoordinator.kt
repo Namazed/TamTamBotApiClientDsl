@@ -11,6 +11,7 @@ import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
 import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
 import chat.tamtam.botsdk.model.prepared.UpdatesList
 import chat.tamtam.botsdk.model.response.UpdateType
+import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
 import chat.tamtam.botsdk.state.AddedBotState
@@ -25,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,6 +39,7 @@ class UpdatesCoordinator internal constructor(
     private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name)
 ): Coordinator {
 
+    @UnstableDefault
     override suspend fun coordinateAsync(jsonUpdates: String) {
         val updates: Updates = try {
             Json.parse(Updates.serializer(), jsonUpdates)
@@ -48,13 +51,15 @@ class UpdatesCoordinator internal constructor(
             return
         }
 
-        if (updates.listUpdates.size > 1) {
-            coordinateUpdates(updates)
+        val updatesList = updates.map()
+
+        if (updatesList.updates.size > 1) {
+            coordinateUpdates(updatesList)
             return
         }
 
         withContext(parallelScope.coroutineContext) {
-            coordinate(updates.listUpdates[0])
+            coordinate(updatesList.updates[0])
         }
     }
 
@@ -75,7 +80,7 @@ class UpdatesCoordinator internal constructor(
         coordinateUpdates(updates)
     }
 
-    private suspend fun coordinateUpdates(updatesList: UpdatesList) {
+    internal suspend fun coordinateUpdates(updatesList: UpdatesList) {
         if (updatesList.updates.isEmpty()) {
             return
         }
