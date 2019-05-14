@@ -1,5 +1,6 @@
 
 import chat.tamtam.botsdk.client.ResultRequest
+import chat.tamtam.botsdk.communications.StartingParams
 import chat.tamtam.botsdk.communications.longPolling
 import chat.tamtam.botsdk.keyboard.keyboard
 import chat.tamtam.botsdk.model.Button
@@ -15,7 +16,7 @@ import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 
 fun main() {
 
-    longPolling("BOT_TOKEN") {
+    longPolling(StartingParams("BOT_TOKEN")) {
 
         // when User start your bot, code below will start
         onStartBot {
