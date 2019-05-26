@@ -24,6 +24,7 @@ import chat.tamtam.botsdk.state.StartedBotState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.SocketTimeoutException
@@ -35,7 +36,7 @@ class UpdatesHandler internal constructor(
     private val log: Logger = LoggerFactory.getLogger(UpdatesHandler::class.java.name)
 ) {
 
-    suspend fun run() {
+    suspend fun run(parallelWorkWithUpdates: Boolean) {
         val updates: UpdatesList
         try {
             updates = botScope.botHttpManager.getUpdates(marker).map()
@@ -47,10 +48,23 @@ class UpdatesHandler internal constructor(
             return
         }
 
-        processUpdates(updates)
+        if (parallelWorkWithUpdates) {
+            processUpdatesParallel(updates)
+        } else {
+            processUpdates(updates)
+        }
     }
 
     suspend fun processUpdates(updatesList: UpdatesList) {
+        if (updatesList.updates.isEmpty()) {
+            return
+        }
+        updatesList.updates.forEachSequential { update: Update ->
+            process(update)
+        }
+    }
+
+    suspend fun processUpdatesParallel(updatesList: UpdatesList) {
         if (updatesList.updates.isEmpty()) {
             return
         }
@@ -92,12 +106,18 @@ class UpdatesHandler internal constructor(
         }
     }
 
-    private suspend fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit =
+    private suspend inline fun <A> Collection<A>.forEachParallel(crossinline f: suspend (A) -> Unit) =
         map {
             log.info("forEachParallel: create async")
             parallelScope.async { f(it) }
         }.forEach {
             log.info("forEachParallel: await")
             it.await()
+        }
+
+    private suspend inline fun <A> Collection<A>.forEachSequential(crossinline f: suspend (A) -> Unit) =
+        forEach {
+            log.info("forEachSequence: start process")
+            withContext(parallelScope.coroutineContext) { f(it) }
         }
 }

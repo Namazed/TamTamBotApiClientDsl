@@ -21,21 +21,22 @@ class LongPollingCommunication(
     override fun start(botScope: BotScope, startingParams: StartingParams) {
         val updateParsing = UpdatesHandler(botScope)
         if (startingParams.async) {
-            runAsync(updateParsing)
+            runAsync(updateParsing, startingParams.parallelWorkWithUpdates)
         } else {
-            run(updateParsing)
+            run(updateParsing, startingParams.parallelWorkWithUpdates)
         }
     }
 
-    private fun runAsync(updatesHandler: UpdatesHandler) = longPollingCoroutineScope.launch {
-        while (isActive) {
-            updatesHandler.run()
+    private fun runAsync(updatesHandler: UpdatesHandler, parallelWorkWithUpdates: Boolean) =
+        longPollingCoroutineScope.launch {
+            while (isActive) {
+                updatesHandler.run(parallelWorkWithUpdates)
+            }
         }
-    }
 
-    private fun run(updatesHandler: UpdatesHandler) = runBlocking {
+    private fun run(updatesHandler: UpdatesHandler, parallelWorkWithUpdates: Boolean) = runBlocking {
         while (isActive) {
-            updatesHandler.run()
+            updatesHandler.run(parallelWorkWithUpdates)
         }
     }
 
