@@ -4,7 +4,6 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,7 +19,7 @@ import kotlinx.serialization.withName
 @Serializable
 internal class Updates(
     @SerialName("updates") val listUpdates: List<Update>,
-    @Optional val marker: Long? = null
+    val marker: Long? = null
 )
 
 /**
@@ -44,14 +43,14 @@ internal class Updates(
 internal class Update(
     val timestamp: Long,
     @SerialName("update_type") val updateType: UpdateType,
-    @SerialName("message_id") @Optional val messageId: String = "",
-    @SerialName("chat_id") @Optional val chatId: Long = -1,
-    @SerialName("user_id") @Optional val userId: Long = -1,
-    @SerialName("admin_id") @Optional val adminId: Long = -1,
-    @SerialName("inviter_id") @Optional val inviterId: Long = -1,
-    @SerialName("title") @Optional val newChatTitle: String = "",
-    @Optional val message: Message? = null,
-    @Optional val callback: Callback? = null
+    @SerialName("message_id") val messageId: String = "",
+    @SerialName("chat_id") val chatId: Long = -1,
+    @SerialName("user_id") val userId: Long = -1,
+    @SerialName("admin_id") val adminId: Long = -1,
+    @SerialName("inviter_id") val inviterId: Long = -1,
+    @SerialName("title") val newChatTitle: String = "",
+    val message: Message? = null,
+    val callback: Callback? = null
 )
 
 @Serializable(UpdateTypeSerializer::class)

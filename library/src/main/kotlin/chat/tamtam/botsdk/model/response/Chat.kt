@@ -4,7 +4,6 @@ import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -33,15 +32,15 @@ class Chat(
     @SerialName("chat_id") val chatId: Long,
     @Serializable(ChatTypeSerializer::class) val type: ChatType,
     @Serializable(ChatStatusSerializer::class) val status: Status,
-    @Optional val title: String = "",
-    @Optional val icon: ChatIcon? = null,
+    val title: String = "",
+    val icon: ChatIcon? = null,
     @SerialName("last_event_time") val lastEventTime: Long,
     @SerialName("participants_count") val participantsCount: Int,
-    @SerialName("owner_id") @Optional val ownerId: Long = -1,
-    @Optional val participants: Map<Long, Long> = emptyMap(),
+    @SerialName("owner_id") val ownerId: Long = -1,
+    val participants: Map<Long, Long> = emptyMap(),
     @SerialName("is_public") val public: Boolean,
-    @SerialName("link") @Optional val linkOnChat: String = "",
-    @Optional val description: String = ""
+    @SerialName("link") val linkOnChat: String = "",
+    val description: String = ""
 )
 
 fun chatTypeFrom(value: String) = when(value) {

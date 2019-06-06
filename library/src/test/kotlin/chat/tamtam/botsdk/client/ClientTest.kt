@@ -9,7 +9,7 @@ open class ClientTest {
 
     protected val mockServer: MockWebServer = MockWebServer()
     internal val httpManager: HttpManager = HttpManager("bot_token",
-        RetrofitFactory.createRetrofit("http://localhost:8080/"))
+        retrofit = RetrofitFactory.createRetrofit("http://localhost:8080/", true))
 
     @Before
     fun setUp() {

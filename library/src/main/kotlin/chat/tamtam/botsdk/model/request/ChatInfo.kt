@@ -1,6 +1,5 @@
 package chat.tamtam.botsdk.model.request
 
-import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 
 /**
@@ -11,6 +10,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class ChatInfo(
-    @Optional val title: String? = null,
-    @Optional val icon: Icon? = null
+    val title: String? = null,
+    val icon: Icon? = null
 )
