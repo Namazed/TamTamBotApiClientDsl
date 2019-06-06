@@ -19,6 +19,9 @@ class LongPollingCommunication(
 ) : Communication {
 
     override fun start(botScope: BotScope, startingParams: StartingParams) {
+        check(startingParams is LongPollingStartingParams) {
+            "Wrong startingParams, for longPolling you must use LongPollingStartingParams"
+        }
         val updateParsing = UpdatesHandler(botScope)
         if (startingParams.async) {
             runAsync(updateParsing, startingParams.parallelWorkWithUpdates)
