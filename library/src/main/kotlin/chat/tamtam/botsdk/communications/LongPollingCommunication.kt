@@ -19,29 +19,29 @@ class LongPollingCommunication(
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
 
-    override fun start(botScope: BotScope, async: Boolean): Coordinator {
+    override fun start(botScope: BotScope, startingParams: StartingParams): Coordinator {
+        check(startingParams is LongPollingStartingParams) {
+            "Wrong startingParams, for longPolling you must use LongPollingStartingParams"
+        }
         val coordinator = UpdatesCoordinator(botScope)
-        if (async) {
-            runAsync(coordinator)
+        if (startingParams.async) {
+            runAsync(coordinator, startingParams.parallelWorkWithUpdates)
         } else {
-            run(coordinator)
+            run(coordinator, startingParams.parallelWorkWithUpdates)
         }
         return coordinator
     }
 
-    private fun runAsync(coordinator: UpdatesCoordinator) {
+    private fun runAsync(coordinator: UpdatesCoordinator, parallelWorkWithUpdates: Boolean) =
         longPollingCoroutineScope.launch {
             while (isActive) {
-                coordinator.run()
+                coordinator.run(parallelWorkWithUpdates)
             }
         }
-    }
 
-    private fun run(coordinator: UpdatesCoordinator) {
-        runBlocking {
-            while (isActive) {
-                coordinator.run()
-            }
+    private fun run(coordinator: UpdatesCoordinator, parallelWorkWithUpdates: Boolean) = runBlocking {
+        while (isActive) {
+            coordinator.run(parallelWorkWithUpdates)
         }
     }
 
@@ -51,21 +51,22 @@ class LongPollingCommunication(
  * This class need for start longPolling for your bot.
  */
 object longPolling {
-    /**
-     * @param botToken - token of your bot, you can give it from primeBot in TamTam
-     * @param async - this flag mean that longPolling start polling on another single thread
-     */
-    operator fun invoke(botToken: String, async: Boolean = false, init: BotScope.() -> Unit): Coordinator {
-        check(botToken.isNotEmpty()) { "Bot token must is not empty" }
-        val longPollingCommunication = LongPollingCommunication(botToken)
-        val botHttpManager = HttpManager(longPollingCommunication.botToken)
-        return longPollingCommunication.init(botHttpManager, longPollingCommunication.log, async, init)
+    operator fun invoke(startingParams: StartingParams, init: BotScope.() -> Unit): Coordinator {
+        check(startingParams.botToken.isNotEmpty()) { "Bot token must is not empty" }
+        val longPollingCommunication = LongPollingCommunication(startingParams.botToken)
+        val botHttpManager = HttpManager(longPollingCommunication.botToken, startingParams.httpLogsEnabled)
+        return longPollingCommunication.init(botHttpManager, longPollingCommunication.log, startingParams, init)
     }
 }
 
-private fun Communication.init(botHttpManager: HttpManager, log: Logger, async: Boolean, init: BotScope.() -> Unit): Coordinator {
+private fun Communication.init(
+    botHttpManager: HttpManager,
+    log: Logger, startingParams:
+    StartingParams,
+    init: BotScope.() -> Unit
+): Coordinator {
     log.info("Long polling bot starting")
     val scope = BotScope(botHttpManager)
     scope.init()
-    return start(scope, async)
+    return start(scope, startingParams)
 }

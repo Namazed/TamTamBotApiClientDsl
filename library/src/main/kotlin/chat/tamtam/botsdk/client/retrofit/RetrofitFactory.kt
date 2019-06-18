@@ -11,21 +11,23 @@ import java.util.concurrent.TimeUnit
 internal object RetrofitFactory {
     private const val BASE_URL = "https://botapi.tamtam.chat"
 
-    fun createRetrofit(url: String? = null): Retrofit {
+    fun createRetrofit(url: String? = null, httpLogsEnabled: Boolean = false): Retrofit {
         val contentType = MediaType.get("application/json")
         return Retrofit.Builder()
             .addConverterFactory(Json.asConverterFactory(contentType))
             .baseUrl(url ?: BASE_URL)
-            .client(createOkHttpClient())
+            .client(createOkHttpClient(httpLogsEnabled))
             .build()
     }
 
-    private fun createOkHttpClient(): OkHttpClient {
+    private fun createOkHttpClient(httpLogsEnabled: Boolean): OkHttpClient {
         OkHttpClient.Builder().apply {
-            val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+            if (httpLogsEnabled) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+                addInterceptor(loggingInterceptor)
             }
-            addInterceptor(loggingInterceptor)
             connectTimeout(20, TimeUnit.SECONDS)
             readTimeout(30, TimeUnit.SECONDS)
             writeTimeout(30, TimeUnit.SECONDS)

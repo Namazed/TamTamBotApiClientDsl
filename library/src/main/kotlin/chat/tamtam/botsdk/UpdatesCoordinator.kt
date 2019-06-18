@@ -63,7 +63,7 @@ class UpdatesCoordinator internal constructor(
         }
     }
 
-    internal suspend fun run() {
+    internal suspend fun run(parallelWorkWithUpdates: Boolean) {
         val updates: UpdatesList
         try {
             updates = withContext(parallelScope.coroutineContext) {
@@ -77,10 +77,23 @@ class UpdatesCoordinator internal constructor(
             return
         }
 
-        coordinateUpdates(updates)
+        if (parallelWorkWithUpdates) {
+            coordinateUpdatesParallel(updates)
+        } else {
+            coordinateUpdates(updates)
+        }
     }
 
     internal suspend fun coordinateUpdates(updatesList: UpdatesList) {
+        if (updatesList.updates.isEmpty()) {
+            return
+        }
+        updatesList.updates.forEachSequential { update: Update ->
+            coordinate(update)
+        }
+    }
+
+    suspend fun coordinateUpdatesParallel(updatesList: UpdatesList) {
         if (updatesList.updates.isEmpty()) {
             return
         }
@@ -122,12 +135,18 @@ class UpdatesCoordinator internal constructor(
         }
     }
 
-    private suspend fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit =
+    private suspend inline fun <A> Collection<A>.forEachParallel(crossinline f: suspend (A) -> Unit) =
         map {
             log.info("forEachParallel: create async")
             parallelScope.async { f(it) }
         }.forEach {
             log.info("forEachParallel: await")
             it.await()
+        }
+
+    private suspend inline fun <A> Collection<A>.forEachSequential(crossinline f: suspend (A) -> Unit) =
+        forEach {
+            log.info("forEachSequence: start process")
+            withContext(parallelScope.coroutineContext) { f(it) }
         }
 }
