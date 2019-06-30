@@ -3,7 +3,7 @@ package chat.tamtam.botsdk.model.prepared
 import chat.tamtam.botsdk.model.UserId
 
 /**
- * This class contains info about specific user or current bot
+ * This class contains info about specific user
  *
  * @param userId - Users identifier, inline class [UserId]
  * @param name - Users visible name

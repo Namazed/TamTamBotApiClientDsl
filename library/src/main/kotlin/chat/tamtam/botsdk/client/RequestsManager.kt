@@ -31,13 +31,12 @@ import chat.tamtam.botsdk.typing.TypingController
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import retrofit2.Response
+import chat.tamtam.botsdk.model.prepared.Bot as PreparedBot
 import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
 import chat.tamtam.botsdk.model.prepared.ChatMember as PreparedChatMember
 import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
-import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.request.Subscription as RequestSubscription
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 import chat.tamtam.botsdk.model.response.Subscription as ResponseSubscription
 
 /**
@@ -51,7 +50,7 @@ class RequestsManager internal constructor(
     /**
      * If you want get information about your bot, which like name or id, you need use this method
      */
-    suspend fun getBotInfo(): ResultRequest<PreparedUser> = startRequest {
+    suspend fun getBotInfo(): ResultRequest<PreparedBot> = startRequest {
         httpManager.getBotInfo()
     }
 

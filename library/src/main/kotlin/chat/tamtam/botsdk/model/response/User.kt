@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
  * @param fullAvatarUrl - URL of avatar of a bigger size
  */
 @Serializable
-class User(
+open class User(
     @SerialName("user_id") val userId: Long = -1,
     val name: String = "",
     val username: String = "",

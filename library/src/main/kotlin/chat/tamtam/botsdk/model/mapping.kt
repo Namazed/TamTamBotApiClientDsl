@@ -34,7 +34,9 @@ import chat.tamtam.botsdk.model.prepared.UpdateUnknown
 import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
 import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
 import chat.tamtam.botsdk.model.prepared.UpdatesList
+import chat.tamtam.botsdk.model.request.Command
 import chat.tamtam.botsdk.model.response.Attachment
+import chat.tamtam.botsdk.model.response.Bot
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMember
@@ -54,9 +56,11 @@ import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.model.response.linkTypeFrom
 import chat.tamtam.botsdk.model.response.permissionFrom
 import chat.tamtam.botsdk.model.prepared.Attachment as PreparedAttachment
+import chat.tamtam.botsdk.model.prepared.Bot as PreparedBot
 import chat.tamtam.botsdk.model.prepared.Callback as PreparedCallback
 import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
 import chat.tamtam.botsdk.model.prepared.ChatMember as PreparedChatMember
+import chat.tamtam.botsdk.model.prepared.Command as PreparedCommand
 import chat.tamtam.botsdk.model.prepared.Link as PreparedLink
 import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 import chat.tamtam.botsdk.model.prepared.Recipient as PreparedRecipient
@@ -70,6 +74,12 @@ fun List<UserId>?.mapOrNull(): List<Long>? {
             .toList()
     }
 }
+
+internal fun Bot.map(): PreparedBot = PreparedBot(PreparedUser(UserId(userId), name, username, avatarUrl,
+    fullAvatarUrl), commands.mapCommands(), description)
+
+internal fun List<Command>.mapCommands(): List<PreparedCommand> =
+    map {command -> PreparedCommand(command.name, command.description ?: "")}
 
 internal fun User.map(): PreparedUser = PreparedUser(UserId(userId), name, username, avatarUrl, fullAvatarUrl)
 
@@ -161,6 +171,7 @@ internal fun Updates.map(): UpdatesList {
 internal inline fun <reified R, reified PR> R.map(): PR {
     return when(this) {
         is User -> this.map() as PR
+        is Bot -> this.map() as PR
         is Message -> this.map() as PR
         is Messages -> this.map() as PR
         is SendMessage -> this.map() as PR
