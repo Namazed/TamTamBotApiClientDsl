@@ -62,13 +62,13 @@ class UpdateMessageRemoved(
  *
  * @param timestamp - Unix-time when event has occured
  * @param chatId - unique identifier of chat where bot started or added or removed
- * @param userId - user unique identifier who pressed "Start" button or added bot to chat or removed bot from chat User
+ * @param user - user who pressed "Start" button or added bot to chat or removed bot from chat
  */
 class UpdateBot(
     override val type: UpdateType,
     val timestamp: Long,
     val chatId: ChatId,
-    val userId: UserId
+    val user: User
 ) : Update
 
 /**
@@ -76,14 +76,14 @@ class UpdateBot(
  *
  * @param timestamp - Unix-time when event has occured
  * @param chatId - unique identifier of chat where user added
- * @param userId - user added to chat
+ * @param user - user added to chat
  * @param inviterId - user who added user to chat
  */
 class UpdateUserAdded(
     override val type: UpdateType,
     val timestamp: Long,
     val chatId: ChatId,
-    val userId: UserId,
+    val user: User,
     val inviterId: UserId
 ) : Update
 
@@ -92,14 +92,14 @@ class UpdateUserAdded(
  *
  * @param timestamp - Unix-time when event has occured
  * @param chatId - unique identifier of chat where user removed
- * @param userId - see bot API docs, this parameter means different, depends on event
+ * @param user - see bot API docs, this parameter means different, depends on event
  * @param adminId - Administrator who removed user from chat [UpdateType.USER_REMOVED]
  */
 class UpdateUserRemoved(
     override val type: UpdateType,
     val timestamp: Long,
     val chatId: ChatId,
-    val userId: UserId,
+    val user: User,
     val adminId: UserId
 ) : Update
 
@@ -109,14 +109,14 @@ class UpdateUserRemoved(
  * @param timestamp - Unix-time when event has occured
  * @param chatId - this chat id you will get in this event [UpdateType.BOT_STARTED], [UpdateType.CHAT_TITLE_CHANGED],
  * [UpdateType.USER_ADDED], [UpdateType.USER_REMOVED], [UpdateType.BOT_ADDED], [UpdateType.BOT_REMOVED]
- * @param userId - see bot API docs, this parameter means different, depends on event
+ * @param user - see bot API docs, this parameter means different, depends on event
  * @param newChatTitle - changed title in chat [UpdateType.CHAT_TITLE_CHANGED]
  */
 class UpdateChatTitle(
     override val type: UpdateType,
     val timestamp: Long,
     val chatId: ChatId,
-    val userId: UserId,
+    val user: User,
     val newChatTitle: String = ""
 ) : Update
 

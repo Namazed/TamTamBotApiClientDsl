@@ -153,10 +153,10 @@ internal fun Update.map(): PreparedUpdate {
         UpdateType.CALLBACK -> UpdateCallback(updateType, timestamp, message.mapOrNull(), callback!!.map())
         UpdateType.MESSAGE_CREATED, UpdateType.MESSAGE_EDITED -> UpdateMessage(updateType, timestamp, message!!.map())
         UpdateType.MESSAGE_REMOVED -> UpdateMessageRemoved(updateType, timestamp, MessageId(messageId))
-        UpdateType.BOT_ADDED, UpdateType.BOT_REMOVED, UpdateType.BOT_STARTED -> UpdateBot(updateType, timestamp, ChatId(chatId), UserId(userId))
-        UpdateType.USER_ADDED -> UpdateUserAdded(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(inviterId))
-        UpdateType.USER_REMOVED -> UpdateUserRemoved(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(adminId))
-        UpdateType.CHAT_TITLE_CHANGED -> UpdateChatTitle(updateType, timestamp, ChatId(chatId), UserId(userId), newChatTitle)
+        UpdateType.BOT_ADDED, UpdateType.BOT_REMOVED, UpdateType.BOT_STARTED -> UpdateBot(updateType, timestamp, ChatId(chatId), user.map())
+        UpdateType.USER_ADDED -> UpdateUserAdded(updateType, timestamp, ChatId(chatId), user.map(), UserId(inviterId))
+        UpdateType.USER_REMOVED -> UpdateUserRemoved(updateType, timestamp, ChatId(chatId), user.map(), UserId(adminId))
+        UpdateType.CHAT_TITLE_CHANGED -> UpdateChatTitle(updateType, timestamp, ChatId(chatId), user.map(), newChatTitle)
         UpdateType.UNKNOWN -> UpdateUnknown(updateType, timestamp)
     }
 }

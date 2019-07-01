@@ -45,7 +45,7 @@ internal class Update(
     @SerialName("update_type") val updateType: UpdateType,
     @SerialName("message_id") val messageId: String = "",
     @SerialName("chat_id") val chatId: Long = -1,
-    @SerialName("user_id") val userId: Long = -1,
+    @SerialName("user") val user: User = User(),
     @SerialName("admin_id") val adminId: Long = -1,
     @SerialName("inviter_id") val inviterId: Long = -1,
     @SerialName("title") val newChatTitle: String = "",
