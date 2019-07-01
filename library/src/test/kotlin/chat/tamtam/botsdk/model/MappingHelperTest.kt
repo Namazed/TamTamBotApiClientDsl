@@ -473,6 +473,12 @@ internal class MappingHelperTest {
         assert(attachment.payload.fileId == preparedAttachment.payload.fileId) {
             getAssertString("FileId of Attachment", "fileId", attachment.payload.fileId, preparedAttachment.payload.fileId)
         }
+        assert(attachment.filename == preparedAttachment.filename) {
+            getAssertString("Filename of Attachment", "filename", attachment.filename, preparedAttachment.filename)
+        }
+        assert(attachment.fileSize == preparedAttachment.fileSize) {
+            getAssertString("FileSize of Attachment", "fileSize", attachment.fileSize, preparedAttachment.fileSize)
+        }
     }
 
     @Test

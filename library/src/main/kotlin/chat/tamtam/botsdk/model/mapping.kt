@@ -129,7 +129,7 @@ internal fun Attachment.map(): PreparedAttachment {
     return when (type) {
         IMAGE -> AttachmentPhoto(type, PayloadPhoto(payload.photoId, payload.token, payload.url))
         VIDEO, AUDIO, STICKER, SHARE -> AttachmentMedia(type, PayloadMedia(payload.url, payload.id))
-        FILE -> AttachmentFile(type, PayloadFile(payload.url, payload.fileId))
+        FILE -> AttachmentFile(type, PayloadFile(payload.url, payload.fileId), filename, fileSize)
         CONTACT -> AttachmentContact(type, PayloadContact(payload.vcfInfo, payload.tamInfo.map()))
         INLINE_KEYBOARD -> AttachmentKeyboard(type, CallbackId(callbackId), PayloadKeyboard(payload.buttons))
         LOCATION -> AttachmentLocation(type, latitude, longitude)

@@ -73,7 +73,9 @@ data class AttachmentMedia(
  */
 data class AttachmentFile(
     override val type: AttachType,
-    val payload: PayloadFile
+    val payload: PayloadFile,
+    val filename: String,
+    val fileSize: Long
 ) : Attachment
 
 /**
