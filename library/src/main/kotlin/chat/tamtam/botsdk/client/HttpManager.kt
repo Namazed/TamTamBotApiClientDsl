@@ -22,6 +22,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.File
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
+import chat.tamtam.botsdk.model.request.Bot as RequestBot
 
 internal const val BOT_TOKEN_FIELD = "access_token"
 internal const val VERSION_FIELD = "v"
@@ -48,6 +49,10 @@ internal class HttpManager(
 
     suspend fun getBotInfo(): HttpResult<Bot> {
         return botService.getBotInfo(botToken, API_VERSION).await()
+    }
+
+    suspend fun editBotInfo(botInfo: RequestBot): HttpResult<Bot> {
+        return botService.editBotInfo(botToken, API_VERSION, botInfo).await()
     }
 
     suspend fun getUpdates(marker: Long?): Updates {

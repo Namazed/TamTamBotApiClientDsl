@@ -2,7 +2,9 @@ package chat.tamtam.botsdk.model.response
 
 import chat.tamtam.botsdk.model.request.Command
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Bot(
     @SerialName("user_id") val userId: Long = -1,
     val name: String = "",

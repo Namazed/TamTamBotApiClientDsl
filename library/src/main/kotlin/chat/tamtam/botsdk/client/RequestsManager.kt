@@ -13,6 +13,7 @@ import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.ChatsList
 import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AnswerParams
+import chat.tamtam.botsdk.model.request.Bot
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.request.ReusableMediaParams
 import chat.tamtam.botsdk.model.request.SendParams
@@ -52,6 +53,13 @@ class RequestsManager internal constructor(
      */
     suspend fun getBotInfo(): ResultRequest<PreparedBot> = startRequest {
         httpManager.getBotInfo()
+    }
+
+    /**
+     * If you want change information about your bot, which like description or commands, you need use this method
+     */
+    suspend fun editBotInfo(botInfo: Bot): ResultRequest<PreparedBot> = startRequest {
+        httpManager.editBotInfo(botInfo)
     }
 
     /**
