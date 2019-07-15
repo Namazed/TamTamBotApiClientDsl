@@ -64,6 +64,7 @@ import chat.tamtam.botsdk.model.prepared.Command as PreparedCommand
 import chat.tamtam.botsdk.model.prepared.Link as PreparedLink
 import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 import chat.tamtam.botsdk.model.prepared.Recipient as PreparedRecipient
+import chat.tamtam.botsdk.model.prepared.Statistics as PreparedStatistics
 import chat.tamtam.botsdk.model.prepared.Update as PreparedUpdate
 import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 
@@ -106,7 +107,7 @@ internal fun Recipient.map(): PreparedRecipient = PreparedRecipient(ChatId(chatI
 internal fun Link.map(): PreparedLink = PreparedLink(linkTypeFrom(type), sender.map(), ChatId(chatId), message.map())
 
 internal fun Message.map(): PreparedMessage {
-    return PreparedMessage(messageInfo.map(), recipient.map(), sender.map(), timestamp, link?.map())
+    return PreparedMessage(messageInfo.map(), recipient.map(), sender.map(), timestamp, link?.map(), PreparedStatistics(statistics.views))
 }
 
 internal fun MessageInfo.map(): Body = Body(MessageId(messageId), sequenceIdInChat, attachments.map(), text)

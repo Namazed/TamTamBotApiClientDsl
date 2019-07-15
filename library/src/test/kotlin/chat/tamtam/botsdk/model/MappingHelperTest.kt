@@ -354,6 +354,9 @@ internal class MappingHelperTest {
         recipient.assertEqualsRecipient(preparedMessage.recipient)
         sender.assertEqualsUser(preparedMessage.sender)
         link?.assertEqualsLink(preparedMessage.link!!)
+        assert(statistics.views == preparedMessage.statistics.views) {
+            getAssertString("Statistics of views", "statistics of views", statistics.views, preparedMessage.statistics.views)
+        }
     }
 
     @Test
