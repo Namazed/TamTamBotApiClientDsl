@@ -44,7 +44,7 @@ You must also add a dependency.
 ### Gradle
 ```groovy
 dependencies {
-    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.3.0'
+    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.2.2'
 }
 ```
 ### Maven
@@ -64,7 +64,7 @@ The example of a finished bot can be found [here](https://github.com/Namazed/Tam
 Below you find example of how start process sync longPolling on main thread:
 ```kotlin
 fun main() {
-  longPolling(LongPollingStartingParams("BOT_TOKEN")) {
+  longPolling("BOT_TOKEN") {
 
   }
 }
