@@ -77,19 +77,19 @@ class UpdatesHandler internal constructor(
         log.info("process: start process update with updateType ${update.type}")
         when {
             update.type == UpdateType.BOT_STARTED && update is UpdateBot -> {
-                botScope.answerOnStart(StartedBotState(update.timestamp, update.chatId, update.userId))
+                botScope.answerOnStart(StartedBotState(update.timestamp, update.chatId, update.user))
             }
             update.type == UpdateType.BOT_ADDED && update is UpdateBot -> {
-                botScope.answerOnAdd(AddedBotState(update.timestamp, update.chatId, update.userId))
+                botScope.answerOnAdd(AddedBotState(update.timestamp, update.chatId, update.user))
             }
             update.type == UpdateType.BOT_REMOVED && update is UpdateBot -> {
-                botScope.answerOnRemove(RemovedBotState(update.timestamp, update.chatId, update.userId))
+                botScope.answerOnRemove(RemovedBotState(update.timestamp, update.chatId, update.user))
             }
             update.type == UpdateType.USER_ADDED && update is UpdateUserAdded -> {
-                botScope.userScope.answerOnAdd(AddedUserState(update.timestamp, update.chatId, update.userId, update.inviterId))
+                botScope.userScope.answerOnAdd(AddedUserState(update.timestamp, update.chatId, update.user, update.inviterId))
             }
             update.type == UpdateType.USER_REMOVED && update is UpdateUserRemoved -> {
-                botScope.userScope.answerOnRemove(RemovedUserState(update.timestamp, update.chatId, update.userId, update.adminId))
+                botScope.userScope.answerOnRemove(RemovedUserState(update.timestamp, update.chatId, update.user, update.adminId))
             }
             update.type == UpdateType.MESSAGE_CREATED && update is UpdateMessage && (update.message.body.text.isCommand()
                     || update.message.body.text.isCommandInChat()) -> {

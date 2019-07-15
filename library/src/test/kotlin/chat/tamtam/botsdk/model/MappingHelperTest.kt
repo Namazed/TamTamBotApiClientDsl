@@ -7,7 +7,9 @@ import chat.tamtam.botsdk.model.prepared.AttachmentLocation
 import chat.tamtam.botsdk.model.prepared.AttachmentMedia
 import chat.tamtam.botsdk.model.prepared.AttachmentPhoto
 import chat.tamtam.botsdk.model.prepared.Body
+import chat.tamtam.botsdk.model.request.Command
 import chat.tamtam.botsdk.model.response.Attachment
+import chat.tamtam.botsdk.model.response.Bot
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatIcon
@@ -88,6 +90,34 @@ internal class MappingHelperTest {
         }
         assert(fullAvatarUrl == preparedUser.fullAvatarUrl) {
             getAssertString("FullAvatarUrl from User", "fullAvatarUrl", fullAvatarUrl, preparedUser.fullAvatarUrl)
+        }
+    }
+
+    @Test
+    fun `check that Bot correct map to Bot from prepared package`() {
+        val commands = listOf(Command(""), Command(""))
+        val bot = Bot(21, "Test", "N", "testurl", "testfullurl", commands, "test")
+        val preparedBot = bot.map()
+        assert(bot.userId == preparedBot.userInfo.userId.id) {
+            getAssertString("UserId of Bot", "userId", bot.userId, preparedBot.userInfo.userId)
+        }
+        assert(bot.name == preparedBot.userInfo.name) {
+            getAssertString("Name of Bot", "name", bot.name, preparedBot.userInfo.name)
+        }
+        assert(bot.username == preparedBot.userInfo.username) {
+            getAssertString("Username of Bot", "username", bot.username, preparedBot.userInfo.username)
+        }
+        assert(bot.avatarUrl == preparedBot.userInfo.avatarUrl) {
+            getAssertString("AvatarUrl from Bot", "avatarUrl", bot.avatarUrl, preparedBot.userInfo.avatarUrl)
+        }
+        assert(bot.fullAvatarUrl == preparedBot.userInfo.fullAvatarUrl) {
+            getAssertString("FullAvatarUrl from Bot", "fullAvatarUrl", bot.fullAvatarUrl, preparedBot.userInfo.fullAvatarUrl)
+        }
+        assert(bot.description == preparedBot.description) {
+            getAssertString("Description from Bot", "description", bot.description, preparedBot.description)
+        }
+        assert(bot.commands.size == preparedBot.commands.size) {
+            getAssertString("Commands size from Bot", "commands size", bot.commands.size, preparedBot.commands.size)
         }
     }
 
@@ -324,6 +354,9 @@ internal class MappingHelperTest {
         recipient.assertEqualsRecipient(preparedMessage.recipient)
         sender.assertEqualsUser(preparedMessage.sender)
         link?.assertEqualsLink(preparedMessage.link!!)
+        assert(statistics.views == preparedMessage.statistics.views) {
+            getAssertString("Statistics of views", "statistics of views", statistics.views, preparedMessage.statistics.views)
+        }
     }
 
     @Test
@@ -442,6 +475,12 @@ internal class MappingHelperTest {
         }
         assert(attachment.payload.fileId == preparedAttachment.payload.fileId) {
             getAssertString("FileId of Attachment", "fileId", attachment.payload.fileId, preparedAttachment.payload.fileId)
+        }
+        assert(attachment.filename == preparedAttachment.filename) {
+            getAssertString("Filename of Attachment", "filename", attachment.filename, preparedAttachment.filename)
+        }
+        assert(attachment.fileSize == preparedAttachment.fileSize) {
+            getAssertString("FileSize of Attachment", "fileSize", attachment.fileSize, preparedAttachment.fileSize)
         }
     }
 
