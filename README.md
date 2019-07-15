@@ -44,7 +44,7 @@ You must also add a dependency.
 ### Gradle
 ```groovy
 dependencies {
-    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.2.2'
+    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.3.0'
 }
 ```
 ### Maven
