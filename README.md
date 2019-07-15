@@ -64,7 +64,7 @@ The example of a finished bot can be found [here](https://github.com/Namazed/Tam
 Below you find example of how start process sync longPolling on main thread:
 ```kotlin
 fun main() {
-  longPolling("BOT_TOKEN") {
+  longPolling(LongPollingStartingParams("BOT_TOKEN")) {
 
   }
 }
