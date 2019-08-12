@@ -6,6 +6,7 @@ import chat.tamtam.botsdk.model.prepared.AttachmentKeyboard
 import chat.tamtam.botsdk.model.prepared.AttachmentLocation
 import chat.tamtam.botsdk.model.prepared.AttachmentMedia
 import chat.tamtam.botsdk.model.prepared.AttachmentPhoto
+import chat.tamtam.botsdk.model.prepared.AttachmentSticker
 import chat.tamtam.botsdk.model.prepared.Body
 import chat.tamtam.botsdk.model.request.Command
 import chat.tamtam.botsdk.model.response.Attachment
@@ -460,6 +461,27 @@ internal class MappingHelperTest {
         }
         assert(attachment.payload.id == preparedAttachment.payload.id) {
             getAssertString("Id of Attachment", "id", attachment.payload.id, preparedAttachment.payload.id)
+        }
+    }
+
+    @Test
+    fun `check that Attachment with sticker type correct map to AttachmentSticker from prepared package`() {
+        val attachment = Attachment(AttachType.STICKER, stickerWidth = 640, stickerHeight = 480, payload = Payload(stickerCode = "code", url = "test.ru"))
+        val preparedAttachment = attachment.map() as AttachmentSticker
+        assert(attachment.type == preparedAttachment.type) {
+            getAssertString("Type of Attachment", "type", attachment.type, preparedAttachment.type)
+        }
+        assert(attachment.stickerWidth == preparedAttachment.width) {
+            getAssertString("Width of Attachment", "width", attachment.stickerWidth, preparedAttachment.width)
+        }
+        assert(attachment.stickerHeight == preparedAttachment.height) {
+            getAssertString("Height of Attachment", "height", attachment.stickerHeight, preparedAttachment.height)
+        }
+        assert(attachment.payload.url == preparedAttachment.payload.url) {
+            getAssertString("Url of Attachment", "url", attachment.payload.url, preparedAttachment.payload.url)
+        }
+        assert(attachment.payload.stickerCode == preparedAttachment.payload.code) {
+            getAssertString("Code of Attachment", "code", attachment.payload.stickerCode, preparedAttachment.payload.code)
         }
     }
 

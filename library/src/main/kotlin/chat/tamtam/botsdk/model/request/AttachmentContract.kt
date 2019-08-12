@@ -43,49 +43,49 @@ abstract class AttachmentContract {
 
 @Serializable
 class AttachmentKeyboard(
-     val type: String,
+    val type: String,
     val payload: InlineKeyboard
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentContact(
-     val type: String,
+    val type: String,
     val payload: PayloadContact
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentSticker(
-     val type: String,
+    val type: String,
     val payload: PayloadSticker
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentPhoto(
-     val type: String,
+    val type: String,
     val payload: UploadInfo
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentPhotoWithToken(
-     val type: String,
+    val type: String,
     val payload: PayloadToken
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentMediaWithUploadData(
-     val type: String,
+    val type: String,
     val payload: UploadInfo
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentPhotoWithUrl(
-     val type: String,
+    val type: String,
     val payload: PayloadUrl
 ) : AttachmentContract()
 
 @Serializable
 class AttachmentLocation(
-     val type: String,
+    val type: String,
     val latitude: Double,
     val longitude: Double
 ) : AttachmentContract()
