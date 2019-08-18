@@ -44,7 +44,7 @@ You must also add a dependency.
 ### Gradle
 ```groovy
 dependencies {
-    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.2.2'
+    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.3.0'
 }
 ```
 ### Maven
@@ -52,7 +52,7 @@ dependencies {
 <dependency>
 	 <groupId>com.github.Namazed</groupId>
 	 <artifactId>TamTamBotApiClientDsl</artifactId>
-	 <version>0.2.2</version>
+	 <version>0.3.0</version>
 </dependency>
 ```
 
@@ -64,7 +64,7 @@ The example of a finished bot can be found [here](https://github.com/Namazed/Tam
 Below you find example of how start process sync longPolling on main thread:
 ```kotlin
 fun main() {
-  longPolling("BOT_TOKEN") {
+  longPolling(LongPollingStartingParams("BOT_TOKEN")) {
 
   }
 }
@@ -72,7 +72,23 @@ fun main() {
 Async longPolling on other single thread:
 ```kotlin
 fun main() {
-  longPolling("BOT_TOKEN", true) {
+  longPolling(LongPollingStartingParams("BOT_TOKEN", async = true)) {
+
+  }
+}
+```
+If you want disable parallel work with update:
+```kotlin
+fun main() {
+  longPolling(LongPollingStartingParams("BOT_TOKEN", parallelWorkWithUpdates = false)) {
+
+  }
+}
+```
+If you want disable http logs:
+```kotlin
+fun main() {
+  longPolling(LongPollingStartingParams("BOT_TOKEN", httpLogsEnabled = false)) {
 
   }
 }
