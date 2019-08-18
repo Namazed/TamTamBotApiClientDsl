@@ -13,6 +13,8 @@ val EMPTY_PAYLOAD = Payload()
  *
  * @param type - type of attach
  * @param callbackId - Optional. For [AttachType.INLINE_KEYBOARD]. Unique identifier of keyboard
+ * @param filename - Uploaded file name
+ * @param fileSize - File size in bytes
  * @param latitude - Optional. For [AttachType.LOCATION]
  * @param longitude - Optional. For [AttachType.LOCATION]
  * @param payload - Optional. For other attach types.
@@ -21,8 +23,12 @@ val EMPTY_PAYLOAD = Payload()
 class Attachment(
     @Serializable(AttachTypeSerializer::class) val type: AttachType,
     @SerialName("callback_id") val callbackId: String = "",
+    val filename: String = "",
+    @SerialName("size") val fileSize: Long = -1,
     val latitude: Double = -1.0,
     val longitude: Double = -1.0,
+    @SerialName("width") val stickerWidth: Int = -1,
+    @SerialName("height") val stickerHeight: Int = -1,
     val payload: Payload = EMPTY_PAYLOAD
 )
 
@@ -39,6 +45,7 @@ class Attachment(
 @Serializable
 class Payload(
     @SerialName("photo_id") val photoId: Long = -1,
+    @SerialName("code") val stickerCode: String = "",
     val token: String = "",
     val url: String = "",
     val id: Long = -1,

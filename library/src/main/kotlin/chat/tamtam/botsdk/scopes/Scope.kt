@@ -26,7 +26,6 @@ import chat.tamtam.botsdk.model.request.createAnswerCallbackForReusablePhotoToke
 import chat.tamtam.botsdk.model.request.createSendMessageForImageUrl
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 /**
  * This interface give all requests methods from BotAPI in dsl style and no dsl (with help [requests] property)

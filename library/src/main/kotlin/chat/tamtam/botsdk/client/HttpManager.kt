@@ -10,11 +10,11 @@ import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.CallbackId
 import chat.tamtam.botsdk.model.request.UploadType
+import chat.tamtam.botsdk.model.response.Bot
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
-import chat.tamtam.botsdk.model.response.User
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -22,8 +22,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.File
 import chat.tamtam.botsdk.model.request.AnswerCallback as RequestAnswerCallback
-import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
+import chat.tamtam.botsdk.model.request.Bot as RequestBot
 
 internal const val BOT_TOKEN_FIELD = "access_token"
 internal const val VERSION_FIELD = "v"
@@ -33,7 +32,7 @@ internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
 internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
 internal val ALL_MEDIA_TYPE = MediaType.parse("all")
 
-internal const val API_VERSION = "0.1.5"
+internal const val API_VERSION = "0.1.8"
 
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
@@ -48,8 +47,12 @@ internal class HttpManager(
     private val botService: BotApi = retrofit.create(BotApi::class.java)
 ) {
 
-    suspend fun getBotInfo(): HttpResult<User> {
+    suspend fun getBotInfo(): HttpResult<Bot> {
         return botService.getBotInfo(botToken, API_VERSION).await()
+    }
+
+    suspend fun editBotInfo(botInfo: RequestBot): HttpResult<Bot> {
+        return botService.editBotInfo(botToken, API_VERSION, botInfo).await()
     }
 
     suspend fun getUpdates(marker: Long?): Updates {

@@ -59,10 +59,6 @@ class SendMessage(
     }
 }
 
-internal fun createSendMessageForKeyboard(sendMessage: SendMessage, keyboard: InlineKeyboard): SendMessage {
-    return SendMessage(sendMessage.text, listOf(AttachmentKeyboard(AttachType.INLINE_KEYBOARD.value, keyboard)), sendMessage.notifyUser)
-}
-
 internal fun createSendMessageForImageUrl(sendMessage: SendMessage, imageUrl: ImageUrl): SendMessage {
     return SendMessage(sendMessage.text,
         listOf(AttachmentPhotoWithUrl(AttachType.IMAGE.value, PayloadUrl(imageUrl.value))), sendMessage.notifyUser)
@@ -79,14 +75,15 @@ internal fun createSendMessageForMediaToken(uploadType: UploadType, sendMessage:
 
 internal fun createSendMessageForReusableMedia(sendMessage: SendMessage, reusableMediaParams: ReusableMediaParams): SendMessage {
     val attachments = listOf(when {
-        reusableMediaParams.uploadType == UploadType.PHOTO && reusableMediaParams.photoToken != null ->
-            AttachmentPhotoWithToken(AttachType.IMAGE.value, PayloadToken(reusableMediaParams.photoToken))
-        reusableMediaParams.uploadType == UploadType.VIDEO && reusableMediaParams.id != null ->
-            AttachmentMediaWithUploadData(AttachType.VIDEO.value, UploadInfo(id = reusableMediaParams.id))
-        reusableMediaParams.uploadType == UploadType.AUDIO && reusableMediaParams.id != null ->
-            AttachmentMediaWithUploadData(AttachType.AUDIO.value, UploadInfo(id = reusableMediaParams.id))
-        reusableMediaParams.uploadType == UploadType.FILE && reusableMediaParams.fileId != null ->
-            AttachmentMediaWithUploadData(AttachType.FILE.value, UploadInfo(id = reusableMediaParams.fileId))
+        reusableMediaParams.token == null -> throw IllegalArgumentException("Token is null")
+        reusableMediaParams.uploadType == UploadType.PHOTO ->
+            AttachmentPhotoWithToken(AttachType.IMAGE.value, PayloadToken(reusableMediaParams.token))
+        reusableMediaParams.uploadType == UploadType.VIDEO ->
+            AttachmentMediaWithUploadData(AttachType.VIDEO.value, UploadInfo(token = reusableMediaParams.token))
+        reusableMediaParams.uploadType == UploadType.AUDIO ->
+            AttachmentMediaWithUploadData(AttachType.AUDIO.value, UploadInfo(token = reusableMediaParams.token))
+        reusableMediaParams.uploadType == UploadType.FILE ->
+            AttachmentMediaWithUploadData(AttachType.FILE.value, UploadInfo(token = reusableMediaParams.token))
         else -> throw IllegalStateException("Unknown upload type")
     })
     return SendMessage(sendMessage.text, attachments, sendMessage.notifyUser)
@@ -94,8 +91,4 @@ internal fun createSendMessageForReusableMedia(sendMessage: SendMessage, reusabl
 
 internal fun createSendMessageForImageToken(sendMessage: SendMessage, response: UploadInfo): SendMessage {
     return SendMessage(sendMessage.text, listOf(AttachmentPhoto(AttachType.IMAGE.value, response)), sendMessage.notifyUser)
-}
-
-internal fun createSendMessageForListImageTokens(sendMessage: SendMessage, uploadedTokens: List<UploadInfo>): SendMessage {
-    return SendMessage(sendMessage.text, uploadedTokens.map { AttachmentPhoto(AttachType.IMAGE.value, it) }, sendMessage.notifyUser)
 }

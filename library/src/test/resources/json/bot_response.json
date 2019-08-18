@@ -1,0 +1,18 @@
+{
+  "user_id": 1,
+  "name": "TestBot",
+  "username": "",
+  "avatar_url": "mail.ru",
+  "full_avatar_url": "mail.ru/full",
+  "commands": [
+    {
+      "name": "awesome",
+      "description": "my_awesome_command"
+    },
+    {
+      "name": "awesome_two",
+      "description": "my_awesome_command_two"
+    }
+  ],
+  "description": "I can everything"
+}

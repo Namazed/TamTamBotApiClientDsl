@@ -2,13 +2,13 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("kotlinx-serialization") version "1.3.30"
-    id("org.jetbrains.dokka") version "0.9.17"
+    id("kotlinx-serialization") version "1.3.40"
+    id("org.jetbrains.dokka") version "0.9.18"
     maven
 }
 
 group = "com.github.Namazed"
-version = "0.2.2"
+version = "0.3.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks

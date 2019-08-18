@@ -37,6 +37,20 @@ data class AttachmentLocation(
 /**
  * This object may contains in [SendMessage]
  *
+ * @param width - width of sticker
+ * @param height - height of sticker
+ * @param payload - see [PayloadSticker]
+ */
+data class AttachmentSticker(
+    override val type: AttachType,
+    val width: Int,
+    val height: Int,
+    val payload: PayloadSticker
+) : Attachment
+
+/**
+ * This object may contains in [SendMessage]
+ *
  * @param callbackId - For [AttachType.INLINE_KEYBOARD]. Unique identifier of keyboard
  * @param payload - see [PayloadKeyboard]
  */
@@ -73,7 +87,9 @@ data class AttachmentMedia(
  */
 data class AttachmentFile(
     override val type: AttachType,
-    val payload: PayloadFile
+    val payload: PayloadFile,
+    val filename: String,
+    val fileSize: Long
 ) : Attachment
 
 /**
@@ -119,6 +135,17 @@ data class PayloadPhoto(
 data class PayloadMedia(
     val url: String,
     val id: Long = -1
+)
+
+/**
+ * This object may contains in [Attachment]
+ *
+ * @param url - For sticker attaches. Url of sticker
+ * @param code - For sticker attaches. Reusable code which you want send with other messages.
+ */
+data class PayloadSticker(
+    val url: String,
+    val code: String
 )
 
 /**

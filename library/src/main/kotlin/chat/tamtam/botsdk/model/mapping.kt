@@ -16,6 +16,7 @@ import chat.tamtam.botsdk.model.prepared.AttachmentKeyboard
 import chat.tamtam.botsdk.model.prepared.AttachmentLocation
 import chat.tamtam.botsdk.model.prepared.AttachmentMedia
 import chat.tamtam.botsdk.model.prepared.AttachmentPhoto
+import chat.tamtam.botsdk.model.prepared.AttachmentSticker
 import chat.tamtam.botsdk.model.prepared.Body
 import chat.tamtam.botsdk.model.prepared.ChatIcon
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
@@ -25,6 +26,7 @@ import chat.tamtam.botsdk.model.prepared.PayloadFile
 import chat.tamtam.botsdk.model.prepared.PayloadKeyboard
 import chat.tamtam.botsdk.model.prepared.PayloadMedia
 import chat.tamtam.botsdk.model.prepared.PayloadPhoto
+import chat.tamtam.botsdk.model.prepared.PayloadSticker
 import chat.tamtam.botsdk.model.prepared.UpdateBot
 import chat.tamtam.botsdk.model.prepared.UpdateCallback
 import chat.tamtam.botsdk.model.prepared.UpdateChatTitle
@@ -34,7 +36,9 @@ import chat.tamtam.botsdk.model.prepared.UpdateUnknown
 import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
 import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
 import chat.tamtam.botsdk.model.prepared.UpdatesList
+import chat.tamtam.botsdk.model.request.Command
 import chat.tamtam.botsdk.model.response.Attachment
+import chat.tamtam.botsdk.model.response.Bot
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.Chat
 import chat.tamtam.botsdk.model.response.ChatMember
@@ -54,12 +58,15 @@ import chat.tamtam.botsdk.model.response.User
 import chat.tamtam.botsdk.model.response.linkTypeFrom
 import chat.tamtam.botsdk.model.response.permissionFrom
 import chat.tamtam.botsdk.model.prepared.Attachment as PreparedAttachment
+import chat.tamtam.botsdk.model.prepared.Bot as PreparedBot
 import chat.tamtam.botsdk.model.prepared.Callback as PreparedCallback
 import chat.tamtam.botsdk.model.prepared.Chat as PreparedChat
 import chat.tamtam.botsdk.model.prepared.ChatMember as PreparedChatMember
+import chat.tamtam.botsdk.model.prepared.Command as PreparedCommand
 import chat.tamtam.botsdk.model.prepared.Link as PreparedLink
 import chat.tamtam.botsdk.model.prepared.Message as PreparedMessage
 import chat.tamtam.botsdk.model.prepared.Recipient as PreparedRecipient
+import chat.tamtam.botsdk.model.prepared.Statistics as PreparedStatistics
 import chat.tamtam.botsdk.model.prepared.Update as PreparedUpdate
 import chat.tamtam.botsdk.model.prepared.User as PreparedUser
 
@@ -70,6 +77,12 @@ fun List<UserId>?.mapOrNull(): List<Long>? {
             .toList()
     }
 }
+
+internal fun Bot.map(): PreparedBot = PreparedBot(PreparedUser(UserId(userId), name, username, avatarUrl,
+    fullAvatarUrl), commands.mapCommands(), description)
+
+internal fun List<Command>.mapCommands(): List<PreparedCommand> =
+    map {command -> PreparedCommand(command.name, command.description ?: "")}
 
 internal fun User.map(): PreparedUser = PreparedUser(UserId(userId), name, username, avatarUrl, fullAvatarUrl)
 
@@ -96,7 +109,7 @@ internal fun Recipient.map(): PreparedRecipient = PreparedRecipient(ChatId(chatI
 internal fun Link.map(): PreparedLink = PreparedLink(linkTypeFrom(type), sender.map(), ChatId(chatId), message.map())
 
 internal fun Message.map(): PreparedMessage {
-    return PreparedMessage(messageInfo.map(), recipient.map(), sender.map(), timestamp, link?.map())
+    return PreparedMessage(messageInfo.map(), recipient.map(), sender.map(), timestamp, link?.map(), PreparedStatistics(statistics.views))
 }
 
 internal fun MessageInfo.map(): Body = Body(MessageId(messageId), sequenceIdInChat, attachments.map(), text)
@@ -118,8 +131,9 @@ internal fun Callback.map(): PreparedCallback = PreparedCallback(timestamp, Call
 internal fun Attachment.map(): PreparedAttachment {
     return when (type) {
         IMAGE -> AttachmentPhoto(type, PayloadPhoto(payload.photoId, payload.token, payload.url))
-        VIDEO, AUDIO, STICKER, SHARE -> AttachmentMedia(type, PayloadMedia(payload.url, payload.id))
-        FILE -> AttachmentFile(type, PayloadFile(payload.url, payload.fileId))
+        VIDEO, AUDIO, SHARE -> AttachmentMedia(type, PayloadMedia(payload.url, payload.id))
+        STICKER -> AttachmentSticker(type, stickerWidth, stickerHeight, PayloadSticker(payload.url, payload.stickerCode))
+        FILE -> AttachmentFile(type, PayloadFile(payload.url, payload.fileId), filename, fileSize)
         CONTACT -> AttachmentContact(type, PayloadContact(payload.vcfInfo, payload.tamInfo.map()))
         INLINE_KEYBOARD -> AttachmentKeyboard(type, CallbackId(callbackId), PayloadKeyboard(payload.buttons))
         LOCATION -> AttachmentLocation(type, latitude, longitude)
@@ -143,10 +157,10 @@ internal fun Update.map(): PreparedUpdate {
         UpdateType.CALLBACK -> UpdateCallback(updateType, timestamp, message.mapOrNull(), callback!!.map())
         UpdateType.MESSAGE_CREATED, UpdateType.MESSAGE_EDITED -> UpdateMessage(updateType, timestamp, message!!.map())
         UpdateType.MESSAGE_REMOVED -> UpdateMessageRemoved(updateType, timestamp, MessageId(messageId))
-        UpdateType.BOT_ADDED, UpdateType.BOT_REMOVED, UpdateType.BOT_STARTED -> UpdateBot(updateType, timestamp, ChatId(chatId), UserId(userId))
-        UpdateType.USER_ADDED -> UpdateUserAdded(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(inviterId))
-        UpdateType.USER_REMOVED -> UpdateUserRemoved(updateType, timestamp, ChatId(chatId), UserId(userId), UserId(adminId))
-        UpdateType.CHAT_TITLE_CHANGED -> UpdateChatTitle(updateType, timestamp, ChatId(chatId), UserId(userId), newChatTitle)
+        UpdateType.BOT_ADDED, UpdateType.BOT_REMOVED, UpdateType.BOT_STARTED -> UpdateBot(updateType, timestamp, ChatId(chatId), user.map())
+        UpdateType.USER_ADDED -> UpdateUserAdded(updateType, timestamp, ChatId(chatId), user.map(), UserId(inviterId))
+        UpdateType.USER_REMOVED -> UpdateUserRemoved(updateType, timestamp, ChatId(chatId), user.map(), UserId(adminId))
+        UpdateType.CHAT_TITLE_CHANGED -> UpdateChatTitle(updateType, timestamp, ChatId(chatId), user.map(), newChatTitle)
         UpdateType.UNKNOWN -> UpdateUnknown(updateType, timestamp)
     }
 }
@@ -161,6 +175,7 @@ internal fun Updates.map(): UpdatesList {
 internal inline fun <reified R, reified PR> R.map(): PR {
     return when(this) {
         is User -> this.map() as PR
+        is Bot -> this.map() as PR
         is Message -> this.map() as PR
         is Messages -> this.map() as PR
         is SendMessage -> this.map() as PR
