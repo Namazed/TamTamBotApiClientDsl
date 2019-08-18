@@ -16,6 +16,7 @@ import chat.tamtam.botsdk.model.prepared.AttachmentKeyboard
 import chat.tamtam.botsdk.model.prepared.AttachmentLocation
 import chat.tamtam.botsdk.model.prepared.AttachmentMedia
 import chat.tamtam.botsdk.model.prepared.AttachmentPhoto
+import chat.tamtam.botsdk.model.prepared.AttachmentSticker
 import chat.tamtam.botsdk.model.prepared.Body
 import chat.tamtam.botsdk.model.prepared.ChatIcon
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
@@ -25,6 +26,7 @@ import chat.tamtam.botsdk.model.prepared.PayloadFile
 import chat.tamtam.botsdk.model.prepared.PayloadKeyboard
 import chat.tamtam.botsdk.model.prepared.PayloadMedia
 import chat.tamtam.botsdk.model.prepared.PayloadPhoto
+import chat.tamtam.botsdk.model.prepared.PayloadSticker
 import chat.tamtam.botsdk.model.prepared.UpdateBot
 import chat.tamtam.botsdk.model.prepared.UpdateCallback
 import chat.tamtam.botsdk.model.prepared.UpdateChatTitle
@@ -129,7 +131,8 @@ internal fun Callback.map(): PreparedCallback = PreparedCallback(timestamp, Call
 internal fun Attachment.map(): PreparedAttachment {
     return when (type) {
         IMAGE -> AttachmentPhoto(type, PayloadPhoto(payload.photoId, payload.token, payload.url))
-        VIDEO, AUDIO, STICKER, SHARE -> AttachmentMedia(type, PayloadMedia(payload.url, payload.id))
+        VIDEO, AUDIO, SHARE -> AttachmentMedia(type, PayloadMedia(payload.url, payload.id))
+        STICKER -> AttachmentSticker(type, stickerWidth, stickerHeight, PayloadSticker(payload.url, payload.stickerCode))
         FILE -> AttachmentFile(type, PayloadFile(payload.url, payload.fileId), filename, fileSize)
         CONTACT -> AttachmentContact(type, PayloadContact(payload.vcfInfo, payload.tamInfo.map()))
         INLINE_KEYBOARD -> AttachmentKeyboard(type, CallbackId(callbackId), PayloadKeyboard(payload.buttons))

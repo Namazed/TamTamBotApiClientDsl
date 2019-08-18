@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Default(
-    val success: Boolean
+    val success: Boolean,
+    val message: String? = null
 )

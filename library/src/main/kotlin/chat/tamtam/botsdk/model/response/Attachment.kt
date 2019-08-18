@@ -27,6 +27,8 @@ class Attachment(
     @SerialName("size") val fileSize: Long = -1,
     val latitude: Double = -1.0,
     val longitude: Double = -1.0,
+    @SerialName("width") val stickerWidth: Int = -1,
+    @SerialName("height") val stickerHeight: Int = -1,
     val payload: Payload = EMPTY_PAYLOAD
 )
 
@@ -43,6 +45,7 @@ class Attachment(
 @Serializable
 class Payload(
     @SerialName("photo_id") val photoId: Long = -1,
+    @SerialName("code") val stickerCode: String = "",
     val token: String = "",
     val url: String = "",
     val id: Long = -1,
