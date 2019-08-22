@@ -1,17 +1,27 @@
+import groovy.lang.GroovyObject
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import groovy.util.Node
+import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
+import org.jfrog.gradle.plugin.artifactory.dsl.ResolverConfig
 
 plugins {
     id("kotlinx-serialization") version "1.3.40"
-    id("org.jetbrains.dokka") version "0.9.18"
-    maven
+    id("com.github.johnrengelman.shadow") version "2.0.4"
+    id("com.jfrog.bintray") version "1.8.4"
+    id("com.jfrog.artifactory") version "4.9.8"
+    `maven-publish`
 }
 
-group = "com.github.Namazed"
+group = "com.namazed"
 version = "0.3.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
+val shadowJar: ShadowJar by tasks
+val test: Test by tasks
+val artifactID = "botsdk"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -25,6 +35,11 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver:3.14.0")
 }
 
+shadowJar.apply {
+    baseName = artifactID
+    classifier = ""
+}
+
 tasks.withType<KotlinCompile>().all {
     kotlinOptions.jvmTarget = "1.8"
 }
@@ -33,7 +48,7 @@ compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
-tasks.withType<DokkaTask> {
+dokka.apply {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
 }
@@ -45,10 +60,71 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(dokka)
 }
 
-tasks.withType<Test> {
+test.apply {
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
+    }
+}
+
+artifactory {
+    setContextUrl("http://oss.jfrog.org")
+    publish(delegateClosureOf<PublisherConfig> {
+        repository(delegateClosureOf<GroovyObject> {
+            val targetRepoKey = "oss-snapshot-local"
+            setProperty("repoKey", targetRepoKey)
+            setProperty("username", project.findProperty("bintray.user") ?: "nouser")
+            setProperty("password", project.findProperty("bintray.key") ?: "nopass")
+            setProperty("maven", true)
+        })
+        defaults(delegateClosureOf<GroovyObject> {
+            invokeMethod("publications", "mavenPublication")
+        })
+    })
+    resolve(delegateClosureOf<ResolverConfig> {
+        setProperty("repoKey", "jcenter")
+    })
+}
+
+configure<PublishingExtension> {
+    publications.withType(MavenPublication::class.java).forEach {
+        with(it) {
+            artifactId = artifactID
+            artifact(shadowJar)
+            addNodeToPom(this)
+        }
+    }
+}
+
+fun addNodeToPom(mavenPublication: MavenPublication) {
+    mavenPublication.pom.withXml {
+        asNode().appendNode("dependencies").let { depNode ->
+            configurations.compile.allDependencies.forEach { appendDependencyToNode(depNode, it) }
+        }
+    }
+}
+
+fun appendDependencyToNode(depNode: Node, dep: Dependency) {
+    depNode.appendNode("dependency").apply {
+        appendNode("groupId", dep.group)
+        appendNode("artifactId", dep.name)
+        appendNode("version", dep.version)
+    }
+}
+
+fun findProperty(s: String) = project.findProperty(s) as String?
+bintray {
+    user = findProperty("bintray.user")
+    key = findProperty("bintray.key")
+    publish = true
+    setPublications("mavenPublication")
+    with(pkg) {
+        repo = "tamtam_bot_dsl_client"
+        name = "TamTamBotApiClientDsl"
+        userOrg = "namazed"
+        vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl"
+        setLabels("kotlin")
+        setLicenses("Apache 2.0")
     }
 }
 

@@ -2,16 +2,17 @@ import java.net.URI
 
 plugins {
     kotlin("jvm") version "1.3.40"
+    id("org.jetbrains.dokka") version "0.9.18"
 }
 
 project(":library") {
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.dokka")
 }
 
 project(":sample") {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 }
-
 
 allprojects {
     repositories {

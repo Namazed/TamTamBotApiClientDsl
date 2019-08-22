@@ -58,7 +58,7 @@ fun main() {
 
             onUnknownCommand {
                 // You can reuse some medias in other messages. Reusable token or id or fileId, you will get after send message with media
-                "Reuse had already sent image" prepareFor it.command.message.sender.userId sendWith ReusableMediaParams(UploadType.PHOTO, photoToken = "TOKEN")
+                "Reuse had already sent image" prepareFor it.command.message.sender.userId sendWith ReusableMediaParams(UploadType.PHOTO, token = "TOKEN")
 
                 """I'm sorry, but I don't know this command, you can try write /help
                     |if you don't remember all my available command.""".trimMargin() sendFor it.command.message.sender.userId

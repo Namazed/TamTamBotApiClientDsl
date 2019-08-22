@@ -10,7 +10,7 @@ pluginManagement {
         }
     }
 }
-rootProject.name = 'BotSdk'
-include 'sample', 'library'
+rootProject.name = "BotSdk"
+include( "sample", "library")
 
 

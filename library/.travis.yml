@@ -1,0 +1,31 @@
+language: java
+install: true
+
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
+before_install:
+  - chmod -R +x src
+  - chmod +x gradlew
+
+stages:
+  - name: build
+  - name: snapshot
+    if: branch = master AND type IN (push)
+  - name: release
+    if: branch = release AND type IN (push)
+
+jobs:
+  include:
+
+    - stage: build
+      script: ./gradlew build
+
+    - stage: snapshot
+      script: ./gradlew artifactoryPublish -x test -Dsnapshot=true -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+
+    - stage: release
+      script: ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
