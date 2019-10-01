@@ -5,9 +5,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.util.Node
 import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
 import org.jfrog.gradle.plugin.artifactory.dsl.ResolverConfig
+import sun.security.krb5.internal.KDCOptions.with
+import javax.xml.ws.Endpoint.publish
 
 plugins {
-    id("kotlinx-serialization") version "1.3.40"
+    id("kotlinx-serialization") version "1.3.50"
     id("com.github.johnrengelman.shadow") version "2.0.4"
     id("com.jfrog.bintray") version "1.8.4"
     id("com.jfrog.artifactory") version "4.9.8"
