@@ -3,6 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "com.github.Namazed"
 version = "0.3.0"
 
+plugins {
+    kotlin("jvm")
+}
+
 repositories {
     mavenCentral()
 }

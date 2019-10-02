@@ -1,4 +1,4 @@
-pluginManagement {
+/*pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "kotlin-multiplatform") {
@@ -9,7 +9,7 @@ pluginManagement {
             }
         }
     }
-}
+}*/
 rootProject.name = "BotSdk"
 include( "sample", "library")
 

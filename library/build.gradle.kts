@@ -1,18 +1,19 @@
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.lang.GroovyObject
+import groovy.util.Node
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import groovy.util.Node
 import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
 import org.jfrog.gradle.plugin.artifactory.dsl.ResolverConfig
-import sun.security.krb5.internal.KDCOptions.with
-import javax.xml.ws.Endpoint.publish
 
 plugins {
-    id("kotlinx-serialization") version "1.3.50"
-    id("com.github.johnrengelman.shadow") version "2.0.4"
-    id("com.jfrog.bintray") version "1.8.4"
-    id("com.jfrog.artifactory") version "4.9.8"
+    kotlin("jvm")
+    id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.github.johnrengelman.shadow")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
     `maven-publish`
 }
 
@@ -29,7 +30,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("ch.qos.logback:logback-classic:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
@@ -114,10 +115,10 @@ fun appendDependencyToNode(depNode: Node, dep: Dependency) {
     }
 }
 
-fun findProperty(s: String) = project.findProperty(s) as String?
+fun String.findProperty() = project.findProperty(this) as String?
 bintray {
-    user = findProperty("bintray.user")
-    key = findProperty("bintray.key")
+    user = "bintray.user".findProperty()
+    key = "bintray.key".findProperty()
     publish = true
     setPublications("mavenPublication")
     with(pkg) {
