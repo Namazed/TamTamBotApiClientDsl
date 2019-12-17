@@ -27,13 +27,14 @@ val test: Test by tasks
 val bintrayUser = "BINTRAY_USER"
 val bintrayKey = "BINTRAY_KEY"
 val artifactID = project.name
+val groupID = project.group as String
 val currentVersion = project.version as String
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("ch.qos.logback:logback-classic:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
@@ -73,6 +74,18 @@ test.apply {
     }
 }
 
+publishing {
+    publications {
+        val mavenJava by creating(MavenPublication::class) {
+            artifactId = artifactID
+            groupId = groupID
+            version = currentVersion
+            artifact(shadowJar)
+            addNodeToPom(this)
+        }
+    }
+}
+
 artifactory {
     setContextUrl("http://oss.jfrog.org")
     publish(delegateClosureOf<PublisherConfig> {
@@ -93,16 +106,16 @@ artifactory {
     clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
-configure<PublishingExtension> {
-    publications.withType(MavenPublication::class.java).forEach {
-        with(it) {
-            artifactId = artifactID
-            groupId = project.group as String
-            artifact(shadowJar)
-            addNodeToPom(this)
-        }
-    }
-}
+//configure<PublishingExtension> {
+//    publications.withType(MavenPublication::class.java).forEach {
+//        with(it) {
+//            artifactId = artifactId
+//            groupId = groupId
+//            artifact(shadowJar)
+//            addNodeToPom(this)
+//        }
+//    }
+//}
 
 fun addNodeToPom(mavenPublication: MavenPublication) {
     mavenPublication.pom.withXml {

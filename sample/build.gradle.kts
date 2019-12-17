@@ -14,6 +14,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":library"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
     testImplementation("junit", "junit", "4.12")
 }
 
