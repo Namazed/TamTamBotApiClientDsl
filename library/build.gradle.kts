@@ -17,14 +17,17 @@ plugins {
     `maven-publish`
 }
 
-group = "com.namazed"
+group = "com.namazed.botsdk"
 version = "0.3.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
 val shadowJar: ShadowJar by tasks
 val test: Test by tasks
-val artifactID = "botsdk"
+val bintrayUser = "BINTRAY_USER"
+val bintrayKey = "BINTRAY_KEY"
+val artifactID = project.name
+val currentVersion = project.version as String
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -76,8 +79,8 @@ artifactory {
         repository(delegateClosureOf<GroovyObject> {
             val targetRepoKey = "oss-snapshot-local"
             setProperty("repoKey", targetRepoKey)
-            setProperty("username", project.findProperty("bintray.user") ?: "nouser")
-            setProperty("password", project.findProperty("bintray.key") ?: "nopass")
+            setProperty("username", project.findProperty(bintrayUser) ?: "nouser")
+            setProperty("password", project.findProperty(bintrayKey) ?: "nopass")
             setProperty("maven", true)
         })
         defaults(delegateClosureOf<GroovyObject> {
@@ -87,12 +90,14 @@ artifactory {
     resolve(delegateClosureOf<ResolverConfig> {
         setProperty("repoKey", "jcenter")
     })
+    clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
 configure<PublishingExtension> {
     publications.withType(MavenPublication::class.java).forEach {
         with(it) {
             artifactId = artifactID
+            groupId = project.group as String
             artifact(shadowJar)
             addNodeToPom(this)
         }
@@ -101,8 +106,8 @@ configure<PublishingExtension> {
 
 fun addNodeToPom(mavenPublication: MavenPublication) {
     mavenPublication.pom.withXml {
-        asNode().appendNode("dependencies").let { depNode ->
-            configurations.compile.allDependencies.forEach { appendDependencyToNode(depNode, it) }
+        configurations.compile.allDependencies.forEach {
+            appendDependencyToNode(asNode().appendNode("dependencies"), it)
         }
     }
 }
@@ -117,17 +122,21 @@ fun appendDependencyToNode(depNode: Node, dep: Dependency) {
 
 fun String.findProperty() = project.findProperty(this) as String?
 bintray {
-    user = "bintray.user".findProperty()
-    key = "bintray.key".findProperty()
+    user = bintrayUser.findProperty()
+    key = bintrayKey.findProperty()
     publish = true
     setPublications("mavenPublication")
     with(pkg) {
         repo = "tamtam_bot_dsl_client"
-        name = "TamTamBotApiClientDsl"
+        name = artifactID
         userOrg = "namazed"
-        vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl"
+        vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl.git"
         setLabels("kotlin")
         setLicenses("Apache 2.0")
+        version = VersionConfig().apply {
+            name = currentVersion
+            vcsTag = currentVersion
+        }
     }
 }
 

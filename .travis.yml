@@ -14,13 +14,12 @@ before_install:
 stages:
   - name: build
   - name: snapshot
-    if: branch = master AND type IN (push)
+    if: branch = master AND type IN (push, pull_request)
   - name: release
-    if: branch = release AND type IN (push)
+    if: branch = release AND type IN (push, pull_request)
 
 jobs:
   include:
-
     - stage: build
       script: ./gradlew build
 
