@@ -12,7 +12,9 @@ addons:
       - oracle-java8-installer
 
 before_install:
+  - cd library
   - chmod -R +x src
+  - cd ..
   - chmod +x gradlew
 
 stages:
