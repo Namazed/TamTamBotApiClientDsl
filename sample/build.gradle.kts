@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-group = "com.github.Namazed"
+group = "com.namazed.botsdk"
 version = "0.3.0"
 
 plugins {
