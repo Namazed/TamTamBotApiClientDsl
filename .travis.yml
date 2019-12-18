@@ -16,10 +16,12 @@ before_install:
   - chmod -R +x src
   - cd ..
   - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
 
 script:
   - ./gradlew test build
-  - ./gradlew codeCoverageReport
+  - ./gradlew build codeCoverageReport
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
