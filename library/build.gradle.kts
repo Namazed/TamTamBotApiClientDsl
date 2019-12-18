@@ -15,6 +15,7 @@ plugins {
     id("com.jfrog.bintray")
     id("com.jfrog.artifactory")
     `maven-publish`
+    jacoco
 }
 
 group = "com.namazed.botsdk"
@@ -51,6 +52,32 @@ tasks.withType<KotlinCompile>().all {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+val codeCoverageReport by tasks.creating(JacocoReport::class) {
+    executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+    subprojects.onEach {
+        sourceSets(it.sourceSets["main"])
+    }
+
+    reports {
+        sourceDirectories =  files(sourceSets["main"].allSource.srcDirs)
+        classDirectories =  files(sourceSets["main"].output)
+        xml.isEnabled = true
+        xml.destination = File("$buildDir/reports/jacoco/report.xml")
+        html.isEnabled = false
+        csv.isEnabled = false
+    }
+
+    dependsOn("test")
+}
+
+test.apply {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
@@ -65,13 +92,6 @@ val dokkaJar by tasks.creating(Jar::class) {
     description = "Assembles Kotlin docs with Dokka"
     classifier = "javadoc"
     from(dokka)
-}
-
-test.apply {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
 }
 
 publishing {

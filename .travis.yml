@@ -17,6 +17,12 @@ before_install:
   - cd ..
   - chmod +x gradlew
 
+script:
+  - ./gradlew test build
+  - ./gradlew codeCoverageReport
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 stages:
   - name: build
   - name: snapshot
