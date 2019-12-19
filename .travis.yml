@@ -18,16 +18,9 @@ before_install:
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
 
-script:
-  - ./gradlew test build
-  - ./gradlew codeCoverageReport
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
 stages:
   - name: build
-  - name: snapshot
+  - name: master
     if: branch = master AND type IN (push, pull_request)
   - name: release
     if: branch = release AND type IN (push, pull_request)
@@ -37,8 +30,14 @@ jobs:
     - stage: build
       script: ./gradlew build
 
-    - stage: snapshot
-      script: ./gradlew artifactoryPublish -x test -Dsnapshot=true -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+    - stage: master
+      script:
+        - ./gradlew test build
+        - ./gradlew codeCoverageReport
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 
     - stage: release
-      script: ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+      script:
+        - ./gradlew test build
+        - ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER

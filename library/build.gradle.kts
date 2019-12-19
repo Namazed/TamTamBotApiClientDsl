@@ -1,9 +1,7 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import groovy.lang.GroovyObject
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
 
 plugins {
     kotlin("jvm")
@@ -106,24 +104,6 @@ publishing {
             artifact(dokkaJar)
         }
     }
-}
-
-artifactory {
-    setContextUrl("https://oss.jfrog.org")
-    publish(delegateClosureOf<PublisherConfig> {
-        repository(delegateClosureOf<GroovyObject> {
-            setProperty("repoKey", "oss-snapshot-local")
-            setProperty("username", bintrayUser.findBintrayUser())
-            setProperty("password", bintrayKey.findBintrayKey())
-            setProperty(publicationName, true)
-        })
-        defaults(delegateClosureOf<GroovyObject> {
-            invokeMethod("publications", publicationName)
-            setProperty("publishArtifacts", true)
-            setProperty("publishPom", true)
-        })
-    })
-    clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
 fun String.findProperty() = project.findProperty(this) as String?
