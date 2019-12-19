@@ -109,7 +109,7 @@ publishing {
 }
 
 artifactory {
-    setContextUrl("https://oss.jfrog.org/artifactory")
+    setContextUrl("https://oss.jfrog.org")
     publish(delegateClosureOf<PublisherConfig> {
         repository(delegateClosureOf<GroovyObject> {
             setProperty("repoKey", "oss-snapshot-local")
@@ -123,7 +123,7 @@ artifactory {
             setProperty("publishPom", true)
         })
     })
-//    clientConfig.info.buildNumber = System.getProperty("build.number")
+    clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
 fun String.findProperty() = project.findProperty(this) as String?
