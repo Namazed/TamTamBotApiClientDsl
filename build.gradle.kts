@@ -1,17 +1,13 @@
 import java.net.URI
 
 plugins {
-    kotlin("jvm") version "1.3.40"
+    kotlin("jvm") version "1.3.50" apply false
+    id("org.jetbrains.dokka") version "0.9.18"  apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.3.50" apply false
+    id("com.github.johnrengelman.shadow") version "2.0.4" apply false
+    id("com.jfrog.bintray") version "1.8.4" apply false
+    id("com.jfrog.artifactory") version "4.9.8" apply false
 }
-
-project(":library") {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-}
-
-project(":sample") {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-}
-
 
 allprojects {
     repositories {

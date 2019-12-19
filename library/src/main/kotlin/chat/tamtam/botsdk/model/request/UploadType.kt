@@ -1,11 +1,13 @@
 package chat.tamtam.botsdk.model.request
 
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.internal.EnumSerializer
 
 /**
  * This is enum for media type which you want upload
  */
+@UseExperimental(InternalSerializationApi::class)
 @Serializable(EnumSerializer::class)
 enum class UploadType(val type: String) {
     PHOTO("photo"),
