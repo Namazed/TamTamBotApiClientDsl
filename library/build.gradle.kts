@@ -1,11 +1,9 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.lang.GroovyObject
-import groovy.util.Node
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
-import org.jfrog.gradle.plugin.artifactory.dsl.ResolverConfig
 
 plugins {
     kotlin("jvm")
@@ -30,6 +28,7 @@ val bintrayKey = "BINTRAY_KEY"
 val artifactID = project.name
 val groupID = project.group as String
 val currentVersion = project.version as String
+val publicationName = "maven"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -41,11 +40,6 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:3.14.0")
-}
-
-shadowJar.apply {
-    baseName = artifactID
-    classifier = ""
 }
 
 tasks.withType<KotlinCompile>().all {
@@ -64,7 +58,7 @@ tasks {
             sourceDirectories =  files(sourceSets["main"].allSource.srcDirs)
             classDirectories =  files(sourceSets["main"].output)
             xml.isEnabled = true
-            xml.destination = File("$buildDir/reports/jacoco/report.xml")
+            xml.destination = File("${rootProject.buildDir}/reports/jacoco/report.xml")
             html.isEnabled = false
             csv.isEnabled = false
         }
@@ -84,6 +78,11 @@ compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
+shadowJar.apply {
+    baseName = artifactID
+    classifier = ""
+}
+
 dokka.apply {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
@@ -98,61 +97,33 @@ val dokkaJar by tasks.creating(Jar::class) {
 
 publishing {
     publications {
-        val mavenJava by creating(MavenPublication::class) {
+        register(publicationName, MavenPublication::class) {
             artifactId = artifactID
             groupId = groupID
             version = currentVersion
+            from(components["java"])
             artifact(shadowJar)
-            addNodeToPom(this)
+            artifact(dokkaJar)
         }
     }
 }
 
 artifactory {
-    setContextUrl("http://oss.jfrog.org")
+    setContextUrl("https://oss.jfrog.org/artifactory")
     publish(delegateClosureOf<PublisherConfig> {
         repository(delegateClosureOf<GroovyObject> {
-            val targetRepoKey = "oss-snapshot-local"
-            setProperty("repoKey", targetRepoKey)
+            setProperty("repoKey", "oss-snapshot-local")
             setProperty("username", project.findProperty(bintrayUser) ?: "nouser")
             setProperty("password", project.findProperty(bintrayKey) ?: "nopass")
-            setProperty("maven", true)
+            setProperty(publicationName, true)
         })
         defaults(delegateClosureOf<GroovyObject> {
-            invokeMethod("publications", "mavenPublication")
+            invokeMethod("publications", publicationName)
+            setProperty("publishArtifacts", true)
+            setProperty("publishPom", true)
         })
     })
-    resolve(delegateClosureOf<ResolverConfig> {
-        setProperty("repoKey", "jcenter")
-    })
-    clientConfig.info.buildNumber = System.getProperty("build.number")
-}
-
-//configure<PublishingExtension> {
-//    publications.withType(MavenPublication::class.java).forEach {
-//        with(it) {
-//            artifactId = artifactId
-//            groupId = groupId
-//            artifact(shadowJar)
-//            addNodeToPom(this)
-//        }
-//    }
-//}
-
-fun addNodeToPom(mavenPublication: MavenPublication) {
-    mavenPublication.pom.withXml {
-        configurations.compile.allDependencies.forEach {
-            appendDependencyToNode(asNode().appendNode("dependencies"), it)
-        }
-    }
-}
-
-fun appendDependencyToNode(depNode: Node, dep: Dependency) {
-    depNode.appendNode("dependency").apply {
-        appendNode("groupId", dep.group)
-        appendNode("artifactId", dep.name)
-        appendNode("version", dep.version)
-    }
+//    clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
 fun String.findProperty() = project.findProperty(this) as String?
@@ -160,13 +131,16 @@ bintray {
     user = bintrayUser.findProperty()
     key = bintrayKey.findProperty()
     publish = true
-    setPublications("mavenPublication")
+    setPublications(publicationName)
     with(pkg) {
-        repo = "tamtam_bot_dsl_client"
+        repo = publicationName
         name = artifactID
         userOrg = "namazed"
         vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl.git"
-        setLabels("kotlin")
+        desc = "Kotlin DSL client for TamTamBotApi"
+        websiteUrl = "https://github.com/Namazed/TamTamBotApiClientDsl"
+        issueTrackerUrl = "https://github.com/Namazed/TamTamBotApiClientDsl/issues"
+        setLabels("kotlin", "dsl", "bot", "tamtam")
         setLicenses("Apache 2.0")
         version = VersionConfig().apply {
             name = currentVersion
