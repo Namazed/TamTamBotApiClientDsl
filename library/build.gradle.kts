@@ -114,7 +114,7 @@ artifactory {
         repository(delegateClosureOf<GroovyObject> {
             setProperty("repoKey", "oss-snapshot-local")
             setProperty("username", bintrayUser.findBintrayUser())
-            setProperty("password", bintrayKey.findBintrayKey())
+            setProperty("password", "BINTRAY_PASS".findBintrayPassword())
             setProperty(publicationName, true)
         })
         defaults(delegateClosureOf<GroovyObject> {
@@ -129,6 +129,7 @@ artifactory {
 fun String.findProperty() = project.findProperty(this) as String?
 fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
 fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)
+fun String.findBintrayPassword() = System.getenv(this)
 
 bintray {
     user = bintrayUser.findBintrayUser()
