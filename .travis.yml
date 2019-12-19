@@ -1,0 +1,43 @@
+language: java
+jdk:
+  - oraclejdk8
+
+dist: trusty
+sudo: false
+install: true
+
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
+before_install:
+  - cd library
+  - chmod -R +x src
+  - cd ..
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+
+stages:
+  - name: build
+  - name: master
+    if: branch = master AND type IN (push, pull_request)
+  - name: release
+    if: branch = release AND type IN (push, pull_request)
+
+jobs:
+  include:
+    - stage: build
+      script: ./gradlew build
+
+    - stage: master
+      script:
+        - ./gradlew test build
+        - ./gradlew codeCoverageReport
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+
+    - stage: release
+      script:
+        - ./gradlew test build
+        - ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER

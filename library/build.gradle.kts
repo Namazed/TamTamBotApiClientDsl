@@ -1,23 +1,38 @@
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("kotlinx-serialization") version "1.3.40"
-    id("org.jetbrains.dokka") version "0.9.18"
-    maven
+    kotlin("jvm")
+    id("org.jetbrains.dokka")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.github.johnrengelman.shadow")
+    id("com.jfrog.bintray")
+    id("com.jfrog.artifactory")
+    `maven-publish`
+    jacoco
 }
 
-group = "com.github.Namazed"
+group = "com.namazed.botsdk"
 version = "0.3.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
+val shadowJar: ShadowJar by tasks
+val test: Test by tasks
+val bintrayUser = "BINTRAY_USER"
+val bintrayKey = "BINTRAY_KEY"
+val artifactID = project.name
+val groupID = project.group as String
+val currentVersion = project.version as String
+val publicationName = "maven"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("ch.qos.logback:logback-classic:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
@@ -29,11 +44,44 @@ tasks.withType<KotlinCompile>().all {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+tasks {
+    val codeCoverageReport by creating(JacocoReport::class) {
+        executionData(fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec"))
+
+        subprojects.onEach {
+            sourceSets(it.sourceSets["main"])
+        }
+
+        reports {
+            sourceDirectories =  files(sourceSets["main"].allSource.srcDirs)
+            classDirectories =  files(sourceSets["main"].output)
+            xml.isEnabled = true
+            xml.destination = File("${rootProject.buildDir}/reports/jacoco/report.xml")
+            html.isEnabled = false
+            csv.isEnabled = false
+        }
+
+        dependsOn("test")
+    }
+}
+
+test.apply {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
-tasks.withType<DokkaTask> {
+shadowJar.apply {
+    baseName = artifactID
+    classifier = ""
+}
+
+dokka.apply {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
 }
@@ -45,10 +93,42 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(dokka)
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
+publishing {
+    publications {
+        register(publicationName, MavenPublication::class) {
+            artifactId = artifactID
+            groupId = groupID
+            version = currentVersion
+            from(components["java"])
+            artifact(shadowJar)
+            artifact(dokkaJar)
+        }
+    }
+}
+
+fun String.findProperty() = project.findProperty(this) as String?
+fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
+fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)
+
+bintray {
+    user = bintrayUser.findBintrayUser()
+    key = bintrayKey.findBintrayKey()
+    publish = true
+    setPublications(publicationName)
+    with(pkg) {
+        repo = publicationName
+        name = artifactID
+        userOrg = "namazed"
+        vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl.git"
+        desc = "Kotlin DSL client for TamTamBotApi"
+        websiteUrl = "https://github.com/Namazed/TamTamBotApiClientDsl"
+        issueTrackerUrl = "https://github.com/Namazed/TamTamBotApiClientDsl/issues"
+        setLabels("kotlin", "dsl", "bot", "tamtam")
+        setLicenses("Apache 2.0")
+        version = VersionConfig().apply {
+            name = currentVersion
+            vcsTag = currentVersion
+        }
     }
 }
 
