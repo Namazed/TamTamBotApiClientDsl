@@ -113,8 +113,8 @@ artifactory {
     publish(delegateClosureOf<PublisherConfig> {
         repository(delegateClosureOf<GroovyObject> {
             setProperty("repoKey", "oss-snapshot-local")
-            setProperty("username", project.findProperty(bintrayUser) ?: "nouser")
-            setProperty("password", project.findProperty(bintrayKey) ?: "nopass")
+            setProperty("username", bintrayUser.findBintrayUser())
+            setProperty("password", bintrayKey.findBintrayKey())
             setProperty(publicationName, true)
         })
         defaults(delegateClosureOf<GroovyObject> {
@@ -127,9 +127,12 @@ artifactory {
 }
 
 fun String.findProperty() = project.findProperty(this) as String?
+fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
+fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)
+
 bintray {
-    user = bintrayUser.findProperty()
-    key = bintrayKey.findProperty()
+    user = bintrayUser.findBintrayUser()
+    key = bintrayKey.findBintrayKey()
     publish = true
     setPublications(publicationName)
     with(pkg) {
