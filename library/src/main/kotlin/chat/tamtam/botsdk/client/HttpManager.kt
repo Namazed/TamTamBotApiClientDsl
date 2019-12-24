@@ -9,13 +9,13 @@ import chat.tamtam.botsdk.client.retrofit.RetrofitFactory
 import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.client.retrofit.await
 import chat.tamtam.botsdk.model.CallbackId
+import chat.tamtam.botsdk.model.MediaTypes
 import chat.tamtam.botsdk.model.request.UploadType
 import chat.tamtam.botsdk.model.response.Bot
 import chat.tamtam.botsdk.model.response.Default
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
-import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
@@ -27,17 +27,12 @@ import chat.tamtam.botsdk.model.request.Bot as RequestBot
 internal const val BOT_TOKEN_FIELD = "access_token"
 internal const val VERSION_FIELD = "v"
 
-internal val IMAGE_MEDIA_TYPE = MediaType.parse("image/*")
-internal val VIDEO_MEDIA_TYPE = MediaType.parse("video/*")
-internal val AUDIO_MEDIA_TYPE = MediaType.parse("audio/*")
-internal val ALL_MEDIA_TYPE = MediaType.parse("all")
-
 internal const val API_VERSION = "0.1.8"
 
 //todo delete this layer, save only specific manager, or wrap in result in this layer
 internal class HttpManager(
     internal val botToken: String,
-    internal val httpLogsEnabled: Boolean = false,
+    private val httpLogsEnabled: Boolean = false,
     retrofit: Retrofit = RetrofitFactory.createRetrofit(httpLogsEnabled = httpLogsEnabled),
     internal val messageHttpManager: MessageHttpManager = MessageHttpManager(botToken, API_VERSION, retrofit),
     internal val chatHttpManager: ChatHttpManager = ChatHttpManager(botToken, API_VERSION, retrofit),
@@ -56,8 +51,7 @@ internal class HttpManager(
     }
 
     suspend fun getUpdates(marker: Long?): Updates {
-        val resultUpdates = subscriptionHttpManager.getUpdates(marker)
-        when (resultUpdates) {
+        when (val resultUpdates = subscriptionHttpManager.getUpdates(marker)) {
             is Success<Updates> -> return resultUpdates.response
             is Failure<Updates> -> throw HttpException(resultUpdates.response)
         }
@@ -75,10 +69,10 @@ internal class HttpManager(
 
     suspend fun upload(url: String, uploadType: UploadType, byteArray: ByteArray, fileName: String): HttpResult<UploadInfo> {
         val mediaType = when (uploadType) {
-            UploadType.PHOTO -> IMAGE_MEDIA_TYPE
-            UploadType.VIDEO -> VIDEO_MEDIA_TYPE
-            UploadType.AUDIO -> AUDIO_MEDIA_TYPE
-            UploadType.FILE -> ALL_MEDIA_TYPE
+            UploadType.PHOTO -> MediaTypes.IMAGE_MEDIA_TYPE.type
+            UploadType.VIDEO -> MediaTypes.VIDEO_MEDIA_TYPE.type
+            UploadType.AUDIO -> MediaTypes.AUDIO_MEDIA_TYPE.type
+            UploadType.FILE -> MediaTypes.ALL_MEDIA_TYPE.type
         }
         val filePart = MultipartBody.Part.createFormData(
             "v1",

@@ -2,7 +2,7 @@ package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.model.response.UpdateType
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import retrofit2.HttpException
 

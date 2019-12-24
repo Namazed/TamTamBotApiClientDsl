@@ -4,7 +4,7 @@ import chat.tamtam.botsdk.client.retrofit.Success
 import chat.tamtam.botsdk.model.request.Command
 import chat.tamtam.botsdk.model.request.Photo
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import chat.tamtam.botsdk.model.request.Bot as RequestBot
 import chat.tamtam.botsdk.model.response.Bot as ResponseBot
 

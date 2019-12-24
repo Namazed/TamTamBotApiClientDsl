@@ -31,7 +31,7 @@ val publicationName = "maven"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("ch.qos.logback:logback-classic:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")

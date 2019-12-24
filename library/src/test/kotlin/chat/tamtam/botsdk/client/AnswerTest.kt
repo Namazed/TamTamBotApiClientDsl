@@ -10,9 +10,8 @@ import chat.tamtam.botsdk.model.request.AnswerCallback
 import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.response.Default
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
-import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
 class AnswerTest : ClientTest() {
 

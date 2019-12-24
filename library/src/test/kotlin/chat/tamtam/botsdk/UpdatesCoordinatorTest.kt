@@ -12,7 +12,7 @@ import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.scopes.BotScope
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicBoolean
 
 class UpdatesCoordinatorTest {

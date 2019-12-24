@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 class WebhookCommunication internal constructor(
     val botToken: String,
     private val subscriptionScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
-    val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
+    val log: Logger = LoggerFactory.getLogger(WebhookCommunication::class.java.name)
 ) : Communication {
     override fun start(botScope: BotScope, startingParams: StartingParams): Coordinator {
         subscribeIfNeeded(botScope)
