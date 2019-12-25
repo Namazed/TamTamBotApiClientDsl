@@ -15,7 +15,7 @@ import java.util.concurrent.Executors
 
 class LongPollingCommunication(
     val botToken: String,
-    private val longPollingCoroutineScope: CoroutineScope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher()),
+    private val longPollingCoroutinesScope: CoroutineScope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher()),
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
 
@@ -33,7 +33,7 @@ class LongPollingCommunication(
     }
 
     private fun runAsync(coordinator: UpdatesCoordinator, parallelWorkWithUpdates: Boolean) =
-        longPollingCoroutineScope.launch {
+        longPollingCoroutinesScope.launch {
             while (isActive) {
                 coordinator.run(parallelWorkWithUpdates)
             }
@@ -55,14 +55,14 @@ object longPolling {
         check(startingParams.botToken.isNotEmpty()) { "Bot token must is not empty" }
         val longPollingCommunication = LongPollingCommunication(startingParams.botToken)
         val botHttpManager = HttpManager(longPollingCommunication.botToken, startingParams.httpLogsEnabled)
-        return longPollingCommunication.init(botHttpManager, longPollingCommunication.log, startingParams, init)
+        return longPollingCommunication.init(botHttpManager, startingParams, longPollingCommunication.log, init)
     }
 }
 
 private fun Communication.init(
     botHttpManager: HttpManager,
-    log: Logger, startingParams:
-    StartingParams,
+    startingParams: StartingParams,
+    log: Logger,
     init: BotScope.() -> Unit
 ): Coordinator {
     log.info("Long polling bot starting")

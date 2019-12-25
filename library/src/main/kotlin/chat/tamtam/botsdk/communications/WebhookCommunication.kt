@@ -39,19 +39,19 @@ class WebhookCommunication internal constructor(
  * This class need for start webhook for your bot.
  */
 object webhook {
-    operator fun invoke(botToken: String, startingParams: StartingParams, init: BotScope.() -> Unit): Coordinator {
+    operator fun invoke(startingParams: StartingParams, init: BotScope.() -> Unit): Coordinator {
         check(startingParams is WebhookStartingParams) {
             "Wrong startingParams, for webhook you must use WebhookStartingParams"
         }
-        check(botToken.isNotEmpty()) { "Bot token must is not empty" }
+        check(startingParams.botToken.isNotEmpty()) { "Bot token must is not empty" }
         check(startingParams.subscription.url.isNotEmpty()) { "Your url must is not empty" }
-        val webHookCommunication = WebhookCommunication(botToken)
+        val webHookCommunication = WebhookCommunication(startingParams.botToken)
         val botHttpManager = HttpManager(webHookCommunication.botToken)
         return webHookCommunication.init(botHttpManager, startingParams, webHookCommunication.log, init)
     }
 }
 
-private fun Communication.init(
+internal fun WebhookCommunication.init(
     botHttpManager: HttpManager,
     startingParams: WebhookStartingParams,
     log: Logger,

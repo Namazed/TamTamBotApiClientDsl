@@ -12,7 +12,6 @@ import chat.tamtam.botsdk.model.mapOrNull
 import chat.tamtam.botsdk.model.prepared.ChatMembersList
 import chat.tamtam.botsdk.model.prepared.ChatsList
 import chat.tamtam.botsdk.model.request.AnswerCallback
-import chat.tamtam.botsdk.model.request.AnswerParams
 import chat.tamtam.botsdk.model.request.Bot
 import chat.tamtam.botsdk.model.request.ChatInfo
 import chat.tamtam.botsdk.model.request.ReusableMediaParams
@@ -29,6 +28,7 @@ import chat.tamtam.botsdk.model.response.Error
 import chat.tamtam.botsdk.model.response.Upload
 import chat.tamtam.botsdk.model.response.UploadInfo
 import chat.tamtam.botsdk.typing.TypingController
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import retrofit2.Response
@@ -347,21 +347,19 @@ class RequestsManager internal constructor(
      * @param request - this is Http request from [HttpManager] and his delegates [MessageHttpManager] and etc.
      */
     private inline fun <reified R, reified PR> startRequest(request: () -> HttpResult<R>): ResultRequest<PR> = try {
-        val httpResult = request()
-        when (httpResult) {
+        when (val httpResult = request()) {
             is Success -> ResultRequest.Success(httpResult.response.map())
             is Failure -> {
-                val error = parseError(httpResult.response)
-                ResultRequest.Failure(httpResult.response.code(), error, HttpException(httpResult.response))
+                ResultRequest.Failure(httpResult.response.code(), parseError(httpResult.response), HttpException(httpResult.response))
             }
         }
     } catch (e: HttpException) {
-        val error = parseError(e.response())
-        ResultRequest.Failure(e.code(), error, e)
+        ResultRequest.Failure(e.code(), parseError(e.response()), e)
     } catch (e: Exception) {
         ResultRequest.Failure(-1, Error(code = "general", message = e.message?.let { it } ?: ""), e)
     }
 
+    @UseExperimental(UnstableDefault::class)
     private fun <R> parseError(e: Response<R>): Error {
         return e.errorBody()?.let {
             Json.parse(Error.serializer(), it.string())

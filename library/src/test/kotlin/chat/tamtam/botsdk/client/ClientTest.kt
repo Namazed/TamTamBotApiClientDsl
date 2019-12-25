@@ -5,7 +5,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 
-open class ClientTest {
+abstract class ClientTest {
 
     protected val mockServer: MockWebServer = MockWebServer()
     internal val httpManager: HttpManager = HttpManager("bot_token",
