@@ -1,30 +1,14 @@
 package chat.tamtam.botsdk
 
-import chat.tamtam.botsdk.model.isCommand
-import chat.tamtam.botsdk.model.isCommandInChat
 import chat.tamtam.botsdk.model.map
 import chat.tamtam.botsdk.model.prepared.Update
-import chat.tamtam.botsdk.model.prepared.UpdateBot
-import chat.tamtam.botsdk.model.prepared.UpdateCallback
-import chat.tamtam.botsdk.model.prepared.UpdateMessage
-import chat.tamtam.botsdk.model.prepared.UpdateUserAdded
-import chat.tamtam.botsdk.model.prepared.UpdateUserRemoved
 import chat.tamtam.botsdk.model.prepared.UpdatesList
-import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
-import chat.tamtam.botsdk.model.toCommand
 import chat.tamtam.botsdk.scopes.BotScope
-import chat.tamtam.botsdk.state.AddedBotState
-import chat.tamtam.botsdk.state.AddedUserState
-import chat.tamtam.botsdk.state.CallbackState
-import chat.tamtam.botsdk.state.CommandState
-import chat.tamtam.botsdk.state.MessageState
-import chat.tamtam.botsdk.state.RemovedBotState
-import chat.tamtam.botsdk.state.RemovedUserState
-import chat.tamtam.botsdk.state.StartedBotState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -36,10 +20,11 @@ class UpdatesCoordinator internal constructor(
     override val botScope: BotScope,
     private var marker: Long? = null,
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name)
+    private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name),
+    private val delegate: UpdatesDelegate = DefaultUpdatesDelegate(botScope, parallelScope, log)
 ): Coordinator {
 
-    @UnstableDefault
+    @UseExperimental(UnstableDefault::class)
     override suspend fun coordinateAsync(jsonUpdates: String) {
         val updates: Updates = try {
             Json.parse(Updates.serializer(), jsonUpdates)
@@ -54,7 +39,7 @@ class UpdatesCoordinator internal constructor(
         val updatesList = updates.map()
 
         if (updatesList.updates.size > 1) {
-            coordinateUpdates(updatesList)
+            coordinate(updatesList)
             return
         }
 
@@ -78,75 +63,73 @@ class UpdatesCoordinator internal constructor(
         }
 
         if (parallelWorkWithUpdates) {
-            coordinateUpdatesParallel(updates)
+            coordinateParallel(updates)
         } else {
-            coordinateUpdates(updates)
+            coordinate(updates)
         }
     }
 
-    internal suspend fun coordinateUpdates(updatesList: UpdatesList) {
-        if (updatesList.updates.isEmpty()) {
-            return
-        }
-        updatesList.updates.forEachSequential { update: Update ->
-            coordinate(update)
-        }
+    internal suspend fun coordinate(updatesList: UpdatesList) {
+        delegate.coordinate(updatesList)
     }
 
-    suspend fun coordinateUpdatesParallel(updatesList: UpdatesList) {
-        if (updatesList.updates.isEmpty()) {
-            return
-        }
-        updatesList.updates.forEachParallel { update: Update ->
-            coordinate(update)
-        }
+    internal suspend fun coordinateParallel(updatesList: UpdatesList) {
+        delegate.coordinateParallel(updatesList)
     }
 
-    private suspend fun coordinate(update: Update) {
-        log.info("process: start process update with updateType ${update.type}")
-        when {
-            update.type == UpdateType.BOT_STARTED && update is UpdateBot -> {
-                botScope.answerOnStart(StartedBotState(update.timestamp, update.chatId, update.user))
-            }
-            update.type == UpdateType.BOT_ADDED && update is UpdateBot -> {
-                botScope.answerOnAdd(AddedBotState(update.timestamp, update.chatId, update.user))
-            }
-            update.type == UpdateType.BOT_REMOVED && update is UpdateBot -> {
-                botScope.answerOnRemove(RemovedBotState(update.timestamp, update.chatId, update.user))
-            }
-            update.type == UpdateType.USER_ADDED && update is UpdateUserAdded -> {
-                botScope.userScope.answerOnAdd(AddedUserState(update.timestamp, update.chatId, update.user, update.inviterId))
-            }
-            update.type == UpdateType.USER_REMOVED && update is UpdateUserRemoved -> {
-                botScope.userScope.answerOnRemove(RemovedUserState(update.timestamp, update.chatId, update.user, update.adminId))
-            }
-            update.type == UpdateType.MESSAGE_CREATED && update is UpdateMessage && (update.message.body.text.isCommand()
-                    || update.message.body.text.isCommandInChat()) -> {
-                val command = update.message.body.text.toCommand(update.message, update.timestamp)
-                botScope.commandScope[command.name](CommandState(update.timestamp, command))
-            }
-            update.type == UpdateType.CALLBACK && update is UpdateCallback -> {
-                val payload = update.callback.payload
-                botScope.callbacksScope[payload](CallbackState(update.timestamp, update.callback.map(), update.message))
-            }
-            update.type == UpdateType.MESSAGE_CREATED && update is UpdateMessage -> {
-                botScope.messagesScope.getAnswer()(MessageState(update.timestamp, update.message))
-            }
-        }
+    internal suspend fun coordinate(update: Update) {
+        delegate.coordinate(update)
     }
 
-    private suspend inline fun <A> Collection<A>.forEachParallel(crossinline f: suspend (A) -> Unit) =
-        map {
-            log.info("forEachParallel: create async")
-            parallelScope.async { f(it) }
-        }.forEach {
-            log.info("forEachParallel: await")
-            it.await()
+    class DefaultUpdatesDelegate(
+        private val botScope: BotScope,
+        private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+        private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name)
+    ) : UpdatesDelegate {
+
+        override suspend fun coordinate(updatesList: UpdatesList) {
+            if (updatesList.updates.isEmpty()) {
+                return
+            }
+            updatesList.updates.forEachSequential { update: Update ->
+                coordinate(update)
+            }
         }
 
-    private suspend inline fun <A> Collection<A>.forEachSequential(crossinline f: suspend (A) -> Unit) =
-        forEach {
-            log.info("forEachSequence: start process")
-            withContext(parallelScope.coroutineContext) { f(it) }
+        override suspend fun coordinateParallel(updatesList: UpdatesList) {
+            if (updatesList.updates.isEmpty()) {
+                return
+            }
+            updatesList.updates.forEachParallel { update: Update ->
+                coordinate(update)
+            }
         }
+
+        override suspend fun coordinate(update: Update) {
+            log.info("process: start process update with updateType ${update.type}")
+            update.process(botScope, log)
+        }
+
+        private suspend inline fun <A> Collection<A>.forEachParallel(crossinline f: suspend (A) -> Unit) =
+            map {
+                log.info("forEachParallel: create async")
+                parallelScope.async { f(it) }
+            }.forEach {
+                log.info("forEachParallel: await")
+                it.await()
+            }
+
+        private suspend inline fun <A> Collection<A>.mapParallel(crossinline f: suspend (A) -> Unit) =
+            map {
+                log.info("forEachParallel: create async")
+                parallelScope.async { f(it) }
+            }.toList().awaitAll()
+
+        private suspend inline fun <A> Collection<A>.forEachSequential(crossinline f: suspend (A) -> Unit) =
+            forEach {
+                log.info("forEachSequence: start process")
+                withContext(parallelScope.coroutineContext) { f(it) }
+            }
+
+    }
 }

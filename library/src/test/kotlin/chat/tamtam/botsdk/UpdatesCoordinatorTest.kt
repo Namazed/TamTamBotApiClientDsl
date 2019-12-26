@@ -2,6 +2,7 @@ package chat.tamtam.botsdk
 
 import chat.tamtam.botsdk.client.HttpManager
 import chat.tamtam.botsdk.model.map
+import chat.tamtam.botsdk.model.prepared.UpdatesList
 import chat.tamtam.botsdk.model.response.Callback
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Message
@@ -11,18 +12,93 @@ import chat.tamtam.botsdk.model.response.Update
 import chat.tamtam.botsdk.model.response.UpdateType
 import chat.tamtam.botsdk.model.response.Updates
 import chat.tamtam.botsdk.scopes.BotScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.concurrent.atomic.AtomicBoolean
 
 class UpdatesCoordinatorTest {
 
     private val botHttpManager = HttpManager("")
     private val botScope = BotScope(botHttpManager)
-    private val handler = UpdatesCoordinator(botScope)
+    private val coordinator = UpdatesCoordinator(botScope)
 
     @Test
-    fun `check that updates handler work correct when processing message created`() {
+    fun `check that coordinator for webhook updates throw exception when pass wrong json`() {
+        assertThrows<IllegalArgumentException>("Wrong threw exception, should throw IllegalArgumentException") {
+            runBlocking { coordinator.coordinateAsync("/json/answer.json".getJson()) }
+        }
+    }
+
+    @Test
+    fun `check that coordinator for webhook updates early return when work with empty list`() {
+        var coordinateCallsCount = 0
+        val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),
+            delegate = object : UpdatesDelegate {
+                override suspend fun coordinate(updatesList: UpdatesList) {
+                    coordinateCallsCount++
+                }
+
+                override suspend fun coordinate(update: chat.tamtam.botsdk.model.prepared.Update) {
+                    coordinateCallsCount++
+                }
+
+                override suspend fun coordinateParallel(updatesList: UpdatesList) {
+                    coordinateCallsCount++
+                }
+            })
+        runBlocking {
+            updatesCoordinator.coordinateAsync("/json/update_empty.json".getJson())
+        }
+        assert(coordinateCallsCount == 0) { "The coordinator didn't early return" }
+    }
+
+    @Test
+    fun `check that coordinator for webhook updates call coordinate method for one update`() {
+        var coordinateCallsCount = 0
+        val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),
+            delegate = object : UpdatesDelegate {
+                override suspend fun coordinate(updatesList: UpdatesList) {
+                }
+
+                override suspend fun coordinate(update: chat.tamtam.botsdk.model.prepared.Update) {
+                    coordinateCallsCount++
+                }
+
+                override suspend fun coordinateParallel(updatesList: UpdatesList) {
+                }
+            })
+        runBlocking {
+            updatesCoordinator.coordinateAsync("/json/update_callback.json".getJson())
+            assert(coordinateCallsCount == 1) { "The coordinator didn't call right method for process update" }
+        }
+    }
+
+    @Test
+    fun `check that coordinator for webhook updates call coordinate method for few updates`() {
+        var coordinateCallsCount = 0
+        val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),
+            delegate = object : UpdatesDelegate {
+                override suspend fun coordinate(updatesList: UpdatesList) {
+                    coordinateCallsCount++
+                }
+
+                override suspend fun coordinate(update: chat.tamtam.botsdk.model.prepared.Update) {
+                }
+
+                override suspend fun coordinateParallel(updatesList: UpdatesList) {
+                }
+            })
+        runBlocking {
+            updatesCoordinator.coordinateAsync("/json/updates.json".getJson())
+            assert(coordinateCallsCount == 1) { "The coordinator didn't call right method for process update" }
+        }
+    }
+
+    @Test
+    fun `check that updates coordinator work correct when processing message created`() {
         val processed = AtomicBoolean()
         botScope.messages {
             answerOnMessage {
@@ -35,15 +111,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed message created update"
+                "The coordinator doesn't processed message created update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing callback`() {
+    fun `check that updates coordinator work correct when processing callback`() {
         val processed = AtomicBoolean()
         botScope.callbacks {
             answerOnCallback("CHUI") {
@@ -57,15 +133,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed callback update"
+                "The coordinator doesn't processed callback update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing message created which contains command`() {
+    fun `check that updates coordinator work correct when processing message created which contains command`() {
         val processed = AtomicBoolean()
         botScope.commands {
             onCommand("/chui") {
@@ -78,15 +154,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed message created which contains command"
+                "The coordinator doesn't processed message created which contains command"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing user removed`() {
+    fun `check that updates coordinator work correct when processing user removed`() {
         val processed = AtomicBoolean()
         botScope.users {
             onRemovedUserFromChat {
@@ -98,15 +174,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed user removed update"
+                "The coordinator doesn't processed user removed update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing user added`() {
+    fun `check that updates coordinator work correct when processing user added`() {
         val processed = AtomicBoolean()
         botScope.users {
             onAddedUserToChat {
@@ -118,15 +194,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed user added update"
+                "The coordinator doesn't processed user added update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing bot removed`() {
+    fun `check that updates coordinator work correct when processing bot removed`() {
         val processed = AtomicBoolean()
         botScope.onRemoveBotFromChat {
             processed.set(true)
@@ -136,15 +212,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed bot removed update"
+                "The coordinator doesn't processed bot removed update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing bot added`() {
+    fun `check that updates coordinator work correct when processing bot added`() {
         val processed = AtomicBoolean()
         botScope.onAddBotToChat {
             processed.set(true)
@@ -154,15 +230,15 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed bot added update"
+                "The coordinator doesn't processed bot added update"
             }
         }
     }
 
     @Test
-    fun `check that updates handler work correct when processing bot started`() {
+    fun `check that updates coordinator work correct when processing bot started`() {
         val processed = AtomicBoolean()
         botScope.onStartBot {
             processed.set(true)
@@ -172,9 +248,9 @@ class UpdatesCoordinatorTest {
         val updatesList = updates.map()
 
         runBlocking {
-            handler.coordinateUpdates(updatesList)
+            coordinator.coordinate(updatesList)
             assert(processed.get()) {
-                "The handler doesn't processed bot started update"
+                "The coordinator doesn't processed bot started update"
             }
         }
     }

@@ -1,18 +1,18 @@
 package chat.tamtam.botsdk.communications
 
+import chat.tamtam.botsdk.assertThrow
 import chat.tamtam.botsdk.client.ClientTest
 import chat.tamtam.botsdk.model.request.Subscription
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 
 class WebhookCommunicationTest : ClientTest() {
 
     @Test
     fun `check that will throw exception when create webhook with wrong type of params`() {
-        assertThrows<IllegalStateException>("Wrong startingParams, for webhook you must use WebhookStartingParams") {
+        assertThrow {
             webhook(LongPollingStartingParams("")) {
             }
         }
@@ -20,7 +20,7 @@ class WebhookCommunicationTest : ClientTest() {
 
     @Test
     fun `check that will throw exception when create webhook with empty BotToken`() {
-        assertThrows<IllegalStateException>("Bot token must is not empty") {
+        assertThrow {
             webhook(WebhookStartingParams("", subscription = Subscription(""))) {
             }
         }
@@ -28,7 +28,7 @@ class WebhookCommunicationTest : ClientTest() {
 
     @Test
     fun `check that will throw exception when create webhook with empty Subscription Url`() {
-        assertThrows<IllegalStateException>("Your url must is not empty") {
+        assertThrow {
             webhook(WebhookStartingParams("TEST", subscription = Subscription(""))) {
             }
         }
