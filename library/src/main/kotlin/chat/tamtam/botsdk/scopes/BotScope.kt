@@ -2,6 +2,7 @@ package chat.tamtam.botsdk.scopes
 
 import chat.tamtam.botsdk.client.HttpManager
 import chat.tamtam.botsdk.client.RequestsManager
+import chat.tamtam.botsdk.communications.StartingParams
 import chat.tamtam.botsdk.model.request.Subscription
 import chat.tamtam.botsdk.state.AddedBotState
 import chat.tamtam.botsdk.state.RemovedBotState
@@ -88,6 +89,15 @@ class BotScope internal constructor(
      */
     @Deprecated(level = DeprecationLevel.ERROR,
         message = "LongPolling communication can't be nested.")
-    fun longPolling(botToken: String, init: () -> Unit = {}) {
+    fun longPolling(startingParams: StartingParams, init: BotScope.() -> Unit) {
+    }
+
+    /**
+     * This method need only for simpler job with webhook.
+     * It removes the possibility create nested webhook scope
+     */
+    @Deprecated(level = DeprecationLevel.ERROR,
+        message = "Webhook communication can't be nested.")
+    fun webhook(startingParams: StartingParams, init: BotScope.() -> Unit) {
     }
 }

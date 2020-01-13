@@ -39,12 +39,12 @@ class UpdatesCoordinator internal constructor(
         val updatesList = updates.map()
 
         if (updatesList.updates.size > 1) {
-            coordinate(updatesList)
+            delegate.coordinate(updatesList)
             return
         }
 
         withContext(parallelScope.coroutineContext) {
-            coordinate(updatesList.updates[0])
+            delegate.coordinate(updatesList.updates[0])
         }
     }
 
@@ -63,22 +63,14 @@ class UpdatesCoordinator internal constructor(
         }
 
         if (parallelWorkWithUpdates) {
-            coordinateParallel(updates)
+            delegate.coordinateParallel(updates)
         } else {
-            coordinate(updates)
+            delegate.coordinate(updates)
         }
     }
 
     internal suspend fun coordinate(updatesList: UpdatesList) {
         delegate.coordinate(updatesList)
-    }
-
-    internal suspend fun coordinateParallel(updatesList: UpdatesList) {
-        delegate.coordinateParallel(updatesList)
-    }
-
-    internal suspend fun coordinate(update: Update) {
-        delegate.coordinate(update)
     }
 
     class DefaultUpdatesDelegate(
