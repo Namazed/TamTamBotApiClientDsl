@@ -21,8 +21,8 @@ val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
 val shadowJar: ShadowJar by tasks
 val test: Test by tasks
-val bintrayUser = "BINTRAY_USER"
-val bintrayKey = "BINTRAY_KEY"
+val bintrayUser = "bintray.user"
+val bintrayKey = "bintray.key"
 val artifactID = project.name
 val groupID = project.group as String
 val currentVersion = project.version as String
@@ -125,8 +125,8 @@ artifactory {
 }
 
 fun String.findProperty() = project.findProperty(this) as String?
-fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
-fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)
+fun String.findBintrayUser() = findProperty() ?: System.getenv(this)
+fun String.findBintrayKey() = findProperty() ?: System.getenv(this)
 
 bintray {
     user = bintrayUser.findBintrayUser()
