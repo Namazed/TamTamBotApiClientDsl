@@ -106,6 +106,24 @@ publishing {
     }
 }
 
+artifactory {
+    setContextUrl("https://oss.jfrog.org")
+    publish(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig> {
+        repository(delegateClosureOf<groovy.lang.GroovyObject> {
+            setProperty("repoKey", "oss-snapshot-local")
+            setProperty("username", bintrayUser.findBintrayUser())
+            setProperty("password", bintrayKey.findBintrayKey())
+            setProperty(publicationName, true)
+        })
+        defaults(delegateClosureOf<groovy.lang.GroovyObject> {
+            invokeMethod("publications", publicationName)
+            setProperty("publishArtifacts", true)
+            setProperty("publishPom", true)
+        })
+    })
+    clientConfig.info.buildNumber = System.getProperty("build.number")
+}
+
 fun String.findProperty() = project.findProperty(this) as String?
 fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
 fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)

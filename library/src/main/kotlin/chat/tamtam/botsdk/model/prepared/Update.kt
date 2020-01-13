@@ -78,7 +78,7 @@ class UpdateMessage(
 }
 
 /**
- * Specific update from [Updates] with type [UpdateType.MESSAGE_REMOVED]
+ * Specific update from [UpdatesList] with type [UpdateType.MESSAGE_REMOVED]
  *
  * @param timestamp - Unix-time when event has occured
  * @param messageId - this message id you will get if user removed
@@ -94,7 +94,7 @@ class UpdateMessageRemoved(
 }
 
 /**
- * Specific update from [Updates] with type [UpdateType.BOT_STARTED], [UpdateType.BOT_ADDED] or [UpdateType.BOT_REMOVED]
+ * Specific update from [UpdatesList] with type [UpdateType.BOT_STARTED], [UpdateType.BOT_ADDED] or [UpdateType.BOT_REMOVED]
  *
  * @param timestamp - Unix-time when event has occured
  * @param chatId - unique identifier of chat where bot started or added or removed
