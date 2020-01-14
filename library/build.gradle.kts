@@ -107,7 +107,7 @@ publishing {
 }
 
 artifactory {
-    setContextUrl("https://oss.jfrog.org")
+    setContextUrl("https://oss.jfrog.org/artifactory")
     publish(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig> {
         repository(delegateClosureOf<groovy.lang.GroovyObject> {
             setProperty("repoKey", "oss-snapshot-local")
