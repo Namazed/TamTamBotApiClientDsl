@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "com.namazed.botsdk"
-version = "0.3.0"
+version = "0.3.0${getSnapshotSuffix()}"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
@@ -125,6 +125,9 @@ artifactory {
 }
 
 fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this)
+fun String.findBoolProperty() = project.findProperty(this) as Boolean? ?: System.getenv(this) as Boolean
+
+fun getSnapshotSuffix(): String = if ("snapshot".findBoolProperty()) "-SNAPSHOT" else ""
 
 bintray {
     user = bintrayUser.findProperty()
