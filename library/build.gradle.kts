@@ -125,7 +125,7 @@ artifactory {
 }
 
 fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this)
-fun String.findBoolProperty() = project.findProperty(this) as Boolean? ?: System.getenv(this) as Boolean
+fun String.findBoolProperty() = (project.findProperty(this) ?: false) as Boolean
 
 fun getSnapshotSuffix(): String = if ("snapshot".findBoolProperty()) "-SNAPSHOT" else ""
 
