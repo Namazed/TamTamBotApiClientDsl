@@ -111,8 +111,8 @@ artifactory {
     publish(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig> {
         repository(delegateClosureOf<groovy.lang.GroovyObject> {
             setProperty("repoKey", "oss-snapshot-local")
-            setProperty("username", bintrayUser.findBintrayUser())
-            setProperty("password", bintrayKey.findBintrayKey())
+            setProperty("username", bintrayUser.findProperty())
+            setProperty("password", bintrayKey.findProperty())
             setProperty(publicationName, true)
         })
         defaults(delegateClosureOf<groovy.lang.GroovyObject> {
@@ -124,13 +124,11 @@ artifactory {
     clientConfig.info.buildNumber = System.getProperty("build.number")
 }
 
-fun String.findProperty() = project.findProperty(this) as String?
-fun String.findBintrayUser() = findProperty() ?: System.getenv(this)
-fun String.findBintrayKey() = findProperty() ?: System.getenv(this)
+fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this)
 
 bintray {
-    user = bintrayUser.findBintrayUser()
-    key = bintrayKey.findBintrayKey()
+    user = bintrayUser.findProperty()
+    key = bintrayKey.findProperty()
     publish = true
     setPublications(publicationName)
     with(pkg) {
