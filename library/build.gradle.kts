@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "com.namazed.botsdk"
-version = "0.3.0${getSnapshotSuffix()}"
+version = "0.3.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
@@ -25,7 +25,7 @@ val bintrayUser = "bintray.user"
 val bintrayKey = "bintray.key"
 val artifactID = project.name
 val groupID = project.group as String
-val currentVersion = project.version as String
+val currentVersion = "${project.version as String}${getSnapshotSuffix()}"
 val publicationName = "maven"
 
 dependencies {
