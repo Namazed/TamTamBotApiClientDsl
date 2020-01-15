@@ -121,14 +121,14 @@ artifactory {
             setProperty("publishPom", true)
         })
     })
-    clientConfig.info.buildNumber = System.getProperty("build.number")
+    clientConfig.info.buildNumber = "build.number".findProperty()
 }
 
 fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this)
 
 fun getSnapshotSuffix(): String {
-    return System.getenv("snapshot")?.let {
-        if (it.toBoolean()) "-SNAPSHOT" else ""
+    return project.findProperty("snapshot")?.let {
+        if (it as Boolean) "-SNAPSHOT" else ""
     } ?: ""
 }
 
