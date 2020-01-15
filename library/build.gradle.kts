@@ -101,7 +101,7 @@ publishing {
             version = currentVersion
             from(components["java"])
             shadow.component(this)
-//            artifact(dokkaJar)
+            artifact(dokkaJar)
         }
     }
 }
