@@ -100,7 +100,7 @@ publishing {
             groupId = groupID
             version = currentVersion
             from(components["java"])
-            shadow.component(this)
+            artifact(shadowJar)
             artifact(dokkaJar)
         }
     }
@@ -124,11 +124,11 @@ artifactory {
     clientConfig.info.buildNumber = "build.number".findProperty()
 }
 
-fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this)
+fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this) ?: System.getProperty(this)
 
 fun getSnapshotSuffix(): String {
-    return project.findProperty("snapshot")?.let {
-        if (it as Boolean) "-SNAPSHOT" else ""
+    return System.getProperty("snapshot")?.let {
+        if (it.toBoolean()) "-SNAPSHOT" else ""
     } ?: ""
 }
 
