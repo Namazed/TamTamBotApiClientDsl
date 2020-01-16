@@ -78,7 +78,7 @@ compileKotlin.kotlinOptions {
 
 shadowJar.apply {
     baseName = artifactID
-    classifier = "sources"
+    classifier = ""
 }
 
 dokka.apply {
