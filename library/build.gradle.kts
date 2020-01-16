@@ -1,5 +1,4 @@
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -19,7 +18,6 @@ version = "0.4.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
-val shadowJar: ShadowJar by tasks
 val test: Test by tasks
 val bintrayUser = "bintray.user"
 val bintrayKey = "bintray.key"
@@ -74,11 +72,6 @@ test.apply {
 
 compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
-}
-
-shadowJar.apply {
-    baseName = artifactID
-    classifier = ""
 }
 
 dokka.apply {
