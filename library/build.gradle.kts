@@ -99,7 +99,7 @@ publishing {
             artifactId = artifactID
             groupId = groupID
             version = currentVersion
-            artifact(shadowJar)
+            from(components["java"])
             artifact(dokkaJar)
         }
     }
