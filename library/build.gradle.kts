@@ -99,7 +99,7 @@ publishing {
             artifactId = artifactID
             groupId = groupID
             version = currentVersion
-            shadow.component(this)
+            artifact(shadowJar)
             artifact(dokkaJar)
         }
     }
