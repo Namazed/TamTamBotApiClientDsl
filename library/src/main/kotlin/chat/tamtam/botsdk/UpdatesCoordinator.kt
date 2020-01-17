@@ -11,6 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.slf4j.Logger
@@ -26,21 +27,14 @@ class UpdatesCoordinator internal constructor(
     private val delegate: UpdatesDelegate = DefaultUpdatesDelegate(botScope, parallelScope, log)
 ): Coordinator {
 
-    @UseExperimental(UnstableDefault::class)
     override fun coordinateAsync(jsonUpdates: String) {
         ioScope.launch {
             coordinateAsyncInternal(jsonUpdates)
         }
     }
 
-    @UseExperimental(UnstableDefault::class)
     internal suspend fun coordinateAsyncInternal(jsonUpdates: String) {
-        val updates: Updates = try {
-            log.debug(jsonUpdates)
-            Json.nonstrict.parse(Updates.serializer(), jsonUpdates)
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Wrong json, you need pass json with Updates class", e)
-        }
+        val updates: Updates = tryParseUpdates(jsonUpdates)
 
         if (updates.listUpdates.isEmpty()) {
             return
@@ -55,6 +49,17 @@ class UpdatesCoordinator internal constructor(
 
         withContext(parallelScope.coroutineContext) {
             delegate.coordinate(updatesList.updates[0])
+        }
+    }
+
+    @UseExperimental(UnstableDefault::class)
+    private fun tryParseUpdates(jsonUpdates: String): Updates = try {
+        Json.nonstrict.parse(Updates.serializer(), jsonUpdates)
+    } catch (e: SerializationException) {
+        try {
+            Updates(listOf(Json.nonstrict.parse(chat.tamtam.botsdk.model.response.Update.serializer(), jsonUpdates)))
+        } catch (e: SerializationException) {
+            throw IllegalArgumentException("Wrong json, you need pass json with Updates class", e)
         }
     }
 
