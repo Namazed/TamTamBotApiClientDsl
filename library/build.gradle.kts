@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.namazed.botsdk"
-version = "0.4.1"
+version = "0.4.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks

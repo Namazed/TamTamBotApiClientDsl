@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -19,15 +20,23 @@ import java.net.SocketTimeoutException
 class UpdatesCoordinator internal constructor(
     override val botScope: BotScope,
     private var marker: Long? = null,
+    private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     private val parallelScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val log: Logger = LoggerFactory.getLogger(UpdatesCoordinator::class.java.name),
     private val delegate: UpdatesDelegate = DefaultUpdatesDelegate(botScope, parallelScope, log)
 ): Coordinator {
 
     @UseExperimental(UnstableDefault::class)
-    override suspend fun coordinateAsync(jsonUpdates: String) {
+    override fun coordinateAsync(jsonUpdates: String) {
+        ioScope.launch {
+            coordinateAsyncInternal(jsonUpdates)
+        }
+    }
+
+    @UseExperimental(UnstableDefault::class)
+    internal suspend fun coordinateAsyncInternal(jsonUpdates: String) {
         val updates: Updates = try {
-            Json.parse(Updates.serializer(), jsonUpdates)
+            Json.nonstrict.parse(Updates.serializer(), jsonUpdates)
         } catch (e: Exception) {
             throw IllegalArgumentException("Wrong json, you need pass json with Updates class", e)
         }

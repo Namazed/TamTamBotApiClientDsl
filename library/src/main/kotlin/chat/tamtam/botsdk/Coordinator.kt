@@ -6,5 +6,5 @@ interface Coordinator {
 
     val botScope: BotScope
 
-    suspend fun coordinateAsync(jsonUpdates: String)
+    fun coordinateAsync(jsonUpdates: String)
 }

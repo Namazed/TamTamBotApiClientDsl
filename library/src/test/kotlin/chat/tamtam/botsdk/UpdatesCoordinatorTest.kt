@@ -28,14 +28,15 @@ class UpdatesCoordinatorTest {
     @Test
     fun `check that coordinator for webhook updates throw exception when pass wrong json`() {
         assertThrows<IllegalArgumentException>("Wrong threw exception, should throw IllegalArgumentException") {
-            runBlocking { coordinator.coordinateAsync("/json/answer.json".getJson()) }
+            runBlocking { coordinator.coordinateAsyncInternal("/json/answer.json".getJson()) }
         }
     }
 
     @Test
     fun `check that coordinator for webhook updates early return when work with empty list`() {
         var coordinateCallsCount = 0
-        val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),
+        val stubScope = CoroutineScope(Dispatchers.Unconfined)
+        val updatesCoordinator = UpdatesCoordinator(botScope, ioScope = stubScope, parallelScope = stubScope,
             delegate = object : UpdatesDelegate {
                 override suspend fun coordinate(updatesList: UpdatesList) {
                     coordinateCallsCount++
@@ -50,9 +51,9 @@ class UpdatesCoordinatorTest {
                 }
             })
         runBlocking {
-            updatesCoordinator.coordinateAsync("/json/update_empty.json".getJson())
+            updatesCoordinator.coordinateAsyncInternal("/json/update_empty.json".getJson())
+            assert(coordinateCallsCount == 0) { "The coordinator didn't early return" }
         }
-        assert(coordinateCallsCount == 0) { "The coordinator didn't early return" }
     }
 
     @Test
@@ -71,7 +72,7 @@ class UpdatesCoordinatorTest {
                 }
             })
         runBlocking {
-            updatesCoordinator.coordinateAsync("/json/update_callback.json".getJson())
+            updatesCoordinator.coordinateAsyncInternal("/json/update_callback.json".getJson())
             assert(coordinateCallsCount == 1) { "The coordinator didn't call right method for process update" }
         }
     }
@@ -92,7 +93,7 @@ class UpdatesCoordinatorTest {
                 }
             })
         runBlocking {
-            updatesCoordinator.coordinateAsync("/json/updates.json".getJson())
+            updatesCoordinator.coordinateAsyncInternal("/json/updates.json".getJson())
             assert(coordinateCallsCount == 1) { "The coordinator didn't call right method for process update" }
         }
     }

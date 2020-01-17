@@ -3,7 +3,6 @@ package chat.tamtam.botsdk.client.retrofit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,7 +16,7 @@ internal object RetrofitFactory {
     fun createRetrofit(url: String? = null, httpLogsEnabled: Boolean = false): Retrofit {
         val contentType = MediaType.get("application/json")
         return Retrofit.Builder()
-            .addConverterFactory(Json(JsonConfiguration(strictMode = false)).asConverterFactory(contentType))
+            .addConverterFactory(Json.nonstrict.asConverterFactory(contentType))
             .baseUrl(url ?: BASE_URL)
             .client(createOkHttpClient(httpLogsEnabled))
             .build()
