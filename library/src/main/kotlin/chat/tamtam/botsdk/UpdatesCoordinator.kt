@@ -36,6 +36,7 @@ class UpdatesCoordinator internal constructor(
     @UseExperimental(UnstableDefault::class)
     internal suspend fun coordinateAsyncInternal(jsonUpdates: String) {
         val updates: Updates = try {
+            log.debug(jsonUpdates)
             Json.nonstrict.parse(Updates.serializer(), jsonUpdates)
         } catch (e: Exception) {
             throw IllegalArgumentException("Wrong json, you need pass json with Updates class", e)
