@@ -78,6 +78,27 @@ class UpdatesCoordinatorTest {
     }
 
     @Test
+    fun `check that coordinator for webhook updates call coordinate method for one update if json without array`() {
+        var coordinateCallsCount = 0
+        val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),
+            delegate = object : UpdatesDelegate {
+                override suspend fun coordinate(updatesList: UpdatesList) {
+                }
+
+                override suspend fun coordinate(update: chat.tamtam.botsdk.model.prepared.Update) {
+                    coordinateCallsCount++
+                }
+
+                override suspend fun coordinateParallel(updatesList: UpdatesList) {
+                }
+            })
+        runBlocking {
+            updatesCoordinator.coordinateAsyncInternal("/json/single_update_without_array.json".getJson())
+            assert(coordinateCallsCount == 1) { "The coordinator didn't call right method for process update" }
+        }
+    }
+
+    @Test
     fun `check that coordinator for webhook updates call coordinate method for few updates`() {
         var coordinateCallsCount = 0
         val updatesCoordinator = UpdatesCoordinator(botScope, parallelScope = CoroutineScope(Dispatchers.Unconfined),

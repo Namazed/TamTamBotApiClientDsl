@@ -1,0 +1,46 @@
+{
+  "update_type": "message_callback",
+  "timestamp": 101,
+  "callback": {
+    "timestamp": 101,
+    "callback_id": "test_callback_id",
+    "payload": "payload",
+    "user": {
+      "user_id": 17,
+      "name": "Felix",
+      "username": "NotFelix"
+    }
+  },
+  "message": {
+    "sender": {
+      "user_id": 17,
+      "name": "Felix",
+      "username": "NotFelix"
+    },
+    "recipient": {
+      "chat_id": 18,
+      "chat_type": "dialog",
+      "user_id": 17
+    },
+    "timestamp": 10,
+    "body": {
+      "mid": "test_id",
+      "seq": 8,
+      "text": "test_text",
+      "attachments": [
+        {
+          "type": "location",
+          "latitude": 10.10,
+          "longitude": 10.15
+        },
+        {
+          "type": "image",
+          "payload": {
+            "photo_id": 1,
+            "url": "test_url"
+          }
+        }
+      ]
+    }
+  }
+}
