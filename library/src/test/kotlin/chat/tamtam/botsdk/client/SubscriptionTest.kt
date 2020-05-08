@@ -2,7 +2,7 @@ package chat.tamtam.botsdk.client
 
 import chat.tamtam.botsdk.model.response.UpdateType
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import retrofit2.HttpException
 
@@ -18,7 +18,7 @@ class SubscriptionTest : ClientTest() {
     }
 
     @Test
-    fun `check right behavior and serialization when get update with 404 status`() = runBlocking {
+    fun `check right behavior and serialization when get update with 404 status`() {
         mockServer.mockHttpResponse("/json/error.json", 404)
         val updates = assertThrows<HttpException> {
             runBlocking { httpManager.getUpdates(null) }

@@ -1,6 +1,7 @@
 package chat.tamtam.botsdk.communications
 
-import chat.tamtam.botsdk.UpdatesHandler
+import chat.tamtam.botsdk.Coordinator
+import chat.tamtam.botsdk.UpdatesCoordinator
 import chat.tamtam.botsdk.client.HttpManager
 import chat.tamtam.botsdk.scopes.BotScope
 import kotlinx.coroutines.CoroutineScope
@@ -14,32 +15,33 @@ import java.util.concurrent.Executors
 
 class LongPollingCommunication(
     val botToken: String,
-    private val longPollingCoroutineScope: CoroutineScope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher()),
+    private val longPollingCoroutinesScope: CoroutineScope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher()),
     val log: Logger = LoggerFactory.getLogger(LongPollingCommunication::class.java.name)
 ) : Communication {
 
-    override fun start(botScope: BotScope, startingParams: StartingParams) {
+    override fun start(botScope: BotScope, startingParams: StartingParams): Coordinator {
         check(startingParams is LongPollingStartingParams) {
             "Wrong startingParams, for longPolling you must use LongPollingStartingParams"
         }
-        val updateParsing = UpdatesHandler(botScope)
+        val coordinator = UpdatesCoordinator(botScope)
         if (startingParams.async) {
-            runAsync(updateParsing, startingParams.parallelWorkWithUpdates)
+            runAsync(coordinator, startingParams.parallelWorkWithUpdates)
         } else {
-            run(updateParsing, startingParams.parallelWorkWithUpdates)
+            run(coordinator, startingParams.parallelWorkWithUpdates)
         }
+        return coordinator
     }
 
-    private fun runAsync(updatesHandler: UpdatesHandler, parallelWorkWithUpdates: Boolean) =
-        longPollingCoroutineScope.launch {
+    private fun runAsync(coordinator: UpdatesCoordinator, parallelWorkWithUpdates: Boolean) =
+        longPollingCoroutinesScope.launch {
             while (isActive) {
-                updatesHandler.run(parallelWorkWithUpdates)
+                coordinator.run(parallelWorkWithUpdates)
             }
         }
 
-    private fun run(updatesHandler: UpdatesHandler, parallelWorkWithUpdates: Boolean) = runBlocking {
+    private fun run(coordinator: UpdatesCoordinator, parallelWorkWithUpdates: Boolean) = runBlocking {
         while (isActive) {
-            updatesHandler.run(parallelWorkWithUpdates)
+            coordinator.run(parallelWorkWithUpdates)
         }
     }
 
@@ -49,23 +51,22 @@ class LongPollingCommunication(
  * This class need for start longPolling for your bot.
  */
 object longPolling {
-    operator fun invoke(startingParams: StartingParams, init: BotScope.() -> Unit): BotScope {
+    operator fun invoke(startingParams: StartingParams, init: BotScope.() -> Unit): Coordinator {
         check(startingParams.botToken.isNotEmpty()) { "Bot token must is not empty" }
         val longPollingCommunication = LongPollingCommunication(startingParams.botToken)
         val botHttpManager = HttpManager(longPollingCommunication.botToken, startingParams.httpLogsEnabled)
-        return longPollingCommunication.init(botHttpManager, longPollingCommunication.log, startingParams, init)
+        return longPollingCommunication.init(botHttpManager, startingParams, longPollingCommunication.log, init)
     }
 }
 
 private fun Communication.init(
     botHttpManager: HttpManager,
-    log: Logger, startingParams:
-    StartingParams,
+    startingParams: StartingParams,
+    log: Logger,
     init: BotScope.() -> Unit
-): BotScope {
+): Coordinator {
     log.info("Long polling bot starting")
     val scope = BotScope(botHttpManager)
     scope.init()
-    start(scope, startingParams)
-    return scope
+    return start(scope, startingParams)
 }

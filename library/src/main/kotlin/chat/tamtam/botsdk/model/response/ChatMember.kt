@@ -40,7 +40,7 @@ class ChatMembersResult(
  *                      Permissions in chat if member is admin. null otherwise
  */
 @Serializable
-class ChatMember(
+data class ChatMember(
     @SerialName("user_id") val userId: Long = -1,
     val name: String = "",
     val username: String = "",

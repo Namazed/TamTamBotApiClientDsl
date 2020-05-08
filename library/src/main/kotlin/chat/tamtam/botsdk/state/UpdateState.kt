@@ -18,7 +18,7 @@ sealed class UpdateState
  * @param chatId - chat id where User started your bot
  * @param user - user who started bot
  */
-class StartedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
+data class StartedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
 
 /**
  * This class created when your bot added to chat
@@ -26,7 +26,7 @@ class StartedBotState(val timestamp: Long, val chatId: ChatId, val user: User) :
  * @param chatId - chat id where your bot added
  * @param user - user who added your bot to chat
  */
-class AddedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
+data class AddedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
 
 /**
  * This class created when your bot removed from chat
@@ -34,7 +34,7 @@ class AddedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : U
  * @param chatId - chat identifier bot removed from
  * @param user - user who removed bot from chat
  */
-class RemovedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
+data class RemovedBotState(val timestamp: Long, val chatId: ChatId, val user: User) : UpdateState()
 
 /**
  * This class created when User added to chat
@@ -43,7 +43,7 @@ class RemovedBotState(val timestamp: Long, val chatId: ChatId, val user: User) :
  * @param user - user who added to chat
  * @param inviterId - inviter id who added user to chat
  */
-class AddedUserState(val timestamp: Long, val chatId: ChatId, val user: User, val inviterId: UserId) : UpdateState()
+data class AddedUserState(val timestamp: Long, val chatId: ChatId, val user: User, val inviterId: UserId) : UpdateState()
 
 /**
  * This class created when User removed from chat
@@ -52,7 +52,7 @@ class AddedUserState(val timestamp: Long, val chatId: ChatId, val user: User, va
  * @param user - removed user
  * @param adminId - admin id who removed user
  */
-class RemovedUserState(val timestamp: Long, val chatId: ChatId, val user: User, val adminId: UserId) : UpdateState()
+data class RemovedUserState(val timestamp: Long, val chatId: ChatId, val user: User, val adminId: UserId) : UpdateState()
 
 /**
  * This class created when somebody clicked on [chat.tamtam.botsdk.model.Button] [chat.tamtam.botsdk.model.ButtonType.CALLBACK]
@@ -60,18 +60,18 @@ class RemovedUserState(val timestamp: Long, val chatId: ChatId, val user: User, 
  * @param callback - class [Callback] which contains all needed information about click action
  * @param message - class [Message] which contains keyboard, must be null
  */
-class CallbackState(val timestamp: Long, val callback: Callback, val message: Message?) : UpdateState()
+data class CallbackState(val timestamp: Long, val callback: Callback, val message: Message?) : UpdateState()
 
 /**
  * This class created when somebody send message for your bot in chat
  * @param timestamp - unix time when message created
  * @param message - class [Message] which contains all needed information about created message and who created it
  */
-class MessageState(val timestamp: Long, val message: Message) : UpdateState()
+data class MessageState(val timestamp: Long, val message: Message) : UpdateState()
 
 /**
  * This class created when somebody sent message with command
  * @param timestamp - unix time when command sent
  * @param command - class [Command] which contains all needed information about command name and message which contains this command
  */
-class CommandState(val timestamp: Long, val command: Command) : UpdateState()
+data class CommandState(val timestamp: Long, val command: Command) : UpdateState()

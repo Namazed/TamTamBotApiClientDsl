@@ -1,6 +1,6 @@
 package chat.tamtam.botsdk.model
 
-import chat.tamtam.botsdk.UpdatesHandler
+import chat.tamtam.botsdk.UpdatesCoordinator
 import chat.tamtam.botsdk.model.prepared.Message
 import chat.tamtam.botsdk.model.response.ChatType
 
@@ -22,7 +22,7 @@ private val BOTS_COMMAND_WITH_ARG_PATTERN_FOR_CHAT = Regex("($PROFILE_TAG_PATTER
  * @param timestamp - time when update created
  * @param message - this message contains in update, which handle when user created message, which contains command.
  */
-class Command(
+data class Command(
     val name: String,
     val argument: String,
     val timestamp: Long = -1,
@@ -32,7 +32,7 @@ class Command(
 /**
  * Map String with Update to Command.
  * @receiver - command name, may has some arguments
- * @param - this update handle in [UpdatesHandler], when user send command for bot.
+ * @param - this update handle in [UpdatesCoordinator], when user send command for bot.
  */
 fun String.toCommand(message: Message, timestamp: Long) = Command(getCommandName(message.recipient.chatType),
     message.body.text.getCommandArgument(message.recipient.chatType), timestamp, message)

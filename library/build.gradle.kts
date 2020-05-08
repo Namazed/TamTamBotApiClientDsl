@@ -1,5 +1,4 @@
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -15,23 +14,22 @@ plugins {
 }
 
 group = "com.namazed.botsdk"
-version = "0.3.0"
+version = "0.4.0"
 
 val compileKotlin: KotlinCompile by tasks
 val dokka: DokkaTask by tasks
-val shadowJar: ShadowJar by tasks
 val test: Test by tasks
-val bintrayUser = "BINTRAY_USER"
-val bintrayKey = "BINTRAY_KEY"
+val bintrayUser = "bintray.user"
+val bintrayKey = "bintray.key"
 val artifactID = project.name
 val groupID = project.group as String
-val currentVersion = project.version as String
+val currentVersion = "${project.version as String}${getSnapshotSuffix()}"
 val publicationName = "maven"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("ch.qos.logback:logback-classic:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
@@ -76,11 +74,6 @@ compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
-shadowJar.apply {
-    baseName = artifactID
-    classifier = ""
-}
-
 dokka.apply {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
@@ -100,19 +93,40 @@ publishing {
             groupId = groupID
             version = currentVersion
             from(components["java"])
-            artifact(shadowJar)
             artifact(dokkaJar)
         }
     }
 }
 
-fun String.findProperty() = project.findProperty(this) as String?
-fun String.findBintrayUser() = "bintrayUser".findProperty() ?: System.getenv(this)
-fun String.findBintrayKey() = "bintrayKey".findProperty() ?: System.getenv(this)
+artifactory {
+    setContextUrl("https://oss.jfrog.org/artifactory")
+    publish(delegateClosureOf<org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig> {
+        repository(delegateClosureOf<groovy.lang.GroovyObject> {
+            setProperty("repoKey", "oss-snapshot-local")
+            setProperty("username", bintrayUser.findProperty())
+            setProperty("password", bintrayKey.findProperty())
+            setProperty(publicationName, true)
+        })
+        defaults(delegateClosureOf<groovy.lang.GroovyObject> {
+            invokeMethod("publications", publicationName)
+            setProperty("publishArtifacts", true)
+            setProperty("publishPom", true)
+        })
+    })
+    clientConfig.info.buildNumber = "build.number".findProperty()
+}
+
+fun String.findProperty() = project.findProperty(this) as String? ?: System.getenv(this) ?: System.getProperty(this)
+
+fun getSnapshotSuffix(): String {
+    return System.getProperty("snapshot")?.let {
+        if (it.toBoolean()) "-SNAPSHOT" else ""
+    } ?: ""
+}
 
 bintray {
-    user = bintrayUser.findBintrayUser()
-    key = bintrayKey.findBintrayKey()
+    user = bintrayUser.findProperty()
+    key = bintrayKey.findProperty()
     publish = true
     setPublications(publicationName)
     with(pkg) {

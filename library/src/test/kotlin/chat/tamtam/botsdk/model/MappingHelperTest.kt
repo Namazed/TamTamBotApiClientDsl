@@ -26,19 +26,9 @@ import chat.tamtam.botsdk.model.response.Recipient
 import chat.tamtam.botsdk.model.response.SendMessage
 import chat.tamtam.botsdk.model.response.Status
 import chat.tamtam.botsdk.model.response.User
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class MappingHelperTest {
-
-    @BeforeEach
-    fun setUp() {
-    }
-
-    @AfterEach
-    fun tearDown() {
-    }
 
     private fun <Value, PreparedValue> getAssertString(
         start: String,

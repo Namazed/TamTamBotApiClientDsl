@@ -12,7 +12,7 @@ class MessagesScope internal constructor(
 ) : Scope {
 
     /**
-     * This method save action which call when [chat.tamtam.botsdk.UpdatesHandler] process new message.
+     * This method save action which call when [chat.tamtam.botsdk.UpdatesCoordinator] process new message.
      *
      * @param answer - all actions in this lambda is async.
      */

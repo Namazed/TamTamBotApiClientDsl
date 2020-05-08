@@ -11,8 +11,10 @@ import kotlinx.serialization.Serializable
  * @param version - Version of API
  */
 @Serializable
-class Subscription(
+data class Subscription(
     val url: String,
     @SerialName("update_types") val updateTypes: List<String>? = null,
     val version: String? = null
 )
+
+internal fun Subscription.isEmpty(): Boolean = this.url.isEmpty()

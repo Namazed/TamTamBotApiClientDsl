@@ -28,7 +28,7 @@ import kotlinx.serialization.withName
  * @param description - chat description
  */
 @Serializable
-class Chat(
+data class Chat(
     @SerialName("chat_id") val chatId: Long,
     @Serializable(ChatTypeSerializer::class) val type: ChatType,
     @Serializable(ChatStatusSerializer::class) val status: Status,

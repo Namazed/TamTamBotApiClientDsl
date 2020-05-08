@@ -11,7 +11,7 @@ import chat.tamtam.botsdk.model.request.AttachmentKeyboard
 import chat.tamtam.botsdk.model.response.ChatType
 import chat.tamtam.botsdk.model.response.Messages
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import chat.tamtam.botsdk.model.request.SendMessage as RequestSendMessage
 import chat.tamtam.botsdk.model.response.SendMessage as ResponseSendMessage
 
@@ -21,15 +21,16 @@ class MessageTest : ClientTest() {
     fun `check right behavior and serialization when send message to chat`() {
         runBlocking {
             mockServer.mockHttpResponse("/json/message.json", 200)
-            val result = httpManager.messageHttpManager.sendMessage(ChatId(101L), RequestSendMessage("text"))
-            when (result) {
+            when (val result = httpManager.messageHttpManager.sendMessage(ChatId(101L), RequestSendMessage("text"))) {
                 is Success<ResponseSendMessage> -> {
                     result.response.apply {
                         assert(message.recipient.chatId == 18L)
                         assert(message.messageInfo.messageId == "test_id")
                     }
                 }
-                else -> {}
+                is Failure<ResponseSendMessage> -> {
+                    throw AssertionError("Test finished with Success, but expected is Failure")
+                }
             }
         }
     }
@@ -65,7 +66,9 @@ class MessageTest : ClientTest() {
             mockServer.mockHttpResponse("/json/error.json", 400)
             val result = httpManager.messageHttpManager.sendMessage(ChatId(101L), RequestSendMessage("text"))
             when (result) {
-                is Success<ResponseSendMessage> -> {}
+                is Success<ResponseSendMessage> -> {
+                    throw AssertionError("Test finished with Success, but expected is Failure")
+                }
                 is Failure<ResponseSendMessage> -> {
                     result.response.apply {
                         assert(errorBody() != null)
@@ -93,7 +96,9 @@ class MessageTest : ClientTest() {
                         assert(message.messageInfo.attachments[1].payload.photoId == 1L)
                     }
                 }
-                is Failure<Messages> -> {}
+                is Failure<Messages> -> {
+                    throw AssertionError("Test finished with Failure, but expected is Success")
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package chat.tamtam.botsdk.scopes
 
-import chat.tamtam.botsdk.client.PreparedAnswer
 import chat.tamtam.botsdk.client.RequestsManager
 import chat.tamtam.botsdk.client.ResultRequest
 import chat.tamtam.botsdk.model.AttachType
@@ -17,6 +16,7 @@ import chat.tamtam.botsdk.model.request.EMPTY_INLINE_KEYBOARD
 import chat.tamtam.botsdk.model.request.InlineKeyboard
 import chat.tamtam.botsdk.model.request.LinkOnMessage
 import chat.tamtam.botsdk.model.request.ReusableMediaParams
+import chat.tamtam.botsdk.model.request.PreparedAnswer
 import chat.tamtam.botsdk.model.request.SendParams
 import chat.tamtam.botsdk.model.request.UploadParams
 import chat.tamtam.botsdk.model.request.UploadType
