@@ -130,8 +130,8 @@ bintray {
     publish = true
     setPublications(publicationName)
     with(pkg) {
-        repo = publicationName
-        name = artifactID
+        repo = "tamtam_bot_dsl_client"
+        name = "botsdk"
         userOrg = "namazed"
         vcsUrl = "https://github.com/Namazed/TamTamBotApiClientDsl.git"
         desc = "Kotlin DSL client for TamTamBotApi"
