@@ -1,9 +1,10 @@
-[![](https://jitpack.io/v/Namazed/TamTamBotApiClientDsl.svg)](https://jitpack.io/#Namazed/TamTamBotApiClientDsl)
+[![GitHub license](https://img.shields.io/github/license/Namazed/TamTamBotApiClientDsl)](https://github.com/Namazed/TamTamBotApiClientDsl/blob/master/LICENSE)
+[ ![Download](https://api.bintray.com/packages/namazed/tamtam_bot_dsl_client/botsdk/images/download.svg)](https://bintray.com/namazed/tamtam_bot_dsl_client/botsdk/link)
 # TamTamBotApiClientDsl
 
 Kotlin DSL for TamTam Bot API. Using this library you can simplify working with the Bot API. 
 What this library helps with:
-* Subscribes to updates using LongPolling (WebHook will be later)
+* Subscribes to updates using LongPolling or WebHook
 * Coordinates updates to specific areas of responsibility that you describe. All updates are processed in parallel.
 * Handles commands
 * Provides a convenient interface for working with requests to the Bot API
@@ -14,7 +15,7 @@ The bot API documentation is [here](https://dev.tamtam.chat).
 
 You should build your project with JDK 8.
 
-To access the library, you must add the dependency on ```jitpack``` and ```kotlinx```
+To access the library, you must add the dependency on ```kotlinx```
 
 ### Gradle
 ```groovy
@@ -22,7 +23,6 @@ allprojects {
 	repositories {
 		...
 		maven { url 'https://dl.bintray.com/kotlin/kotlinx' }
-		maven { url 'https://jitpack.io' }
 	}
 }
 ```
@@ -33,10 +33,6 @@ allprojects {
 	    <id>kotlinx</id>
 	    <url>https://dl.bintray.com/kotlin/kotlinx</url>
 	</repository>
-	<repository>
-	    <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
-	</repository>
 </repositories>
 ```
 You must also add a dependency.
@@ -44,15 +40,16 @@ You must also add a dependency.
 ### Gradle
 ```groovy
 dependencies {
-    implementation 'com.github.Namazed:TamTamBotApiClientDsl:0.3.0'
+    implementation "com.namazed.botsdk:library:0.4.0"
 }
 ```
 ### Maven
 ```xml
 <dependency>
-	 <groupId>com.github.Namazed</groupId>
-	 <artifactId>TamTamBotApiClientDsl</artifactId>
-	 <version>0.3.0</version>
+	 <groupId>com.namazed.botsdk</groupId>
+	 <artifactId>library</artifactId>
+	 <version>0.4.0</version>
+	<type>pom</type>
 </dependency>
 ```
 
@@ -93,7 +90,15 @@ fun main() {
   }
 }
 ```
-All other methods are called from longPolling scope (lambda).
+If you want use webhook:
+```kotlin
+val coordinator: Coordinator = webhook(WebhookStartingParams("BOT_TOKEN", subscription = Subscription(url = "https://your_url"))) {
+
+}
+// then you can call coordinator where you want and pass your json like String
+coordinator.coordinateAsync(yourJson)
+```
+All other methods are called from longPolling scope or webhook scope (lambda).
 In order to subscribe to the launch of the bot, just call the method:
 ```kotlin
 onStartBot { startedBotState ->
